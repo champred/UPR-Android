@@ -1,1 +1,1 @@
-include ':app', ':universal-pokemon-randomizer'
+include ':app', ':upr'
