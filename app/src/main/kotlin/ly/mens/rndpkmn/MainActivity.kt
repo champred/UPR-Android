@@ -28,10 +28,6 @@ private val romHandlerFactories = listOf(
         Gen5RomHandler.Factory())
 
 class MainActivity : AppCompatActivity() {
-    private var saveDir: File? = null
-    private var romHandler: RomHandler? = null
-    private val ui by lazy { MainActivityUI() }
-    var loading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         if (BuildConfig.DEBUG) {
             testForRequiredConfigs()
         }
-        ui.setContentView(this)
+        MainActivityUI().setContentView(this)
         checkPermission()
     }
 
@@ -64,48 +60,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loadRom(romPath: String) {
-        val handler = romHandlerFactories.firstOrNull { it.isLoadable(romPath) }?.create(random)
+        val handler = romHandlerFactories.firstOrNull { it.isLoadable(romPath) }
         if (handler == null) {
+
             longToast(error_invalid_rom, romPath)
             return
         }
-        loading = true
-        doAsync {
-            handler.loadRom(romPath)
-            runOnUiThread {
-                saveDir = File(romPath).parentFile
-                romHandler = handler
-                loading = false
-                toast(rom_loaded, handler.romName)
-            }
-        }
-    }
-
-    fun saveRom() {
-        // TODO: Move this to separate activity with randomization options
-        val saveDir = this.saveDir
-        if (saveDir == null) {
-            toast(noromloaded)
-            return
-        }
-        doAsync {
-            romHandler?.apply {
-                randomizeFieldItems(true)
-                if (canChangeStaticPokemon()) {
-                    randomizeStaticPokemon(true)
-                }
-                if (canChangeStarters()) {
-                    starters = List(3) { random2EvosPokemon() }
-                }
-                area1to1Encounters(false, true, false, false, false)
-                // TODO: Allow choosing file name and output directory
-                val output = File(saveDir, "$romName Random.$defaultExtension").canonicalPath
-                saveRom(output)
-                runOnUiThread {
-                    toast(rom_saved, output)
-                }
-            }
-        }
+        startActivity<RandomizerActivity>(
+                RandomizerActivity.FILE_PATH to romPath,
+                RandomizerActivity.HANDLER_FACTORY to handler.javaClass.name
+        )
     }
 }
 
@@ -115,18 +79,12 @@ class MainActivityUI: AnkoComponent<MainActivity> {
             val romsDir = editText(defaultDir)
             button(openrombutton) {
                 onClick {
-                    if (owner.loading) { return@onClick }
                     owner.listRoms(File(romsDir.text.toString()))?.apply {
                         selector(ctx.getString(openrombutton),
                                 map(File::nameWithoutExtension)) { _, index ->
                             owner.loadRom(get(index).absolutePath)
                         }
                     }
-                }
-            }
-            button(saverombutton) {
-                onClick {
-                    owner.saveRom()
                 }
             }
         }
