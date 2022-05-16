@@ -1,11 +1,10 @@
 package ly.mens.rndpkmn
 
 import android.content.Context
-import android.support.annotation.StringRes
+import android.widget.Toast
+import androidx.annotation.StringRes
 import com.dabomstew.pkrandom.RandomSource
 import com.dabomstew.pkrandom.Utils
-import org.jetbrains.anko.longToast
-import org.jetbrains.anko.toast
 import java.io.File
 
 val File.isRomFile: Boolean get() {
@@ -22,6 +21,6 @@ val File.isRomFile: Boolean get() {
 val random get() = RandomSource.instance()
 
 fun Context.toast(@StringRes resId: Int, vararg formatArgs: Any) =
-        toast(getString(resId, *formatArgs))
+        Toast.makeText(this, getString(resId, *formatArgs), Toast.LENGTH_SHORT)
 fun Context.longToast(@StringRes resId: Int, vararg formatArgs: Any) =
-        longToast(getString(resId, *formatArgs))
+        Toast.makeText(this, getString(resId, *formatArgs), Toast.LENGTH_LONG)

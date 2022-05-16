@@ -4,14 +4,14 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.dabomstew.pkrandom.Settings
 import com.dabomstew.pkrandom.Utils.testForRequiredConfigs
 import com.dabomstew.pkrandom.romhandlers.*
-import ly.mens.rndpkmn.R.string.*
-import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import java.io.File
 
 private val defaultDir by lazy {
@@ -30,8 +30,8 @@ private val romHandlerFactories = listOf(
 class MainActivity : AppCompatActivity() {
     private var saveDir: File? = null
     private var romHandler: RomHandler? = null
-    private val ui by lazy { MainActivityUI() }
     var loading = false
+    private lateinit var settings: Settings
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         if (BuildConfig.DEBUG) {
             testForRequiredConfigs()
         }
-        ui.setContentView(this)
         checkPermission()
     }
 
@@ -53,12 +52,12 @@ class MainActivity : AppCompatActivity() {
 
     fun listRoms(directory: File): List<File>? {
         if (!directory.exists() || !directory.isDirectory) {
-            toast(error_invalid_dir)
+            toast(R.string.error_invalid_dir)
             return null
         }
         val files = directory.listFiles(File::isRomFile)
         if (files.isEmpty()) {
-            longToast(error_no_roms, directory)
+            longToast(R.string.error_no_roms, directory)
         }
         return files.toList()
     }
@@ -66,17 +65,17 @@ class MainActivity : AppCompatActivity() {
     fun loadRom(romPath: String) {
         val handler = romHandlerFactories.firstOrNull { it.isLoadable(romPath) }?.create(random)
         if (handler == null) {
-            longToast(error_invalid_rom, romPath)
+            longToast(R.string.error_invalid_rom, romPath)
             return
         }
         loading = true
-        doAsync {
+        GlobalScope.async {
             handler.loadRom(romPath)
             runOnUiThread {
                 saveDir = File(romPath).parentFile
                 romHandler = handler
                 loading = false
-                toast(rom_loaded, handler.romName)
+                toast(R.string.rom_loaded, handler.romName)
             }
         }
     }
@@ -85,50 +84,24 @@ class MainActivity : AppCompatActivity() {
         // TODO: Move this to separate activity with randomization options
         val saveDir = this.saveDir
         if (saveDir == null) {
-            toast(noromloaded)
+            toast(R.string.noromloaded)
             return
         }
-        doAsync {
+        GlobalScope.async {
             romHandler?.apply {
-                randomizeFieldItems(true)
+                randomizeFieldItems(settings)
                 if (canChangeStaticPokemon()) {
-                    randomizeStaticPokemon(true)
+                    randomizeStaticPokemon(settings)
+                    randomizeBasicTwoEvosStarters(settings)
                 }
-                if (canChangeStarters()) {
-                    starters = List(3) { random2EvosPokemon() }
-                }
-                area1to1Encounters(false, true, false, false, false)
+                area1to1Encounters(settings)
                 // TODO: Allow choosing file name and output directory
                 val output = File(saveDir, "$romName Random.$defaultExtension").canonicalPath
-                saveRom(output)
+                saveRom()
                 runOnUiThread {
-                    toast(rom_saved, output)
+                    toast(R.string.rom_saved, output)
                 }
             }
         }
     }
-}
-
-class MainActivityUI: AnkoComponent<MainActivity> {
-    override fun createView(ui: AnkoContext<MainActivity>) = ui.apply {
-        verticalLayout {
-            val romsDir = editText(defaultDir)
-            button(openrombutton) {
-                onClick {
-                    if (owner.loading) { return@onClick }
-                    owner.listRoms(File(romsDir.text.toString()))?.apply {
-                        selector(ctx.getString(openrombutton),
-                                map(File::nameWithoutExtension)) { _, index ->
-                            owner.loadRom(get(index).absolutePath)
-                        }
-                    }
-                }
-            }
-            button(saverombutton) {
-                onClick {
-                    owner.saveRom()
-                }
-            }
-        }
-    }.view
 }
