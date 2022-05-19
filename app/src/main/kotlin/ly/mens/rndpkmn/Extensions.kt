@@ -1,16 +1,17 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package ly.mens.rndpkmn
 
 import android.content.Context
-import android.support.annotation.StringRes
-import android.view.ViewManager
+import android.widget.Toast
+import androidx.annotation.StringRes
 import com.dabomstew.pkrandom.RandomSource
 import com.dabomstew.pkrandom.Utils
-import org.jetbrains.anko.longToast
-import org.jetbrains.anko.radioButton
-import org.jetbrains.anko.toast
 import java.io.File
+import java.lang.reflect.Field
+
+val Field.id get() = name.replaceFirstChar { it.uppercase() }
+val Enum<*>.id get() = name.split("_").joinToString("") {
+    it.replaceRange(1 until it.length, it.substring(1).lowercase())
+}
 
 val File.isRomFile: Boolean get() {
     if (!isFile) { return false }
@@ -26,15 +27,6 @@ val File.isRomFile: Boolean get() {
 val random get() = RandomSource.instance()
 
 fun Context.toast(@StringRes resId: Int, vararg formatArgs: Any) =
-        toast(getString(resId, *formatArgs))
+        Toast.makeText(this, getString(resId, *formatArgs), Toast.LENGTH_SHORT)
 fun Context.longToast(@StringRes resId: Int, vararg formatArgs: Any) =
-        longToast(getString(resId, *formatArgs))
-
-
-inline fun ViewManager.radioButton(title: Int, tooltip: Int) = radioButton {
-    with(context.resources) {
-        id = title
-        text = getString(title)
-        contentDescription = getString(tooltip)
-    }
-}
+        Toast.makeText(this, getString(resId, *formatArgs), Toast.LENGTH_LONG)
