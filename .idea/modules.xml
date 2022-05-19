@@ -4,7 +4,12 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/UPR-Android.iml" filepath="$PROJECT_DIR$/.idea/modules/UPR-Android.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/UPR-Android.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/UPR-Android.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/UPR-Android.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/UPR-Android.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/UPR-Android.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/UPR-Android.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/UPR-Android.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/UPR-Android.app.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/upr/UPR-Android.upr.iml" filepath="$PROJECT_DIR$/.idea/modules/upr/UPR-Android.upr.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/upr/UPR-Android.upr.main.iml" filepath="$PROJECT_DIR$/.idea/modules/upr/UPR-Android.upr.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/upr/UPR-Android.upr.test.iml" filepath="$PROJECT_DIR$/.idea/modules/upr/UPR-Android.upr.test.iml" />
     </modules>
   </component>
 </project>
