@@ -3,11 +3,16 @@
     <string name="action_open_rom">Open ROM</string>
     <string name="action_save_rom">Save ROM</string>
 
-    <string name="rom_loaded">Loaded: %1$s</string>
-    <string name="rom_saved">Saved: %1$s</string>
+    <string name="rom_loaded">ROM Loaded</string>
+    <string name="rom_not_loaded">ROM Not Loaded</string>
+    <string name="rom_saved">ROM Saved</string>
+    <string name="rom_not_saved">ROM Not Saved</string>
+    <string name="current_rom">Current ROM: %1$s</string>
 
     <string name="error_invalid_dir">Invalid directory</string>
     <string name="error_no_roms">No ROMs in directory: %1$s</string>
     <string name="error_invalid_rom">Invalid ROM: %1$s</string>
-    <string name="error_not_loaded">No ROM loaded</string>
+
+    <string name="title_general">General Settings</string>
+    <string name="title_misc">Miscellaneous Settings</string>
 </resources>
