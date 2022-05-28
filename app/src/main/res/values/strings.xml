@@ -2,6 +2,7 @@
     <string name="app_name">Randomizer for Pokémon</string>
     <string name="action_open_rom">Open ROM</string>
     <string name="action_save_rom">Save ROM</string>
+    <string name="action_save_starters">Save Starters</string>
 
     <string name="rom_loaded">ROM Loaded</string>
     <string name="rom_not_loaded">ROM Not Loaded</string>

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -20,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -27,7 +30,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dabomstew.pkrandom.SettingsMod
-import com.dabomstew.pkrandom.pokemon.Pokemon
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -227,6 +229,7 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 			}
 			"int" -> {
 				val limit = RandomizerSettings.limits[this] ?: 0f..1f
+				val length = (limit.endInclusive - limit.start).toInt()
 				val toggle = RandomizerSettings.toggles[this]
 				//toggle?.isAccessible = true
 				var position by rememberSaveable { mutableStateOf(getInt(RandomizerSettings).toFloat()) }
@@ -238,8 +241,20 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 					})
 					Text(String.format(label, position.toInt()))
 				}
-				//TODO doesn't include full range
-				Slider(position, { position = it }, Modifier.fillMaxWidth(), checked, limit, (limit.endInclusive - limit.start).toInt(), { setInt(RandomizerSettings, position.toInt()) })
+				if (length <= 10) {
+					Slider(position, { position = it }, Modifier.fillMaxWidth(), checked, limit, length - 1, { setInt(RandomizerSettings, position.toInt()) })
+				} else {
+					val numPattern = Regex("^-?\\d+$")
+					var input by rememberSaveable { mutableStateOf(position.toString().substringBefore('.')) }
+					TextField(input, {
+						input = it
+						position = numPattern.matchEntire(it)?.run {
+							val num = value.toFloat().coerceIn(limit)
+							setInt(RandomizerSettings, num.toInt())
+							num
+						} ?: position
+					}, enabled = checked, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done))
+				}
 			}
 		}
 	} else if (type.isEnum) {
@@ -251,33 +266,34 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 			Text(label)
 		}
 		if (get(RandomizerSettings) === SettingsMod.StartersMod.CUSTOM && index == SettingsMod.StartersMod.CUSTOM.ordinal) {
-			with(RandomizerSettings.currentStarters) {
-				val firstName = rememberSaveable { mutableStateOf(first.name) }
-				SearchField(firstName) { copy(first = it ?: first) }
-				val secondName = rememberSaveable { mutableStateOf(second.name) }
-				SearchField(secondName) { copy(second = it ?: second) }
-				val thirdName = rememberSaveable { mutableStateOf(third.name) }
-				SearchField(thirdName) { copy(third = it ?: third) }
-			}
+			var (first, second, third) = RandomizerSettings.currentStarters
+			val firstName = rememberSaveable { mutableStateOf(first.name) }; SearchField(firstName)
+			val secondName = rememberSaveable { mutableStateOf(second.name) }; SearchField(secondName)
+			val thirdName = rememberSaveable { mutableStateOf(third.name) }; SearchField(thirdName)
+			Button({
+				first = RandomizerSettings.getPokemon(firstName.value) ?: first
+				second = RandomizerSettings.getPokemon(secondName.value) ?: second
+				third = RandomizerSettings.getPokemon(thirdName.value) ?: third
+				RandomizerSettings.currentStarters = Triple(first, second, third)
+			}) { Text(stringResource(R.string.action_save_starters)) }
 		}
 	}
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SearchField(search: MutableState<String>, update: (Pokemon?)->Triple<Pokemon, Pokemon, Pokemon>) {
+fun SearchField(search: MutableState<String>) {
 	var selected by remember { mutableStateOf(search.value) }
 	var expanded by remember { mutableStateOf(false) }
 	val options = RandomizerSettings.pokeTrie[search.value.uppercase()]?.children() ?: emptyList()
 	ExposedDropdownMenuBox(expanded, { expanded = !expanded }) {
-		TextField(search.value, { search.value = it })
+		TextField(search.value, { search.value = it }, singleLine = true)
 		ExposedDropdownMenu(expanded, { expanded = false }) {
 			options.forEach { option ->
 				DropdownMenuItem({
 					selected = option
 					expanded = false
 					search.value = selected
-					RandomizerSettings.currentStarters = update(RandomizerSettings.getPokemon(selected))
 				}) { Text(option) }
 			}
 		}

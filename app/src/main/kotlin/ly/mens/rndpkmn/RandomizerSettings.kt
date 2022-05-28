@@ -30,7 +30,12 @@ object RandomizerSettings : Settings() {
 			customStarters = intArrayOf(value.first.number, value.second.number, value.third.number)
 			_currentStarters = value
 		}
-		get() = _currentStarters!!
+		get() {
+			val poke = Pokemon().apply {
+				name = ""
+			}
+			return _currentStarters ?: Triple(poke, poke, poke)
+		}
 	val pokeTrie = Trie()
 	private var seed by Delegates.notNull<Long>()
 	val limits: Map<Field?, ClosedFloatingPointRange<Float>> = mapOf(
