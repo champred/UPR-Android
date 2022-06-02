@@ -254,7 +254,7 @@ public class CustomNamesEditorDialog extends javax.swing.JDialog {
         nicknamesText.setRows(5);
         nicknamesSP.setViewportView(nicknamesText);
 
-        editorTabsPane.addTab(bundle.getString("CustomNamesEditorDialog.nicknamesSP.TabConstraints.tabTitle"), nicknamesSP);
+        editorTabsPane.addTab(bundle.getString("CustomNamesEditorDialog.pokemonNicknamesSP.TabConstraints.tabTitle"), nicknamesSP);
 
         saveBtn.setText(bundle.getString("CustomNamesEditorDialog.saveBtn.text"));
         saveBtn.addActionListener(evt -> saveBtnActionPerformed());

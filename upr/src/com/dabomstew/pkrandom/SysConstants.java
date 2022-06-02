@@ -48,7 +48,7 @@ public class SysConstants {
     private static String getRootPath() {
         String customRoot = System.getProperty("pkrandom.root");
         if (customRoot != null) {
-            return customRoot;
+            return customRoot + File.separator;
         }
         try {
             File fh = Utils.getExecutionLocation().getParentFile();
