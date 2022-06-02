@@ -3,12 +3,17 @@
     <string name="action_open_rom">Open ROM</string>
     <string name="action_save_rom">Save ROM</string>
     <string name="action_save_starters">Save Starters</string>
+    <string name="action_save_names">Save Names</string>
+    <string name="action_save_restrictions">Save Restrictions</string>
 
     <string name="rom_loaded">ROM Loaded</string>
     <string name="rom_not_loaded">ROM Not Loaded</string>
     <string name="rom_saved">ROM Saved</string>
     <string name="rom_not_saved">ROM Not Saved</string>
     <string name="current_rom">Current ROM: %1$s</string>
+    <string name="edit_custom">Edit Custom:</string>
+    <string name="generation_number">Generation %1$d</string>
+    <string name="allow_relatives">Allow Evolutionary Relatives</string>
 
     <string name="error_invalid_dir">Invalid directory</string>
     <string name="error_no_roms">No ROMs in directory: %1$s</string>

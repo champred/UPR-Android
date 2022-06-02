@@ -3,6 +3,7 @@ package ly.mens.rndpkmn
 import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,12 +26,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dabomstew.pkrandom.MiscTweak
-import com.dabomstew.pkrandom.SettingsMod
+import com.dabomstew.pkrandom.SettingsMod.StartersMod
+import com.dabomstew.pkrandom.SysConstants.customNamesFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -120,6 +123,7 @@ fun RandomizerDrawerItem(text: String, onClick: ()->Unit) {
 fun RandomizerHome() {
 	Column {
 		RomButtons()
+		DialogButtons()
 		//TODO add missing settings
 	}
 }
@@ -137,7 +141,7 @@ fun RomButtons() {
 		scope.launch(Dispatchers.IO) {
 			if (!file.isRomFile) {
 				ctx.openFileOutput(file.name, Context.MODE_PRIVATE).use {
-					it.write(ctx.contentResolver.openInputStream(uri)!!.readBytes())
+					ctx.contentResolver.openInputStream(uri)?.copyTo(it)
 				}
 			}
 			//TODO show error if ROM fails to load
@@ -153,20 +157,91 @@ fun RomButtons() {
 		scope.launch(Dispatchers.IO) {
 			RandomizerSettings.saveRom(file)
 			ctx.contentResolver.openOutputStream(uri).use {
-				it?.write(ctx.openFileInput(file.name).readBytes())
+				val source = ctx.openFileInput(file.name)
+				if (it != null) {
+					source.copyTo(it)
+				}
+				source.close()
 			}
 			romSaved = true
 		}
 	}
-	Column {
-		Text(stringResource(R.string.current_rom, romFileName ?: ""))
-		Row(verticalAlignment = Alignment.CenterVertically) {
-			Button({ openLauncher.launch("*/*") }, Modifier.padding(8.dp)) { Text(stringResource(R.string.action_open_rom)) }
-			Text(if (romFileName == null) stringResource(R.string.rom_not_loaded) else stringResource(R.string.rom_loaded))
+	Text(stringResource(R.string.current_rom, romFileName ?: ""))
+	Row(verticalAlignment = Alignment.CenterVertically) {
+		Button({ openLauncher.launch("*/*") }, Modifier.padding(8.dp)) { Text(stringResource(R.string.action_open_rom)) }
+		Text(if (romFileName == null) stringResource(R.string.rom_not_loaded) else stringResource(R.string.rom_loaded))
+	}
+	Row(verticalAlignment = Alignment.CenterVertically) {
+		Button({ saveLauncher.launch(romFileName) }, Modifier.padding(8.dp), romFileName != null) { Text(stringResource(R.string.action_save_rom)) }
+		Text(if (romSaved) stringResource(R.string.rom_saved) else stringResource(R.string.rom_not_saved))
+	}
+}
+
+@Composable
+fun DialogButtons() {
+	Divider()
+	Text(stringResource(R.string.edit_custom))
+	RandomizerSettings.nameLists.forEach { (title, names) ->
+		val openNamesDialog = rememberSaveable { mutableStateOf(false) }
+		Button({ openNamesDialog.value = true }, Modifier.padding(8.dp)) { Text(title) }
+		if (openNamesDialog.value) NamesDialog(title, names, openNamesDialog)
+	}
+	Divider()
+	val openLimitDialog = rememberSaveable { mutableStateOf(false) }
+	Button({ openLimitDialog.value = true }, Modifier.padding(8.dp)) { Text(stringResource(R.string.limitPokemonCheckBox)) }
+	if (openLimitDialog.value) LimitDialog(openLimitDialog)
+}
+
+@Composable
+fun NamesDialog(label: String, names: MutableList<String>, openDialog: MutableState<Boolean>) {
+	val ctx = LocalContext.current
+	val scope = rememberCoroutineScope()
+	var text by rememberSaveable { mutableStateOf(names.joinToString("\n")) }
+	Dialog({ openDialog.value = false }) {
+		Column(Modifier.background(MaterialTheme.colors.background).padding(8.dp)) {
+			TextField(text, { text = it }, label = { Text(label) }, maxLines = 10)
+			Button({
+				names.clear()
+				names.addAll(text.split("\n"))
+				scope.launch(Dispatchers.IO) {
+					ctx.openFileOutput(customNamesFile, Context.MODE_PRIVATE).use {
+						it.write(RandomizerSettings.customNames.bytes)
+					}
+				}
+				openDialog.value = false
+			}) { Text(stringResource(R.string.action_save_names)) }
 		}
-		Row(verticalAlignment = Alignment.CenterVertically) {
-			Button({ saveLauncher.launch(romFileName) }, Modifier.padding(8.dp), romFileName != null) { Text(stringResource(R.string.action_save_rom)) }
-			Text(if (romSaved) stringResource(R.string.rom_saved) else stringResource(R.string.rom_not_saved))
+	}
+}
+
+@Composable
+fun LimitDialog(openDialog: MutableState<Boolean>) {
+	Dialog({ openDialog.value = false }) {
+		Column(Modifier.background(MaterialTheme.colors.background).padding(8.dp)) {
+			Text(stringResource(R.string.GenerationLimitDialog_includePokemonHeader))
+			for (i in 1..RandomizerSettings.currentGen) {
+				val fld = RandomizerSettings.currentRestrictions::class.java.getField("allow_gen$i")
+				var checked by rememberSaveable { mutableStateOf(fld.getBoolean(RandomizerSettings.currentRestrictions)) }
+				Row(verticalAlignment = Alignment.CenterVertically) {
+					Checkbox(checked, {
+						checked = it
+						fld.setBoolean(RandomizerSettings.currentRestrictions, it)
+					})
+					Text(stringResource(R.string.generation_number, i))
+				}
+			}
+			var checked by rememberSaveable { mutableStateOf(RandomizerSettings.currentRestrictions.allow_evolutionary_relatives) }
+			Row(verticalAlignment = Alignment.CenterVertically) {
+				Checkbox(checked, {
+					checked = it
+					RandomizerSettings.currentRestrictions.allow_evolutionary_relatives = it
+				})
+				Text(stringResource(R.string.allow_relatives))
+			}
+			Button({
+				RandomizerSettings.isLimitPokemon = !RandomizerSettings.currentRestrictions.nothingSelected()
+				openDialog.value = false
+			}) { Text(stringResource(R.string.action_save_restrictions)) }
 		}
 	}
 }
@@ -293,7 +368,7 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 			})
 			Text(label)
 		}
-		if (get(RandomizerSettings) === SettingsMod.StartersMod.CUSTOM && index == SettingsMod.StartersMod.CUSTOM.ordinal) {
+		if (get(RandomizerSettings) === StartersMod.CUSTOM && index == StartersMod.CUSTOM.ordinal) {
 			var (first, second, third) = RandomizerSettings.currentStarters
 			val firstName = rememberSaveable { mutableStateOf(first.name) }; SearchField(firstName)
 			val secondName = rememberSaveable { mutableStateOf(second.name) }; SearchField(secondName)

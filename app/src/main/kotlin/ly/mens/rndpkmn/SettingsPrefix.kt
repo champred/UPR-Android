@@ -50,4 +50,13 @@ enum class SettingsPrefix(val prefix: String, @StringRes val title: Int) {
 		}
 		return false
 	}
+
+	companion object {
+		val emptyPrefix: Map<String, String> = BuildConfig.PREFIX_MAP[""]!!
+
+		fun customNamesTitle(name: String): String? {
+			val template = "CustomNamesEditorDialog.${name}SP.TabConstraints.tabTitle"
+			return emptyPrefix[template]
+		}
+	}
 }

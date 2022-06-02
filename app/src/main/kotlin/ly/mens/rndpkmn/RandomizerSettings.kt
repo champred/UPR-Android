@@ -1,17 +1,18 @@
 package ly.mens.rndpkmn
 
-import com.dabomstew.pkrandom.RandomSource
-import com.dabomstew.pkrandom.Randomizer
-import com.dabomstew.pkrandom.Settings
-import com.dabomstew.pkrandom.SettingsMod
+import android.util.Log
+import com.dabomstew.pkrandom.*
 import com.dabomstew.pkrandom.constants.GlobalConstants
 import com.dabomstew.pkrandom.pokemon.ExpCurve
+import com.dabomstew.pkrandom.pokemon.GenRestrictions
 import com.dabomstew.pkrandom.pokemon.Pokemon
 import com.dabomstew.pkrandom.romhandlers.*
 import java.io.File
+import java.io.IOException
 import java.lang.reflect.Field
 import kotlin.properties.Delegates
 import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
 
 object RandomizerSettings : Settings() {
@@ -24,6 +25,7 @@ object RandomizerSettings : Settings() {
 	)
 	private var _romHandler: RomHandler? = null
 	val romHandler: RomHandler get() = _romHandler!!
+	val currentGen get() = _romHandler?.generationOfPokemon() ?: 1
 	private var _currentStarters: Triple<Pokemon, Pokemon, Pokemon>? = null
 	var currentStarters: Triple<Pokemon, Pokemon, Pokemon>
 		set(value) {
@@ -74,6 +76,9 @@ object RandomizerSettings : Settings() {
 			this::updateMoves.javaField to this::updateMovesToGeneration.javaField,
 	)
 	val selections: MutableMap<Field?, List<Any>> = mutableMapOf()
+	val nameLists: List<Pair<String, MutableList<String>>>
+
+	private const val TAG = "Settings"
 
 	init {
 		this::class.memberProperties.forEach { prop ->
@@ -100,6 +105,20 @@ object RandomizerSettings : Settings() {
 				}
 			}
 		}
+		customNames = try {
+			FileFunctions.getCustomNames()
+		} catch (e: IOException) {
+			Log.e(TAG, e.message ?: "Unable to load custom names.")
+			CustomNamesSet()
+		}
+		nameLists = customNames::class.memberProperties.reversed().associate {
+			it.isAccessible = true
+			val title = SettingsPrefix.customNamesTitle(it.name) ?: it.name
+			@Suppress("UNCHECKED_CAST")
+			val names = it.javaField?.get(customNames) as? MutableList<String> ?: mutableListOf()
+			title to names
+		}.toList()
+		currentRestrictions = GenRestrictions()
 	}
 
 	fun loadRom(file: File) {
@@ -115,23 +134,23 @@ object RandomizerSettings : Settings() {
 			pokeTrie.insert(romHandler.pokemon[i].name)
 		}
 
-		val baseStatGenerationNumbers = arrayOfNulls<Int>(Math.min(3, GlobalConstants.HIGHEST_POKEMON_GEN - romHandler.generationOfPokemon()))
-		var j = Math.max(6, romHandler.generationOfPokemon() + 1)
+		val baseStatGenerationNumbers = arrayOfNulls<Int>(Math.min(3, GlobalConstants.HIGHEST_POKEMON_GEN - currentGen))
+		var j = Math.max(6, currentGen + 1)
 		updateBaseStatsToGeneration = j
 		for (i in baseStatGenerationNumbers.indices) {
 			baseStatGenerationNumbers[i] = j++
 		}
 		selections[this::updateBaseStats.javaField] = baseStatGenerationNumbers.filterNotNull()
 
-		val moveGenerationNumbers = arrayOfNulls<Int>(GlobalConstants.HIGHEST_POKEMON_GEN - romHandler.generationOfPokemon())
-		j = romHandler.generationOfPokemon() + 1
+		val moveGenerationNumbers = arrayOfNulls<Int>(GlobalConstants.HIGHEST_POKEMON_GEN - currentGen)
+		j = currentGen + 1
 		updateMovesToGeneration = j
 		for (i in moveGenerationNumbers.indices) {
 			moveGenerationNumbers[i] = j++
 		}
 		selections[this::updateMoves.javaField] = moveGenerationNumbers.filterNotNull()
 
-		val expCurves = if (romHandler.generationOfPokemon() < 3) {
+		val expCurves = if (currentGen < 3) {
 			arrayOf(ExpCurve.MEDIUM_FAST, ExpCurve.MEDIUM_SLOW, ExpCurve.FAST, ExpCurve.SLOW)
 		} else {
 			arrayOf(ExpCurve.MEDIUM_FAST, ExpCurve.MEDIUM_SLOW, ExpCurve.FAST, ExpCurve.SLOW, ExpCurve.ERRATIC, ExpCurve.FLUCTUATING)
@@ -140,6 +159,7 @@ object RandomizerSettings : Settings() {
 	}
 
 	fun saveRom(file: File) {
+		//TODO option to view/save output log
 		Randomizer(this, romHandler, null, false).randomize(file.absolutePath, System.out, seed)
 	}
 
