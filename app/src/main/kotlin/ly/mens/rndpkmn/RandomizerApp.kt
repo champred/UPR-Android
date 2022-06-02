@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.dabomstew.pkrandom.MiscTweak
 import com.dabomstew.pkrandom.SettingsMod
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +39,7 @@ import java.io.File
 import java.lang.reflect.Field
 
 const val START_ROUTE = "GENERAL"
+const val MISC_ROUTE = "MISC"
 
 @Composable
 @Preview
@@ -52,6 +54,7 @@ fun RandomizerApp() {
 				SettingsCategory.values().forEach { category ->
 					composable(category.name) { SettingsList(category) }
 				}
+				composable(MISC_ROUTE) { TweaksList() }
 			}
 		}
 	}
@@ -95,7 +98,13 @@ fun RandomizerDrawer(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavCon
 			scope.launch { scaffold.drawerState.close() }
 		}
 	}
-	//TODO add misc tweaks
+	RandomizerDrawerItem(stringResource(R.string.title_misc)) {
+		nav.navigate(MISC_ROUTE) {
+			popUpTo(START_ROUTE)
+			launchSingleTop = true
+		}
+		scope.launch { scaffold.drawerState.close() }
+	}
 }
 
 @Composable
@@ -158,6 +167,25 @@ fun RomButtons() {
 		Row(verticalAlignment = Alignment.CenterVertically) {
 			Button({ saveLauncher.launch(romFileName) }, Modifier.padding(8.dp), romFileName != null) { Text(stringResource(R.string.action_save_rom)) }
 			Text(if (romSaved) stringResource(R.string.rom_saved) else stringResource(R.string.rom_not_saved))
+		}
+	}
+}
+
+@Composable
+fun TweaksList() {
+	LazyColumn {
+		item {
+			Text(stringResource(R.string.title_misc), fontWeight = FontWeight.Bold)
+		}
+		items(MiscTweak.allTweaks) { tweak ->
+			var checked by rememberSaveable { mutableStateOf(RandomizerSettings.currentMiscTweaks and tweak.value == tweak.value) }
+			Row(verticalAlignment = Alignment.CenterVertically) {
+				Checkbox(checked, {
+					checked = it
+					RandomizerSettings.currentMiscTweaks = RandomizerSettings.currentMiscTweaks xor tweak.value
+				})
+				Text(tweak.tweakName)
+			}
 		}
 	}
 }
