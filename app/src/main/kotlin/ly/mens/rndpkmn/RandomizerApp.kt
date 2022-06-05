@@ -1,6 +1,7 @@
 package ly.mens.rndpkmn
 
 import android.content.Context
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -11,18 +12,26 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,6 +41,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dabomstew.pkrandom.MiscTweak
+import com.dabomstew.pkrandom.RandomSource.pickSeed
 import com.dabomstew.pkrandom.SettingsMod.StartersMod
 import com.dabomstew.pkrandom.SysConstants.customNamesFile
 import kotlinx.coroutines.CoroutineScope
@@ -121,18 +131,19 @@ fun RandomizerDrawerItem(text: String, onClick: ()->Unit) {
 
 @Composable
 fun RandomizerHome() {
-	Column {
-		RomButtons()
-		DialogButtons()
+	val romName = rememberSaveable { mutableStateOf<String?>(null) }
+	Column(Modifier.verticalScroll(rememberScrollState())) {
+		RomButtons(romName)
+		DialogButtons(romName)
+		if (romName.value != null) ConfigFields(romName)
 		//TODO add missing settings
 	}
 }
 
 @Composable
-fun RomButtons() {
+fun RomButtons(romFileName: MutableState<String?>) {
 	val ctx = LocalContext.current
 	val scope = rememberCoroutineScope()
-	var romFileName by remember { mutableStateOf<String?>(RandomizerSettings.romName) }
 	var romSaved by remember { mutableStateOf(false) }
 	val openLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
@@ -146,13 +157,13 @@ fun RomButtons() {
 			}
 			//TODO show error if ROM fails to load
 			RandomizerSettings.loadRom(file)
-			romFileName = RandomizerSettings.romName
+			romFileName.value = RandomizerSettings.romFileName
 		}
 	}
 	val saveLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument()) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
 		var file = File(uri.path!!)
-		romFileName = file.name.substringAfter(':')
+		romFileName.value = file.name.substringAfter(':')
 		file = File(ctx.filesDir, file.name)
 		scope.launch(Dispatchers.IO) {
 			RandomizerSettings.saveRom(file)
@@ -166,19 +177,19 @@ fun RomButtons() {
 			romSaved = true
 		}
 	}
-	Text(stringResource(R.string.current_rom, romFileName ?: ""))
+	Text(stringResource(R.string.current_rom, romFileName.value ?: ""))
 	Row(verticalAlignment = Alignment.CenterVertically) {
 		Button({ openLauncher.launch("*/*") }, Modifier.padding(8.dp)) { Text(stringResource(R.string.action_open_rom)) }
-		Text(if (romFileName == null) stringResource(R.string.rom_not_loaded) else stringResource(R.string.rom_loaded))
+		Text(if (romFileName.value == null) stringResource(R.string.rom_not_loaded) else stringResource(R.string.rom_loaded))
 	}
 	Row(verticalAlignment = Alignment.CenterVertically) {
-		Button({ saveLauncher.launch(romFileName) }, Modifier.padding(8.dp), romFileName != null) { Text(stringResource(R.string.action_save_rom)) }
+		Button({ saveLauncher.launch(romFileName.value) }, Modifier.padding(8.dp), romFileName.value != null) { Text(stringResource(R.string.action_save_rom)) }
 		Text(if (romSaved) stringResource(R.string.rom_saved) else stringResource(R.string.rom_not_saved))
 	}
 }
 
 @Composable
-fun DialogButtons() {
+fun DialogButtons(romFileName: MutableState<String?>) {
 	Divider()
 	Text(stringResource(R.string.edit_custom))
 	RandomizerSettings.nameLists.forEach { (title, names) ->
@@ -189,7 +200,7 @@ fun DialogButtons() {
 	Divider()
 	val openLimitDialog = rememberSaveable { mutableStateOf(false) }
 	Button({ openLimitDialog.value = true }, Modifier.padding(8.dp)) { Text(stringResource(R.string.limitPokemonCheckBox)) }
-	if (openLimitDialog.value) LimitDialog(openLimitDialog)
+	if (openLimitDialog.value && romFileName.value != null) LimitDialog(openLimitDialog)
 }
 
 @Composable
@@ -244,6 +255,95 @@ fun LimitDialog(openDialog: MutableState<Boolean>) {
 			}) { Text(stringResource(R.string.action_save_restrictions)) }
 		}
 	}
+}
+
+@Composable
+fun ConfigFields(romFileName: MutableState<String?>) {
+	val shareLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
+
+	var validSettings by remember { mutableStateOf(true) }
+	var settingsText by remember { mutableStateOf(RandomizerSettings.versionString) }
+	val updateSettings = {
+		//TODO show error/success
+		RandomizerSettings.updateFromString(settingsText)
+		validSettings = true
+	}
+	TextField(settingsText, {
+		settingsText = it
+		validSettings = false
+	}, Modifier.fillMaxWidth(),
+	textStyle = TextStyle(fontFamily = FontFamily.Monospace),
+	label = {
+		Text(stringResource(R.string.current_settings_string))
+	}, trailingIcon = {
+		IconButton(updateSettings) { Icon(Icons.Filled.Done, null) }
+	}, leadingIcon = {
+		IconButton({
+			shareLauncher.launch(Intent().apply {
+				action = Intent.ACTION_SEND
+				type = "text/plain"
+				putExtra(Intent.EXTRA_TEXT, settingsText)
+			})
+		}) { Icon(Icons.Filled.Share, null) }
+	}, isError = !validSettings,
+	keyboardOptions = KeyboardOptions(KeyboardCapitalization.None, false, KeyboardType.Ascii, ImeAction.Done),
+	keyboardActions = KeyboardActions(onDone = {
+		updateSettings()
+		this.defaultKeyboardAction(ImeAction.Done)
+	}), singleLine = true)
+
+	var validSeed by remember { mutableStateOf(true) }
+	var seedText by remember { mutableStateOf(RandomizerSettings.currentSeed.toString(16)) }
+	var seedBase by remember { mutableStateOf(16) }
+	val updateSeed = {
+		//TODO show error/success
+		RandomizerSettings.updateSeed(seedText, seedBase)
+		validSeed = true
+	}
+	val updateBase = { base: Int ->
+		val seed = seedText.toLong(seedBase)
+		seedBase = base
+		seedText = seed.toString(base)
+		validSeed = true
+	}
+	Row(verticalAlignment = Alignment.CenterVertically) {
+		RadioButton(seedBase == 16, { updateBase(16) })
+		Text(stringResource(R.string.seed_hex))
+		RadioButton(seedBase == 10, { updateBase(10) })
+		Text(stringResource(R.string.seed_dec))
+	}
+	TextField(seedText, {
+		seedText = it
+		validSeed = false
+	}, Modifier.fillMaxWidth(),
+	textStyle = TextStyle(fontFamily = FontFamily.Monospace),
+	label = {
+		Text(stringResource(R.string.current_seed))
+	}, trailingIcon = {
+		IconButton(updateSeed) { Icon(Icons.Filled.Done, null) }
+	}, leadingIcon = {
+		IconButton({
+			shareLauncher.launch(Intent().apply {
+				action = Intent.ACTION_SEND
+				type = "text/plain"
+				putExtra(Intent.EXTRA_TEXT, seedText)
+			})
+		}) { Icon(Icons.Filled.Share, null) }
+	}, isError = !validSeed,
+	keyboardOptions = KeyboardOptions(KeyboardCapitalization.None, false, KeyboardType.Ascii, ImeAction.Done),
+	keyboardActions = KeyboardActions(onDone = {
+		updateSeed()
+		this.defaultKeyboardAction(ImeAction.Done)
+	}), singleLine = true)
+	Button({
+		val seed = pickSeed()
+		RandomizerSettings.currentSeed = seed
+		seedText = seed.toString(seedBase)
+		validSeed = true
+		val name = RandomizerSettings.romFileName.let { Triple(it.substringBeforeLast('-'), seedText, it.substringAfterLast('.')).fileName }
+		RandomizerSettings.romFileName = name
+		romFileName.value = name
+	}) { Text(stringResource(R.string.action_random_seed)) }
 }
 
 @Composable

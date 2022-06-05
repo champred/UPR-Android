@@ -12,6 +12,7 @@ val Field.id get() = name.replaceFirstChar { it.uppercase() }
 val Enum<*>.id get() = name.split("_").joinToString("") {
     it.replaceRange(1 until it.length, it.substring(1).lowercase())
 }
+val Triple<Any, Any, Any>.fileName get() = "$first-$second.$third"
 
 val File.isRomFile: Boolean get() {
     if (!isFile) { return false }

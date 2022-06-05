@@ -9,6 +9,7 @@ import com.dabomstew.pkrandom.pokemon.Pokemon
 import com.dabomstew.pkrandom.romhandlers.*
 import java.io.File
 import java.io.IOException
+import java.lang.NumberFormatException
 import java.lang.reflect.Field
 import kotlin.properties.Delegates
 import kotlin.reflect.full.memberProperties
@@ -39,7 +40,9 @@ object RandomizerSettings : Settings() {
 			return _currentStarters ?: Triple(poke, poke, poke)
 		}
 	val pokeTrie = Trie()
-	private var seed by Delegates.notNull<Long>()
+	var currentSeed by Delegates.notNull<Long>()
+	lateinit var romFileName: String
+	val versionString: String get() = "$VERSION${toString()}"
 	val limits: Map<Field?, ClosedFloatingPointRange<Float>> = mapOf(
 			this::staticLevelModifier.javaField to -50f..50f,
 			this::guaranteedMoveCount.javaField to 2f..4f,
@@ -122,11 +125,12 @@ object RandomizerSettings : Settings() {
 	}
 
 	fun loadRom(file: File) {
-		seed = RandomSource.pickSeed()
-		romName = "${file.nameWithoutExtension.substringAfter(':')} ${seed.toString(16)}.${file.extension}"
+		currentSeed = RandomSource.pickSeed()
+		romFileName = Triple(file.nameWithoutExtension.substringAfter(':'), currentSeed.toString(16), file.extension).fileName
 		_romHandler = romHandlerFactories.firstOrNull() { it.isLoadable(file.absolutePath) }?.create(random)
 		if (_romHandler == null) return
 		romHandler.loadRom(file.absolutePath)
+		romName = romHandler.romName
 
 		val (first, second, third) = romHandler.starters
 		currentStarters = Triple(first, second, third)
@@ -160,7 +164,7 @@ object RandomizerSettings : Settings() {
 
 	fun saveRom(file: File) {
 		//TODO option to view/save output log
-		Randomizer(this, romHandler, null, false).randomize(file.absolutePath, System.out, seed)
+		Randomizer(this, romHandler, null, false).randomize(file.absolutePath, System.out, currentSeed)
 	}
 
 	fun getPokemon(name: String): Pokemon? {
@@ -168,5 +172,34 @@ object RandomizerSettings : Settings() {
 			if (romHandler.pokemon[i].name.equals(name, true)) return romHandler.pokemon[i]
 		}
 		return null
+	}
+
+	fun updateFromString(text: String) {
+		val other: Settings
+		try {
+			val version = text.substring(0..2).toInt()
+			var config = text.substring(3)
+			if (version < VERSION) {
+				config = SettingsUpdater().update(version, config)
+			} else if (version > VERSION) {
+				throw Exception("Settings string created by newer version.")
+			}
+			other = fromString(config)
+		} catch (e: Exception) {
+			Log.e(TAG, e.message ?: "Failed to load settings string.")
+			return
+		}
+		other.javaClass.declaredFields.forEach {
+			it.isAccessible = true
+			it.set(this, it.get(other))
+		}
+	}
+
+	fun updateSeed(text: String, base: Int) {
+		try {
+			currentSeed = text.toLong(base)
+		} catch (e: NumberFormatException) {
+			Log.e(TAG, e.message ?: "Unable to convert seed to number.")
+		}
 	}
 }
