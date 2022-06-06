@@ -124,11 +124,11 @@ object RandomizerSettings : Settings() {
 		currentRestrictions = GenRestrictions()
 	}
 
-	fun loadRom(file: File) {
+	fun loadRom(file: File): Boolean {
 		currentSeed = RandomSource.pickSeed()
 		romFileName = Triple(file.nameWithoutExtension.substringAfter(':'), currentSeed.toString(16), file.extension).fileName
 		_romHandler = romHandlerFactories.firstOrNull() { it.isLoadable(file.absolutePath) }?.create(random)
-		if (_romHandler == null) return
+		if (_romHandler == null) return false
 		romHandler.loadRom(file.absolutePath)
 		romName = romHandler.romName
 
@@ -160,6 +160,8 @@ object RandomizerSettings : Settings() {
 			arrayOf(ExpCurve.MEDIUM_FAST, ExpCurve.MEDIUM_SLOW, ExpCurve.FAST, ExpCurve.SLOW, ExpCurve.ERRATIC, ExpCurve.FLUCTUATING)
 		}
 		selections[this::standardizeEXPCurves.javaField] = expCurves.toList()
+
+		return true
 	}
 
 	fun saveRom(file: File) {
@@ -174,7 +176,7 @@ object RandomizerSettings : Settings() {
 		return null
 	}
 
-	fun updateFromString(text: String) {
+	fun updateFromString(text: String): Boolean {
 		val other: Settings
 		try {
 			val version = text.substring(0..2).toInt()
@@ -187,19 +189,22 @@ object RandomizerSettings : Settings() {
 			other = fromString(config)
 		} catch (e: Exception) {
 			Log.e(TAG, e.message ?: "Failed to load settings string.")
-			return
+			return false
 		}
 		other.javaClass.declaredFields.forEach {
 			it.isAccessible = true
 			it.set(this, it.get(other))
 		}
+		return true
 	}
 
-	fun updateSeed(text: String, base: Int) {
-		try {
+	fun updateSeed(text: String, base: Int): Boolean {
+		return try {
 			currentSeed = text.toLong(base)
+			true
 		} catch (e: NumberFormatException) {
 			Log.e(TAG, e.message ?: "Unable to convert seed to number.")
+			false
 		}
 	}
 }

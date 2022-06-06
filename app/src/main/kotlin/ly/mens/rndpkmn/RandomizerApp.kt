@@ -24,8 +24,10 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -63,7 +65,7 @@ fun RandomizerApp() {
 		val scope = rememberCoroutineScope()
 		Scaffold(scaffoldState = scaffold, topBar = { RandomizerAppBar(scope, scaffold, nav) }, drawerContent = { RandomizerDrawer(scope, scaffold, nav) }) {
 			NavHost(nav, START_ROUTE) {
-				composable(START_ROUTE) { RandomizerHome() }
+				composable(START_ROUTE) { RandomizerHome(scaffold) }
 				SettingsCategory.values().forEach { category ->
 					composable(category.name) { SettingsList(category) }
 				}
@@ -130,18 +132,18 @@ fun RandomizerDrawerItem(text: String, onClick: ()->Unit) {
 }
 
 @Composable
-fun RandomizerHome() {
+fun RandomizerHome(scaffold: ScaffoldState) {
 	val romName = rememberSaveable { mutableStateOf<String?>(null) }
 	Column(Modifier.verticalScroll(rememberScrollState())) {
-		RomButtons(romName)
-		DialogButtons(romName)
-		if (romName.value != null) ConfigFields(romName)
+		RomButtons(scaffold, romName)
+		DialogButtons(scaffold, romName)
+		if (romName.value != null) ConfigFields(scaffold, romName)
 		//TODO add missing settings
 	}
 }
 
 @Composable
-fun RomButtons(romFileName: MutableState<String?>) {
+fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	val ctx = LocalContext.current
 	val scope = rememberCoroutineScope()
 	var romSaved by remember { mutableStateOf(false) }
@@ -155,9 +157,11 @@ fun RomButtons(romFileName: MutableState<String?>) {
 					ctx.contentResolver.openInputStream(uri)?.copyTo(it)
 				}
 			}
-			//TODO show error if ROM fails to load
-			RandomizerSettings.loadRom(file)
-			romFileName.value = RandomizerSettings.romFileName
+			if (RandomizerSettings.loadRom(file)) {
+				romFileName.value = RandomizerSettings.romFileName
+			} else {
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_invalid_rom, file.name))
+			}
 		}
 	}
 	val saveLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument()) { uri ->
@@ -189,7 +193,7 @@ fun RomButtons(romFileName: MutableState<String?>) {
 }
 
 @Composable
-fun DialogButtons(romFileName: MutableState<String?>) {
+fun DialogButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	Divider()
 	Text(stringResource(R.string.edit_custom))
 	RandomizerSettings.nameLists.forEach { (title, names) ->
@@ -199,8 +203,16 @@ fun DialogButtons(romFileName: MutableState<String?>) {
 	}
 	Divider()
 	val openLimitDialog = rememberSaveable { mutableStateOf(false) }
-	Button({ openLimitDialog.value = true }, Modifier.padding(8.dp)) { Text(stringResource(R.string.limitPokemonCheckBox)) }
-	if (openLimitDialog.value && romFileName.value != null) LimitDialog(openLimitDialog)
+	val ctx = LocalContext.current
+	val scope = rememberCoroutineScope()
+	Button({
+		if (romFileName.value == null) {
+			scope.launch {
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.rom_not_loaded))
+			}
+		} else openLimitDialog.value = true
+	}, Modifier.padding(8.dp)) { Text(stringResource(R.string.limitPokemonCheckBox)) }
+	if (openLimitDialog.value) LimitDialog(openLimitDialog)
 }
 
 @Composable
@@ -257,16 +269,25 @@ fun LimitDialog(openDialog: MutableState<Boolean>) {
 	}
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ConfigFields(romFileName: MutableState<String?>) {
+fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	val shareLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
+	val scope = rememberCoroutineScope()
+	val ctx = LocalContext.current
+	val keyCon = LocalSoftwareKeyboardController.current
 
 	var validSettings by remember { mutableStateOf(true) }
 	var settingsText by remember { mutableStateOf(RandomizerSettings.versionString) }
-	val updateSettings = {
-		//TODO show error/success
-		RandomizerSettings.updateFromString(settingsText)
-		validSettings = true
+	val updateSettings: ()->Unit = {
+		keyCon?.hide()
+		if (RandomizerSettings.updateFromString(settingsText)) {
+			validSettings = true
+		} else {
+			scope.launch {
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_invalid_settings))
+			}
+		}
 	}
 	TextField(settingsText, {
 		settingsText = it
@@ -274,7 +295,7 @@ fun ConfigFields(romFileName: MutableState<String?>) {
 	}, Modifier.fillMaxWidth(),
 	textStyle = TextStyle(fontFamily = FontFamily.Monospace),
 	label = {
-		Text(stringResource(R.string.current_settings_string))
+		Text(stringResource(R.string.current_settings))
 	}, trailingIcon = {
 		IconButton(updateSettings) { Icon(Icons.Filled.Done, null) }
 	}, leadingIcon = {
@@ -295,16 +316,27 @@ fun ConfigFields(romFileName: MutableState<String?>) {
 	var validSeed by remember { mutableStateOf(true) }
 	var seedText by remember { mutableStateOf(RandomizerSettings.currentSeed.toString(16)) }
 	var seedBase by remember { mutableStateOf(16) }
-	val updateSeed = {
-		//TODO show error/success
-		RandomizerSettings.updateSeed(seedText, seedBase)
-		validSeed = true
+	val updateSeed: ()->Unit = {
+		keyCon?.hide()
+		if (RandomizerSettings.updateSeed(seedText, seedBase)) {
+			validSeed = true
+		} else {
+			scope.launch {
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_invalid_seed))
+			}
+		}
 	}
-	val updateBase = { base: Int ->
-		val seed = seedText.toLong(seedBase)
-		seedBase = base
-		seedText = seed.toString(base)
-		validSeed = true
+	val updateBase: (Int)->Unit = { base ->
+		keyCon?.hide()
+		if (RandomizerSettings.updateSeed(seedText, seedBase)) {
+			seedBase = base
+			seedText = RandomizerSettings.currentSeed.toString(base)
+			validSeed = true
+		} else {
+			scope.launch {
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_invalid_seed))
+			}
+		}
 	}
 	Row(verticalAlignment = Alignment.CenterVertically) {
 		RadioButton(seedBase == 16, { updateBase(16) })
@@ -397,7 +429,7 @@ fun SettingsGroup(prefix: SettingsPrefix, subtitle: String, group: MutableMap<St
 	}
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: MutableState<Int>? = null) {
 	if (type.isPrimitive) {
@@ -449,6 +481,7 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 				} else {
 					val numPattern = Regex("^-?\\d+$")
 					var input by rememberSaveable { mutableStateOf(position.toString().substringBefore('.')) }
+					val keyCon = LocalSoftwareKeyboardController.current
 					TextField(input, {
 						input = it
 						position = numPattern.matchEntire(it)?.run {
@@ -456,7 +489,9 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 							setInt(RandomizerSettings, num.toInt())
 							num
 						} ?: position
-					}, enabled = checked, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done))
+					}, enabled = checked,
+					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+					keyboardActions = KeyboardActions { keyCon?.hide() })
 				}
 			}
 		}
@@ -483,12 +518,13 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 	}
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SearchField(search: MutableState<String>) {
 	var selected by remember { mutableStateOf(search.value) }
 	var expanded by remember { mutableStateOf(false) }
 	val options = RandomizerSettings.pokeTrie[search.value.uppercase()]?.children() ?: emptyList()
+	val keyCon = LocalSoftwareKeyboardController.current
 	ExposedDropdownMenuBox(expanded, { expanded = !expanded }) {
 		TextField(search.value, { search.value = it }, singleLine = true)
 		ExposedDropdownMenu(expanded, { expanded = false }) {
@@ -497,6 +533,8 @@ fun SearchField(search: MutableState<String>) {
 					selected = option
 					expanded = false
 					search.value = selected
+					keyCon?.hide()
+					//TODO update cursor position
 				}) { Text(option) }
 			}
 		}
