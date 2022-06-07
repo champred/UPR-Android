@@ -4,18 +4,12 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
@@ -35,8 +29,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -57,14 +51,13 @@ const val START_ROUTE = "GENERAL"
 const val MISC_ROUTE = "MISC"
 
 @Composable
-@Preview
 fun RandomizerApp() {
 	MaterialTheme {
 		val nav = rememberNavController()
 		val scaffold = rememberScaffoldState()
 		val scope = rememberCoroutineScope()
 		Scaffold(scaffoldState = scaffold, topBar = { RandomizerAppBar(scope, scaffold, nav) }, drawerContent = { RandomizerDrawer(scope, scaffold, nav) }) {
-			NavHost(nav, START_ROUTE) {
+			NavHost(nav, START_ROUTE, Modifier.padding(horizontal = 8.dp)) {
 				composable(START_ROUTE) { RandomizerHome(scaffold) }
 				SettingsCategory.values().forEach { category ->
 					composable(category.name) { SettingsList(category) }
@@ -124,10 +117,11 @@ fun RandomizerDrawer(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavCon
 
 @Composable
 fun RandomizerDrawerItem(text: String, onClick: ()->Unit) {
-	//TODO improve styling
 	Text(text, Modifier
 			.fillMaxWidth()
 			.clickable(onClick = onClick)
+			.padding(8.dp),
+			style = MaterialTheme.typography.h5
 	)
 }
 
@@ -138,7 +132,6 @@ fun RandomizerHome(scaffold: ScaffoldState) {
 		RomButtons(scaffold, romName)
 		DialogButtons(scaffold, romName)
 		if (romName.value != null) ConfigFields(scaffold, romName)
-		//TODO add missing settings
 	}
 }
 
@@ -194,14 +187,11 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 
 @Composable
 fun DialogButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
-	Divider()
-	Text(stringResource(R.string.edit_custom))
 	RandomizerSettings.nameLists.forEach { (title, names) ->
 		val openNamesDialog = rememberSaveable { mutableStateOf(false) }
-		Button({ openNamesDialog.value = true }, Modifier.padding(8.dp)) { Text(title) }
+		Button({ openNamesDialog.value = true }, Modifier.padding(8.dp)) { Text(stringResource(R.string.edit_custom, title)) }
 		if (openNamesDialog.value) NamesDialog(title, names, openNamesDialog)
 	}
-	Divider()
 	val openLimitDialog = rememberSaveable { mutableStateOf(false) }
 	val ctx = LocalContext.current
 	val scope = rememberCoroutineScope()
@@ -242,29 +232,31 @@ fun LimitDialog(openDialog: MutableState<Boolean>) {
 	Dialog({ openDialog.value = false }) {
 		Column(Modifier.background(MaterialTheme.colors.background).padding(8.dp)) {
 			Text(stringResource(R.string.GenerationLimitDialog_includePokemonHeader))
-			for (i in 1..RandomizerSettings.currentGen) {
-				val fld = RandomizerSettings.currentRestrictions::class.java.getField("allow_gen$i")
-				var checked by rememberSaveable { mutableStateOf(fld.getBoolean(RandomizerSettings.currentRestrictions)) }
+			with(RandomizerSettings.currentRestrictions) {
+				for (i in 1..RandomizerSettings.currentGen) {
+					val fld = this.javaClass.getField("allow_gen$i")
+					var checked by rememberSaveable { mutableStateOf(fld.getBoolean(this)) }
+					Row(verticalAlignment = Alignment.CenterVertically) {
+						Checkbox(checked, {
+							checked = it
+							fld.setBoolean(this@with, it)
+						})
+						Text(stringResource(R.string.generation_number, i))
+					}
+				}
+				var checked by rememberSaveable { mutableStateOf(this.allow_evolutionary_relatives) }
 				Row(verticalAlignment = Alignment.CenterVertically) {
 					Checkbox(checked, {
 						checked = it
-						fld.setBoolean(RandomizerSettings.currentRestrictions, it)
+						this@with.allow_evolutionary_relatives = it
 					})
-					Text(stringResource(R.string.generation_number, i))
+					Text(stringResource(R.string.allow_relatives))
 				}
+				Button({
+					RandomizerSettings.isLimitPokemon = !this.nothingSelected()
+					openDialog.value = false
+				}) { Text(stringResource(R.string.action_save_restrictions)) }
 			}
-			var checked by rememberSaveable { mutableStateOf(RandomizerSettings.currentRestrictions.allow_evolutionary_relatives) }
-			Row(verticalAlignment = Alignment.CenterVertically) {
-				Checkbox(checked, {
-					checked = it
-					RandomizerSettings.currentRestrictions.allow_evolutionary_relatives = it
-				})
-				Text(stringResource(R.string.allow_relatives))
-			}
-			Button({
-				RandomizerSettings.isLimitPokemon = !RandomizerSettings.currentRestrictions.nothingSelected()
-				openDialog.value = false
-			}) { Text(stringResource(R.string.action_save_restrictions)) }
 		}
 	}
 }
@@ -382,7 +374,7 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 fun TweaksList() {
 	LazyColumn {
 		item {
-			Text(stringResource(R.string.title_misc), fontWeight = FontWeight.Bold)
+			Text(stringResource(R.string.title_misc), style = MaterialTheme.typography.h6)
 		}
 		items(MiscTweak.allTweaks) { tweak ->
 			var checked by rememberSaveable { mutableStateOf(RandomizerSettings.currentMiscTweaks and tweak.value == tweak.value) }
@@ -402,10 +394,13 @@ fun SettingsList(category: SettingsCategory) {
 	LazyColumn {
 		category.prefixes.forEach { prefix ->
 			item {
-				Text(stringResource(prefix.title), fontWeight = FontWeight.Bold)
+				Text(stringResource(prefix.title), style = MaterialTheme.typography.h6)
 			}
 			items(prefix.groups.toList()) { (subtitle, group) ->
 				SettingsGroup(prefix, subtitle, group)
+			}
+			item {
+				Divider()
 			}
 			items(prefix.props.toList()) { (label, field) ->
 				field.SettingsComponent(prefix.strings[label]!!)
@@ -418,7 +413,7 @@ fun SettingsList(category: SettingsCategory) {
 fun SettingsGroup(prefix: SettingsPrefix, subtitle: String, group: MutableMap<String, Field>) {
 	Column {
 		if (subtitle.isNotEmpty()) {
-			Text(prefix.strings[subtitle]!!)
+			Text(prefix.strings[subtitle]!!, fontSize = 16.sp, fontWeight = FontWeight.Bold)
 		}
 		val groupField = group.values.first()
 		val groupEnum = groupField.get(RandomizerSettings) as Enum<*>
@@ -436,27 +431,27 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 		when (type.name) {
 			"boolean" -> {
 				var checked by rememberSaveable { mutableStateOf(getBoolean(RandomizerSettings)) }
-				Row(verticalAlignment = Alignment.CenterVertically) {
+				Row(Modifier.padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
 					Checkbox(checked, {
 						checked = it
 						setBoolean(RandomizerSettings, it)
 					})
 					Text(label)
-				}
-				if (this in RandomizerSettings.selections && checked) {
-					val toggle = RandomizerSettings.toggles[this]
-					val options = RandomizerSettings.selections[this] ?: emptyList()
-					var selected by rememberSaveable { mutableStateOf(toggle?.get(RandomizerSettings).toString()) }
-					var expanded by remember { mutableStateOf(false) }
-					ExposedDropdownMenuBox(expanded, { expanded = !expanded }) {
-						TextField(selected, {}, readOnly = true)
-						ExposedDropdownMenu(expanded, { expanded = false }) {
-							options.forEach { option ->
-								DropdownMenuItem({
-									selected = option.toString()
-									toggle?.set(RandomizerSettings, option)
-									expanded = false
-								}) { Text(option.toString()) }
+					if (this@SettingsComponent in RandomizerSettings.selections && checked) {
+						val toggle = RandomizerSettings.toggles[this@SettingsComponent]
+						val options = RandomizerSettings.selections[this@SettingsComponent] ?: emptyList()
+						var selected by rememberSaveable { mutableStateOf(toggle?.get(RandomizerSettings).toString()) }
+						var expanded by remember { mutableStateOf(false) }
+						ExposedDropdownMenuBox(expanded, { expanded = !expanded }) {
+							TextField(selected, {}, Modifier.width((options.maxOf { it.toString().length } * MaterialTheme.typography.body2.fontSize.value).coerceAtLeast(48f).dp).offset(x = 2.dp), readOnly = true)
+							ExposedDropdownMenu(expanded, { expanded = false }) {
+								options.forEach { option ->
+									DropdownMenuItem({
+										selected = option.toString()
+										toggle?.set(RandomizerSettings, option)
+										expanded = false
+									}) { Text(option.toString()) }
+								}
 							}
 						}
 					}
@@ -469,29 +464,30 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 				//toggle?.isAccessible = true
 				var position by rememberSaveable { mutableStateOf(getInt(RandomizerSettings).toFloat()) }
 				var checked by rememberSaveable { mutableStateOf(toggle?.getBoolean(RandomizerSettings) ?: (position > 0f)) }
-				Row(verticalAlignment = Alignment.CenterVertically) {
+				Row(Modifier.padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
 					Checkbox(checked, {
 						checked = it
 						toggle?.setBoolean(RandomizerSettings, it)
 					})
 					Text(String.format(label, position.toInt()))
+					if (length > 10) {
+						val numPattern = Regex("^-?\\d+$")
+						var input by rememberSaveable { mutableStateOf(position.toString().substringBefore('.')) }
+						val keyCon = LocalSoftwareKeyboardController.current
+						TextField(input, {
+							input = it
+							position = numPattern.matchEntire(it)?.run {
+								val num = value.toFloat().coerceIn(limit)
+								setInt(RandomizerSettings, num.toInt())
+								num
+							} ?: position
+						}, Modifier.width(64.dp).offset(x = 2.dp), checked,
+						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+						keyboardActions = KeyboardActions { keyCon?.hide() })
+					}
 				}
 				if (length <= 10) {
 					Slider(position, { position = it }, Modifier.fillMaxWidth(), checked, limit, length - 1, { setInt(RandomizerSettings, position.toInt()) })
-				} else {
-					val numPattern = Regex("^-?\\d+$")
-					var input by rememberSaveable { mutableStateOf(position.toString().substringBefore('.')) }
-					val keyCon = LocalSoftwareKeyboardController.current
-					TextField(input, {
-						input = it
-						position = numPattern.matchEntire(it)?.run {
-							val num = value.toFloat().coerceIn(limit)
-							setInt(RandomizerSettings, num.toInt())
-							num
-						} ?: position
-					}, enabled = checked,
-					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-					keyboardActions = KeyboardActions { keyCon?.hide() })
 				}
 			}
 		}
@@ -526,7 +522,7 @@ fun SearchField(search: MutableState<String>) {
 	val options = RandomizerSettings.pokeTrie[search.value.uppercase()]?.children() ?: emptyList()
 	val keyCon = LocalSoftwareKeyboardController.current
 	ExposedDropdownMenuBox(expanded, { expanded = !expanded }) {
-		TextField(search.value, { search.value = it }, singleLine = true)
+		TextField(search.value, { search.value = it }, Modifier.padding(vertical = 2.dp), singleLine = true)
 		ExposedDropdownMenu(expanded, { expanded = false }) {
 			options.forEach { option ->
 				DropdownMenuItem({

@@ -12,7 +12,7 @@
     <string name="rom_saved">ROM Saved</string>
     <string name="rom_not_saved">ROM Not Saved</string>
     <string name="current_rom">Current ROM: %1$s</string>
-    <string name="edit_custom">Edit Custom:</string>
+    <string name="edit_custom">Edit Custom %1$s</string>
     <string name="generation_number">Generation %1$d</string>
     <string name="allow_relatives">Allow Evolutionary Relatives</string>
     <string name="current_settings">Current Settings String</string>
