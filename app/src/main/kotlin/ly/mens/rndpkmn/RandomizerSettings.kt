@@ -7,8 +7,7 @@ import com.dabomstew.pkrandom.pokemon.ExpCurve
 import com.dabomstew.pkrandom.pokemon.GenRestrictions
 import com.dabomstew.pkrandom.pokemon.Pokemon
 import com.dabomstew.pkrandom.romhandlers.*
-import java.io.File
-import java.io.IOException
+import java.io.*
 import java.lang.NumberFormatException
 import java.lang.reflect.Field
 import kotlin.properties.Delegates
@@ -26,6 +25,8 @@ object RandomizerSettings : Settings() {
 	)
 	private var _romHandler: RomHandler? = null
 	val romHandler: RomHandler get() = _romHandler!!
+	//initialize with 1MiB to accommodate large logs without needing to resize
+	val currentLog = ByteArrayOutputStream(1024 * 1024)
 	val currentGen get() = _romHandler?.generationOfPokemon() ?: 1
 	private var _currentStarters: Triple<Pokemon, Pokemon, Pokemon>? = null
 	var currentStarters: Triple<Pokemon, Pokemon, Pokemon>
@@ -165,8 +166,11 @@ object RandomizerSettings : Settings() {
 	}
 
 	fun saveRom(file: File) {
-		//TODO option to view/save output log
-		Randomizer(this, romHandler, null, false).randomize(file.absolutePath, System.out, currentSeed)
+		currentLog.reset()
+		val out = PrintStream(currentLog, false, "UTF-8")
+		romHandler.setLog(out)
+		Randomizer(this, romHandler, null, false).randomize(file.absolutePath, out, currentSeed)
+		out.close()
 	}
 
 	fun getPokemon(name: String): Pokemon? {

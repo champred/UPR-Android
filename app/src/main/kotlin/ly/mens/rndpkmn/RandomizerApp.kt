@@ -140,11 +140,13 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	val ctx = LocalContext.current
 	val scope = rememberCoroutineScope()
 	var romSaved by remember { mutableStateOf(false) }
+
 	val openLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
 		var file = File(uri.path!!)
 		file = File(ctx.filesDir, file.name)
 		scope.launch(Dispatchers.IO) {
+			//copy selected file to app directory if it doesn't exist
 			if (!file.isRomFile) {
 				ctx.openFileOutput(file.name, Context.MODE_PRIVATE).use {
 					ctx.contentResolver.openInputStream(uri)?.copyTo(it)
@@ -157,31 +159,52 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			}
 		}
 	}
-	val saveLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument()) { uri ->
+	val saveRomLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument()) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
 		var file = File(uri.path!!)
 		romFileName.value = file.name.substringAfter(':')
 		file = File(ctx.filesDir, file.name)
 		scope.launch(Dispatchers.IO) {
 			RandomizerSettings.saveRom(file)
+			//copy temporary file to selected path
 			ctx.contentResolver.openOutputStream(uri).use {
 				val source = ctx.openFileInput(file.name)
 				if (it != null) {
 					source.copyTo(it)
 				}
 				source.close()
+				//clean up temporary file
+				ctx.deleteFile(file.name)
 			}
 			romSaved = true
 		}
 	}
-	Text(stringResource(R.string.current_rom, romFileName.value ?: ""))
+	val saveLogLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument()) { uri ->
+		if (uri == null) return@rememberLauncherForActivityResult
+		scope.launch(Dispatchers.IO) {
+			ctx.contentResolver.openOutputStream(uri).use {
+				if (it != null) {
+					RandomizerSettings.currentLog.writeTo(it)
+				}
+			}
+		}
+	}
+
+	romFileName.value?.let { Text(stringResource(R.string.current_rom, it)) }
 	Row(verticalAlignment = Alignment.CenterVertically) {
-		Button({ openLauncher.launch("*/*") }, Modifier.padding(8.dp)) { Text(stringResource(R.string.action_open_rom)) }
-		Text(if (romFileName.value == null) stringResource(R.string.rom_not_loaded) else stringResource(R.string.rom_loaded))
+		Button({ openLauncher.launch("*/*") }, Modifier.padding(8.dp)) {
+			Text(stringResource(R.string.action_open_rom))
+		}
+		Text(stringResource(if (romFileName.value == null) R.string.rom_not_loaded else R.string.rom_loaded))
 	}
 	Row(verticalAlignment = Alignment.CenterVertically) {
-		Button({ saveLauncher.launch(romFileName.value) }, Modifier.padding(8.dp), romFileName.value != null) { Text(stringResource(R.string.action_save_rom)) }
-		Text(if (romSaved) stringResource(R.string.rom_saved) else stringResource(R.string.rom_not_saved))
+		Button({ saveRomLauncher.launch(romFileName.value) }, Modifier.padding(8.dp), romFileName.value != null) {
+			Text(stringResource(R.string.action_save_rom))
+		}
+		Text(stringResource(if (romSaved) R.string.rom_saved else R.string.rom_not_saved))
+	}
+	Button({ saveLogLauncher.launch("${romFileName.value}.log.txt") }, Modifier.padding(8.dp), romSaved) {
+		Text(stringResource(R.string.action_save_log))
 	}
 }
 
