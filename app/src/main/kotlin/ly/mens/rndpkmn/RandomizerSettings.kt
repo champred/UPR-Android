@@ -195,6 +195,10 @@ object RandomizerSettings : Settings() {
 			Log.e(TAG, e.message ?: "Failed to load settings string.")
 			return false
 		}
+		if (romName != other.romName) {
+			Log.i(TAG, "Settings string created for different game.")
+			return false
+		}
 		other.javaClass.declaredFields.forEach {
 			it.isAccessible = true
 			it.set(this, it.get(other))
