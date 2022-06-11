@@ -18,8 +18,8 @@ android {
         applicationId "ly.mens.rndpkmn"
         minSdkVersion 26
         targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "0.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         importStrings.forEach { rawKey, value ->
@@ -49,6 +49,9 @@ android {
     composeOptions {
         kotlinCompilerVersion kotlin_version
         kotlinCompilerExtensionVersion "1.1.1"
+    }
+    lintOptions {
+        checkReleaseBuilds false
     }
 }
 
