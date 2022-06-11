@@ -39,7 +39,7 @@ public class SettingsUpdater {
     /**
      * Given a quicksettings config string from an old randomizer version,
      * update it to be compatible with the currently running randomizer version.
-     * 
+     *
      * @param oldVersion
      *            The PRESET_FILE_VERSION used to generate the given string
      * @param configString
@@ -220,15 +220,15 @@ public class SettingsUpdater {
             insertExtraByte(20, (byte) 0);
             insertExtraByte(22, (byte) 0);
         }
-        
+
         if(oldVersion < 172) {
             // 171 to 172: removed separate names files in favor of one unified file
             // so two of the trailing checksums are gone
             actualDataLength -= 8;
-            
+
             // fix wild legendaries
             dataBlock[16] = (byte) (dataBlock[16] ^ (1 << 1));
-            
+
             // add space for the trainer level modifier
             insertExtraByte(35, (byte) 50); // 50 in the settings file = +0% after adjustment
         }
@@ -291,6 +291,11 @@ public class SettingsUpdater {
             FileFunctions.writeFullIntBigEndian(dataBlock, 28, genRestrictions);
         }
 
+        if (oldVersion < 319) {
+            // E4 unique pokemon
+            insertExtraByte(50, (byte) 0);
+        }
+
         // fix checksum
         CRC32 checksum = new CRC32();
         checksum.update(dataBlock, 0, actualDataLength - 8);
@@ -320,7 +325,7 @@ public class SettingsUpdater {
      * Insert a 4-byte int field in the data block at the given position. Shift
      * everything else up. Do nothing if there's no room left (should never
      * happen)
-     * 
+     *
      * @param position
      *            The offset to add the field
      * @param value
@@ -343,7 +348,7 @@ public class SettingsUpdater {
      * Insert a byte-field in the data block at the given position. Shift
      * everything else up. Do nothing if there's no room left (should never
      * happen)
-     * 
+     *
      * @param position
      *            The offset to add the field
      * @param value
