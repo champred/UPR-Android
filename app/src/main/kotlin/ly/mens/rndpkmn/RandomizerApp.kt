@@ -331,10 +331,16 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	var validSeed by remember { mutableStateOf(true) }
 	var seedText by remember { mutableStateOf(RandomizerSettings.currentSeed.toString(16)) }
 	var seedBase by remember { mutableStateOf(16) }
+	val updateName: ()->Unit = {
+		val name = RandomizerSettings.romFileName.let { Triple(it.substringBeforeLast('-'), seedText, it.substringAfterLast('.')).fileName }
+		RandomizerSettings.romFileName = name
+		romFileName.value = name
+	}
 	val updateSeed: ()->Unit = {
 		keyCon?.hide()
 		if (RandomizerSettings.updateSeed(seedText, seedBase)) {
 			validSeed = true
+			updateName()
 		} else {
 			scope.launch {
 				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_invalid_seed))
@@ -347,6 +353,7 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			seedBase = base
 			seedText = RandomizerSettings.currentSeed.toString(base)
 			validSeed = true
+			updateName()
 		} else {
 			scope.launch {
 				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_invalid_seed))
@@ -387,9 +394,7 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		RandomizerSettings.currentSeed = seed
 		seedText = seed.toString(seedBase)
 		validSeed = true
-		val name = RandomizerSettings.romFileName.let { Triple(it.substringBeforeLast('-'), seedText, it.substringAfterLast('.')).fileName }
-		RandomizerSettings.romFileName = name
-		romFileName.value = name
+		updateName()
 	}) { Text(stringResource(R.string.action_random_seed)) }
 }
 
