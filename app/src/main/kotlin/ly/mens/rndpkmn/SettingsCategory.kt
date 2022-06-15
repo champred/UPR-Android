@@ -12,7 +12,7 @@ enum class SettingsCategory(@StringRes val title: Int) {
 	}, MM(R.string.movesMovesetsPanel) {
 		override val prefixes = arrayOf(MOVES, MOVESETS)
 	}, FOE(R.string.foePokemonPanel_title) {
-		override val prefixes = arrayOf(TRAINERS, TOTEMS)
+		override val prefixes = arrayOf(TRAINERS)
 	}, WILD(R.string.wildPokemonPanel_title) {
 		override val prefixes = arrayOf(ENCOUNTERS)
 	}, THT(R.string.tmsHMsTutorsPanel_title) {
