@@ -464,14 +464,15 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 						checked = it
 						setBoolean(RandomizerSettings, it)
 					})
-					Text(label)
+					Text(label, Modifier.weight(1f))
 					if (this@SettingsComponent in RandomizerSettings.selections && checked) {
 						val toggle = RandomizerSettings.toggles[this@SettingsComponent]
 						val options = RandomizerSettings.selections[this@SettingsComponent] ?: emptyList()
 						var selected by rememberSaveable { mutableStateOf(toggle?.get(RandomizerSettings).toString()) }
 						var expanded by remember { mutableStateOf(false) }
+						val width = (options.maxOf { it.toString().length } * MaterialTheme.typography.body2.fontSize.value).coerceAtLeast(48f)
 						ExposedDropdownMenuBox(expanded, { expanded = !expanded }) {
-							TextField(selected, {}, Modifier.width((options.maxOf { it.toString().length } * MaterialTheme.typography.body2.fontSize.value).coerceAtLeast(48f).dp).offset(x = 2.dp), readOnly = true)
+							TextField(selected, {}, Modifier.width(width.dp).offset(x = 2.dp), readOnly = true)
 							ExposedDropdownMenu(expanded, { expanded = false }) {
 								options.forEach { option ->
 									DropdownMenuItem({
