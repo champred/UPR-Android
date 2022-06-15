@@ -1,6 +1,9 @@
 package ly.mens.rndpkmn
 
+import android.content.ContentResolver
 import android.content.Context
+import android.net.Uri
+import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.annotation.StringRes
 import com.dabomstew.pkrandom.RandomSource
@@ -31,3 +34,17 @@ fun Context.toast(@StringRes resId: Int, vararg formatArgs: Any) =
         Toast.makeText(this, getString(resId, *formatArgs), Toast.LENGTH_SHORT)
 fun Context.longToast(@StringRes resId: Int, vararg formatArgs: Any) =
         Toast.makeText(this, getString(resId, *formatArgs), Toast.LENGTH_LONG)
+
+
+fun Uri.fileName(ctx: Context): String? {
+    return when (scheme) {
+        ContentResolver.SCHEME_FILE -> lastPathSegment
+        ContentResolver.SCHEME_CONTENT -> {
+            ctx.contentResolver.query(this, arrayOf(OpenableColumns.DISPLAY_NAME), null, arrayOf(), null)?.use {
+                it.moveToFirst()
+                it.getString(0)
+            }
+        }
+        else -> null
+    }
+}

@@ -143,7 +143,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 
 	val openLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
-		var file = File(uri.path!!)
+		var file = File(uri.fileName(ctx) ?: "input")
 		file = File(ctx.filesDir, file.name)
 		scope.launch(Dispatchers.IO) {
 			//copy selected file to app directory if it doesn't exist
@@ -161,7 +161,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	}
 	val saveRomLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument()) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
-		var file = File(uri.path!!)
+		var file = File(uri.fileName(ctx) ?: "output")
 		romFileName.value = file.name.substringAfter(':')
 		file = File(ctx.filesDir, file.name)
 		scope.launch(Dispatchers.IO) {
