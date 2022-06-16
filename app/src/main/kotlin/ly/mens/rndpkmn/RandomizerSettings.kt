@@ -199,9 +199,10 @@ object RandomizerSettings : Settings() {
 			Log.i(TAG, "Settings string created for different game.")
 			return false
 		}
-		other.javaClass.declaredFields.forEach {
-			it.isAccessible = true
-			it.set(this, it.get(other))
+		other.javaClass.declaredFields.forEach { fld ->
+			fld.isAccessible = true
+			//don't copy null values
+			fld.get(other)?.let { fld.set(this, it) }
 		}
 		return true
 	}
