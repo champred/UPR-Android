@@ -52,7 +52,9 @@ const val MISC_ROUTE = "MISC"
 
 @Composable
 fun RandomizerApp() {
-	MaterialTheme {
+	MaterialTheme(
+			colors = if (isSystemInDarkTheme()) darkColors() else lightColors()
+	) {
 		val nav = rememberNavController()
 		val scaffold = rememberScaffoldState()
 		val scope = rememberCoroutineScope()
