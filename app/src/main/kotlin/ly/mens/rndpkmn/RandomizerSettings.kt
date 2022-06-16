@@ -112,7 +112,7 @@ object RandomizerSettings : Settings() {
 		customNames = try {
 			FileFunctions.getCustomNames()
 		} catch (e: IOException) {
-			Log.e(TAG, e.message ?: "Unable to load custom names.")
+			Log.e(TAG, "Unable to load custom names.", e)
 			CustomNamesSet()
 		}
 		nameLists = customNames::class.memberProperties.reversed().associate {
@@ -192,12 +192,11 @@ object RandomizerSettings : Settings() {
 			}
 			other = fromString(config)
 		} catch (e: Exception) {
-			Log.e(TAG, e.message ?: "Failed to load settings string.")
+			Log.e(TAG, "Failed to load settings string.", e)
 			return false
 		}
 		if (romName != other.romName) {
-			Log.i(TAG, "Settings string created for different game.")
-			return false
+			Log.i(TAG, "Settings string created for ${other.romName} but $romName is loaded.")
 		}
 		other.javaClass.declaredFields.forEach { fld ->
 			fld.isAccessible = true
@@ -212,7 +211,7 @@ object RandomizerSettings : Settings() {
 			currentSeed = text.toLong(base)
 			true
 		} catch (e: NumberFormatException) {
-			Log.e(TAG, e.message ?: "Unable to convert seed to number.")
+			Log.e(TAG, "Unable to convert seed to number.", e)
 			false
 		}
 	}

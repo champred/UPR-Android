@@ -192,7 +192,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		}
 	}
 
-	romFileName.value?.let { Text(stringResource(R.string.current_rom, it, RandomizerSettings.romName)) }
+	romFileName.value?.let { Text(stringResource(R.string.current_rom, it)) }
 	Row(verticalAlignment = Alignment.CenterVertically) {
 		Button({ openLauncher.launch("*/*") }, Modifier.padding(8.dp)) {
 			Text(stringResource(R.string.action_open_rom))
