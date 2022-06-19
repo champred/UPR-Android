@@ -7,6 +7,7 @@ class Trie {
 		fun children(words: MutableList<String> = mutableListOf()): List<String> {
 			word?.let { words.add(it) }
 			for (n in childNodes.values) {
+				//limit results so it doesn't take too long
 				if (words.size >= 3) break
 				n.children(words)
 			}
@@ -14,7 +15,12 @@ class Trie {
 		}
 	}
 
-	private val root = Node()
+	private var root = Node()
+
+	fun clear() {
+		//TODO prevent memory leak
+		root = Node()
+	}
 
 	fun insert(word: String) {
 		var currentNode = root

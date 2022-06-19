@@ -152,6 +152,7 @@ object RandomizerSettings : Settings() {
 
 		val (first, second, third) = romHandler.starters
 		currentStarters = Triple(first, second, third)
+		pokeTrie.clear()
 		for (i in 1 until romHandler.pokemon.size) {
 			pokeTrie.insert(romHandler.pokemon[i].name)
 		}
