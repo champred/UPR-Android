@@ -20,6 +20,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -32,6 +34,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.documentfile.provider.DocumentFile
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,12 +43,12 @@ import com.dabomstew.pkrandom.MiscTweak
 import com.dabomstew.pkrandom.RandomSource.pickSeed
 import com.dabomstew.pkrandom.SettingsMod.StartersMod
 import com.dabomstew.pkrandom.SysConstants.customNamesFile
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.dabomstew.pkrandom.romhandlers.RomHandler
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import java.io.File
 import java.lang.reflect.Field
+import java.util.concurrent.atomic.AtomicInteger
 
 const val START_ROUTE = "GENERAL"
 const val MISC_ROUTE = "MISC"
@@ -132,7 +135,7 @@ fun RandomizerHome(scaffold: ScaffoldState) {
 	val romName = rememberSaveable { mutableStateOf<String?>(null) }
 	Column(Modifier.verticalScroll(rememberScrollState())) {
 		RomButtons(scaffold, romName)
-		DialogButtons(scaffold, romName)
+		DialogButtons(romName)
 		if (romName.value != null) ConfigFields(scaffold, romName)
 	}
 }
@@ -145,8 +148,8 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 
 	val openLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
-		var file = File(uri.fileName(ctx) ?: "input")
-		file = File(ctx.filesDir, file.name)
+		val name = DocumentFile.fromSingleUri(ctx, uri)!!.name ?: uri.lastPathSegment!!
+		val file = File(ctx.filesDir, name)
 		scope.launch(Dispatchers.IO) {
 			//copy selected file to app directory if it doesn't exist
 			if (!file.isRomFile) {
@@ -156,6 +159,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			}
 			if (RandomizerSettings.loadRom(file)) {
 				romFileName.value = RandomizerSettings.romFileName
+				romSaved = false
 			} else {
 				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_invalid_rom, file.name))
 			}
@@ -163,11 +167,11 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	}
 	val saveRomLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument()) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
-		var file = File(uri.fileName(ctx) ?: "output")
-		romFileName.value = file.name.substringAfter(':')
-		file = File(ctx.filesDir, file.name)
+		val name = DocumentFile.fromSingleUri(ctx, uri)!!.name ?: uri.lastPathSegment!!
+		romFileName.value = name.substringAfter(':')
+		val file = File(ctx.filesDir, name)
 		scope.launch(Dispatchers.IO) {
-			RandomizerSettings.saveRom(file)
+			if (!RandomizerSettings.saveRom(file)) return@launch
 			//copy temporary file to selected path
 			ctx.contentResolver.openOutputStream(uri).use {
 				val source = ctx.openFileInput(file.name)
@@ -186,7 +190,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		scope.launch(Dispatchers.IO) {
 			ctx.contentResolver.openOutputStream(uri).use {
 				if (it != null) {
-					RandomizerSettings.currentLog.writeTo(it)
+					RandomizerSettings.outputLog.writeTo(it)
 				}
 			}
 		}
@@ -211,27 +215,113 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 }
 
 @Composable
-fun DialogButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
+fun DialogButtons(romFileName: MutableState<String?>) {
+	val openBatchDialog = rememberSaveable { mutableStateOf(false) }
+	Button({ openBatchDialog.value = true }, Modifier.padding(8.dp), romFileName.value != null) { Text(stringResource(R.string.action_batch_random)) }
+	if (openBatchDialog.value) BatchDialog(openBatchDialog, romFileName)
+
 	RandomizerSettings.nameLists.forEach { (title, names) ->
 		val openNamesDialog = rememberSaveable { mutableStateOf(false) }
 		Button({ openNamesDialog.value = true }, Modifier.padding(8.dp)) { Text(stringResource(R.string.edit_custom, title)) }
-		if (openNamesDialog.value) NamesDialog(title, names, openNamesDialog)
+		if (openNamesDialog.value) NamesDialog(openNamesDialog, title, names)
 	}
+
 	val openLimitDialog = rememberSaveable { mutableStateOf(false) }
-	val ctx = LocalContext.current
-	val scope = rememberCoroutineScope()
-	Button({
-		if (romFileName.value == null) {
-			scope.launch {
-				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.rom_not_loaded))
-			}
-		} else openLimitDialog.value = true
-	}, Modifier.padding(8.dp)) { Text(stringResource(R.string.limitPokemonCheckBox)) }
+	Button({ openLimitDialog.value = true }, Modifier.padding(8.dp), romFileName.value != null) { Text(stringResource(R.string.limitPokemonCheckBox)) }
 	if (openLimitDialog.value) LimitDialog(openLimitDialog)
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun NamesDialog(label: String, names: MutableList<String>, openDialog: MutableState<Boolean>) {
+fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<String?>) {
+	val name = romFileName.value!!
+	var prefix by rememberSaveable { mutableStateOf(name.substringBeforeLast('-')) }
+	var start by rememberSaveable { mutableStateOf(1) }
+	var end by rememberSaveable { mutableStateOf(10) }
+	val keyCon = LocalSoftwareKeyboardController.current
+	val (first, second) = remember { FocusRequester.createRefs() }
+	val scope = rememberCoroutineScope()
+	val ctx = LocalContext.current
+
+	val batchLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+		keyCon?.hide()
+		openDialog.value = false
+		if (start >= end || uri == null) return@rememberLauncherForActivityResult
+		val dir = DocumentFile.fromTreeUri(ctx, uri)!!
+		//determine how many ROMs we can make at a time
+		val len = end - start + 1; val count = AtomicInteger(start)
+		val numHandlers = Math.min(len, RandomizerSettings.romLimit)
+		val romsPerHandler = len / numHandlers; val remainingRoms = len % numHandlers
+
+		val saveRom = fun (_: Int) {
+			val file = File(ctx.filesDir, Triple(prefix, count.getAndIncrement().toString().padStart(4, '0'), name.substringAfterLast('.')).fileName)
+			val fileUri = dir.createFile("application/octet-stream", file.name)?.uri ?: return
+			if (!RandomizerSettings.saveRom(file, pickSeed())) return
+			//copy temporary file to selected path
+			ctx.contentResolver.openOutputStream(fileUri).use {
+				val source = ctx.openFileInput(file.name)
+				if (it != null) {
+					source.copyTo(it)
+				}
+				source.close()
+				//clean up temporary file
+				ctx.deleteFile(file.name)
+			}
+		}
+
+		if (numHandlers > 1) {
+			//split ROMs evenly among handlers
+			for (i in 1..numHandlers) {
+				scope.launch(Dispatchers.IO) {
+					repeat(romsPerHandler, saveRom)
+				}
+			}
+			//finish remaining ROMs
+			scope.launch(Dispatchers.IO) {
+				repeat(remainingRoms, saveRom)
+			}
+		} else scope.launch(Dispatchers.IO) {
+			repeat(romsPerHandler, saveRom)
+		}
+	}
+
+	Dialog({ openDialog.value = false }) {
+		Column(Modifier.background(MaterialTheme.colors.background).padding(8.dp)) {
+			TextField(prefix,
+					{ prefix = it },
+					Modifier.fillMaxWidth(),
+					label = { Text(stringResource(R.string.name_prefix)) },
+					keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+					keyboardActions = KeyboardActions { first.requestFocus() }
+			)
+			Row(Modifier.padding(vertical = 8.dp)) {
+				val notNumPattern = Regex("\\D")
+				TextField(start.toString(), {
+						val tmp = it.replace(notNumPattern, "").trimStart('0')
+						start = if (tmp.isNotEmpty()) tmp.toInt() else 0
+					},
+					Modifier.weight(1f).focusRequester(first),
+					label = { Text(stringResource(R.string.name_start)) },
+					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+					keyboardActions = KeyboardActions { second.requestFocus() }
+				)
+				TextField(end.toString(), {
+						val tmp = it.replace(notNumPattern, "").trimStart('0')
+						end = if (tmp.isNotEmpty()) tmp.toInt() else 0
+					},
+					Modifier.weight(1f).focusRequester(second).offset(x = 2.dp),
+					label = { Text(stringResource(R.string.name_end)) },
+					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+					keyboardActions = KeyboardActions { batchLauncher.launch(null) }
+				)
+			}
+			Button({ batchLauncher.launch(null) }) { Text(stringResource(R.string.action_choose_dir) )}
+		}
+	}
+}
+
+@Composable
+fun NamesDialog(openDialog: MutableState<Boolean>, label: String, names: MutableList<String>) {
 	val ctx = LocalContext.current
 	val scope = rememberCoroutineScope()
 	var text by rememberSaveable { mutableStateOf(names.joinToString("\n")) }

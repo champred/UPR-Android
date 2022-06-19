@@ -7,6 +7,8 @@
     <string name="action_save_names">Save Names</string>
     <string name="action_save_restrictions">Save Restrictions</string>
     <string name="action_random_seed">Random Seed</string>
+    <string name="action_batch_random">Batch Randomize</string>
+    <string name="action_choose_dir">Choose Directory</string>
 
     <string name="rom_loaded">ROM Loaded</string>
     <string name="rom_not_loaded">ROM Not Loaded</string>
@@ -20,6 +22,9 @@
     <string name="current_seed">Current Seed Number</string>
     <string name="seed_hex">Hexadecimal</string>
     <string name="seed_dec">Decimal</string>
+    <string name="name_prefix">File Prefix</string>
+    <string name="name_start">Starting Number</string>
+    <string name="name_end">Ending Number</string>
 
     <string name="error_invalid_dir">Invalid directory</string>
     <string name="error_no_roms">No ROMs in directory: %1$s</string>

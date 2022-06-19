@@ -16,18 +16,30 @@ import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
 
 object RandomizerSettings : Settings() {
-	val romHandlerFactories = listOf(
+	private val romHandlerFactories = listOf(
 			Gen1RomHandler.Factory(),
 			Gen2RomHandler.Factory(),
 			Gen3RomHandler.Factory(),
 			Gen4RomHandler.Factory(),
 			Gen5RomHandler.Factory()
 	)
-	private var _romHandler: RomHandler? = null
-	val romHandler: RomHandler get() = _romHandler!!
-	//initialize with 1MiB to accommodate large logs without needing to resize
-	val currentLog = ByteArrayOutputStream(1024 * 1024)
-	val currentGen get() = _romHandler?.generationOfPokemon() ?: 1
+	private lateinit var romHandlerFactory: RomHandler.Factory
+	private lateinit var romHandler: RomHandler
+	private lateinit var inputFile: File
+	//allocate enough space to accommodate large logs without needing to resize
+	val outputLog = ByteArrayOutputStream(1024 * 1024 * 4)
+	private val emptyLog = object : OutputStream() {
+		override fun write(b: Int) {
+			return
+		}
+	}
+	//limit the number of ROMs based on amount of available memory
+	val romLimit: Int get() {
+		val rt = Runtime.getRuntime()
+		val mem = rt.maxMemory() - (rt.totalMemory() - rt.freeMemory())
+		return (mem / inputFile.length() / 2).toInt()
+	}
+	val currentGen: Int get() = if (this::romHandler.isInitialized) romHandler.generationOfPokemon() else 1
 	private var _currentStarters: Triple<Pokemon, Pokemon, Pokemon>? = null
 	var currentStarters: Triple<Pokemon, Pokemon, Pokemon>
 		set(value) {
@@ -43,7 +55,7 @@ object RandomizerSettings : Settings() {
 	val pokeTrie = Trie()
 	var currentSeed by Delegates.notNull<Long>()
 	lateinit var romFileName: String
-	val versionString: String get() = "$VERSION${toString()}"
+	val versionString: String get() = "$VERSION$this"
 	val limits: Map<Field?, ClosedFloatingPointRange<Float>> = mapOf(
 			this::staticLevelModifier.javaField to -50f..50f,
 			this::guaranteedMoveCount.javaField to 2f..4f,
@@ -126,12 +138,17 @@ object RandomizerSettings : Settings() {
 	}
 
 	fun loadRom(file: File): Boolean {
+		inputFile = file
 		currentSeed = RandomSource.pickSeed()
 		romFileName = Triple(file.nameWithoutExtension.substringAfter(':'), currentSeed.toString(16), file.extension).fileName
-		_romHandler = romHandlerFactories.firstOrNull() { it.isLoadable(file.absolutePath) }?.create(random)
-		if (_romHandler == null) return false
-		romHandler.loadRom(file.absolutePath)
-		romName = romHandler.romName
+		try {
+			romHandlerFactory = romHandlerFactories.first { it.isLoadable(file.absolutePath) }
+			romHandler = createRomHandler()
+			romName = romHandler.romName
+		} catch (e: Exception) {
+			Log.e(TAG, "${file.name} cannot be loaded.", e)
+			return false
+		}
 
 		val (first, second, third) = romHandler.starters
 		currentStarters = Triple(first, second, third)
@@ -165,12 +182,40 @@ object RandomizerSettings : Settings() {
 		return true
 	}
 
-	fun saveRom(file: File) {
-		currentLog.reset()
-		val out = PrintStream(currentLog, false, "UTF-8")
+	fun saveRom(file: File): Boolean {
+		outputLog.reset()
+		val out = PrintStream(outputLog, false, "UTF-8")
 		romHandler.setLog(out)
-		Randomizer(this, romHandler, null, false).randomize(file.absolutePath, out, currentSeed)
-		out.close()
+		return saveRom(file, currentSeed, romHandler, out)
+	}
+
+	fun saveRom(file: File, seed: Long): Boolean {
+		val handler = try {
+			createRomHandler()
+		} catch (e: Exception) {
+			Log.e(TAG, "Failed to create ROM handler.", e)
+			return false
+		}
+		val out = PrintStream(emptyLog)
+		return saveRom(file, seed, handler, out)
+	}
+
+	private fun saveRom(file: File, seed: Long, handler: RomHandler, out: PrintStream): Boolean {
+		return try {
+			Randomizer(this, handler, null, false).randomize(file.absolutePath, out, seed)
+			true
+		} catch (e: Exception) {
+			Log.e(TAG, "Failed to randomize ROM.", e)
+			false
+		} finally {
+			out.close()
+		}
+	}
+
+	private fun createRomHandler(): RomHandler {
+		val romHandler = romHandlerFactory.create(random)
+		romHandler.loadRom(inputFile.absolutePath)
+		return romHandler
 	}
 
 	fun getPokemon(name: String): Pokemon? {
