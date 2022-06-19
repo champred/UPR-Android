@@ -35,4 +35,5 @@
 
     <string name="title_general">General Settings</string>
     <string name="title_misc">Miscellaneous Settings</string>
+    <string name="desc_batch">Shows progress of batch randomization.</string>
 </resources>

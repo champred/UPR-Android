@@ -1,5 +1,7 @@
 package ly.mens.rndpkmn
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,6 +15,15 @@ class MainActivity : ComponentActivity() {
         if (BuildConfig.DEBUG) {
             testForRequiredConfigs()
         }
+        val channel = NotificationChannel(
+                CHANNEL_ID.toString(),
+                getString(R.string.action_batch_random),
+                NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = getString(R.string.desc_batch)
+        }
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
         setContent { RandomizerApp() }
     }
 

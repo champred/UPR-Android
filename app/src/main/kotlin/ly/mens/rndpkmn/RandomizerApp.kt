@@ -34,6 +34,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -43,15 +45,18 @@ import com.dabomstew.pkrandom.MiscTweak
 import com.dabomstew.pkrandom.RandomSource.pickSeed
 import com.dabomstew.pkrandom.SettingsMod.StartersMod
 import com.dabomstew.pkrandom.SysConstants.customNamesFile
-import com.dabomstew.pkrandom.romhandlers.RomHandler
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.io.File
 import java.lang.reflect.Field
+import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicInteger
 
 const val START_ROUTE = "GENERAL"
 const val MISC_ROUTE = "MISC"
+const val CHANNEL_ID = 69_420
 
 @Composable
 fun RandomizerApp() {
@@ -145,24 +150,22 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	val ctx = LocalContext.current
 	val scope = rememberCoroutineScope()
 	var romSaved by remember { mutableStateOf(false) }
+	var showProgress by remember { mutableStateOf(false) }
 
 	val openLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
 		val name = DocumentFile.fromSingleUri(ctx, uri)!!.name ?: uri.lastPathSegment!!
 		val file = File(ctx.filesDir, name)
 		scope.launch(Dispatchers.IO) {
-			//copy selected file to app directory if it doesn't exist
-			if (!file.isRomFile) {
-				ctx.openFileOutput(file.name, Context.MODE_PRIVATE).use {
-					ctx.contentResolver.openInputStream(uri)?.copyTo(it)
-				}
-			}
+			showProgress = true
+			ctx.loadFromUri(uri, file)
 			if (RandomizerSettings.loadRom(file)) {
 				romFileName.value = RandomizerSettings.romFileName
 				romSaved = false
 			} else {
 				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_invalid_rom, file.name))
 			}
+			showProgress = false
 		}
 	}
 	val saveRomLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument()) { uri ->
@@ -171,22 +174,16 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		romFileName.value = name.substringAfter(':')
 		val file = File(ctx.filesDir, name)
 		scope.launch(Dispatchers.IO) {
+			showProgress = true
 			if (!RandomizerSettings.saveRom(file)) {
 				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_save_failed))
+				showProgress = false
 				return@launch
 			}
-			//copy temporary file to selected path
-			ctx.contentResolver.openOutputStream(uri).use {
-				val source = ctx.openFileInput(file.name)
-				if (it != null) {
-					source.copyTo(it)
-				}
-				source.close()
-				//clean up temporary file
-				ctx.deleteFile(file.name)
-			}
+			ctx.saveToUri(uri, file)
 			RandomizerSettings.reloadRomHandler()
 			romSaved = true
+			showProgress = false
 		}
 	}
 	val saveLogLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument()) { uri ->
@@ -200,9 +197,10 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		}
 	}
 
+	if (showProgress) LinearProgressIndicator(Modifier.fillMaxWidth().padding(vertical = 8.dp))
 	romFileName.value?.let { Text(stringResource(R.string.current_rom, it)) }
 	Row(verticalAlignment = Alignment.CenterVertically) {
-		Button({ openLauncher.launch("*/*") }, Modifier.padding(8.dp)) {
+		Button({ openLauncher.launch("application/octet-stream") }, Modifier.padding(8.dp)) {
 			Text(stringResource(R.string.action_open_rom))
 		}
 		Text(stringResource(if (romFileName.value == null) R.string.rom_not_loaded else R.string.rom_loaded))
@@ -246,6 +244,12 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 	val (first, second) = remember { FocusRequester.createRefs() }
 	val scope = rememberCoroutineScope()
 	val ctx = LocalContext.current
+	val builder = NotificationCompat.Builder(ctx, CHANNEL_ID.toString()).apply {
+		setSmallIcon(R.drawable.ic_batch_save)
+		setContentTitle(ctx.getString(R.string.action_batch_random))
+	}
+	val manager = NotificationManagerCompat.from(ctx)
+	val lock = Semaphore(1)
 
 	val batchLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
 		keyCon?.hide()
@@ -258,19 +262,16 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 		val romsPerHandler = len / numHandlers; val remainingRoms = len % numHandlers
 
 		val saveRom = fun (_: Int) {
+			//update the progress notification
+			if (lock.tryAcquire()) {
+				builder.setProgress(len, count.get() - start + 1, false)
+				manager.notify(CHANNEL_ID, builder.build())
+				lock.release()
+			}
 			val file = File(ctx.filesDir, Triple(prefix, count.getAndIncrement().toString().padStart(4, '0'), name.substringAfterLast('.')).fileName)
 			val fileUri = dir.createFile("application/octet-stream", file.name)?.uri ?: return
 			if (!RandomizerSettings.saveRom(file, pickSeed())) return
-			//copy temporary file to selected path
-			ctx.contentResolver.openOutputStream(fileUri).use {
-				val source = ctx.openFileInput(file.name)
-				if (it != null) {
-					source.copyTo(it)
-				}
-				source.close()
-				//clean up temporary file
-				ctx.deleteFile(file.name)
-			}
+			ctx.saveToUri(fileUri, file)
 		}
 
 		if (numHandlers > 1) {
