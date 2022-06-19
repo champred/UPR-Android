@@ -171,7 +171,10 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		romFileName.value = name.substringAfter(':')
 		val file = File(ctx.filesDir, name)
 		scope.launch(Dispatchers.IO) {
-			if (!RandomizerSettings.saveRom(file)) return@launch
+			if (!RandomizerSettings.saveRom(file)) {
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_save_failed))
+				return@launch
+			}
 			//copy temporary file to selected path
 			ctx.contentResolver.openOutputStream(uri).use {
 				val source = ctx.openFileInput(file.name)
@@ -182,6 +185,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 				//clean up temporary file
 				ctx.deleteFile(file.name)
 			}
+			RandomizerSettings.reloadRomHandler()
 			romSaved = true
 		}
 	}

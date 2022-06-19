@@ -219,6 +219,15 @@ object RandomizerSettings : Settings() {
 		return romHandler
 	}
 
+	fun reloadRomHandler() {
+		romHandler = try {
+			createRomHandler()
+		} catch (e: Exception) {
+			Log.e(TAG, "Failed to create new ROM handler.", e)
+			romHandler
+		}
+	}
+
 	fun getPokemon(name: String): Pokemon? {
 		for (i in 1 until romHandler.pokemon.size) {
 			if (romHandler.pokemon[i].name.equals(name, true)) return romHandler.pokemon[i]
