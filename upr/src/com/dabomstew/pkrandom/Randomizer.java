@@ -683,9 +683,6 @@ public class Randomizer {
 
         // Diagnostics
         log.println("--ROM Diagnostics--");
-        if (!romHandler.isRomValid()) {
-            log.println(bundle.getString("Log.InvalidRomLoaded"));
-        }
         romHandler.printRomDiagnostics(log);
 
         return checkValue;
