@@ -254,8 +254,6 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 	}
 	val manager = NotificationManagerCompat.from(ctx)
 
-	val lock = Semaphore(1)
-
 	val batchLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
 		keyCon?.hide()
 		openDialog.value = false
@@ -265,13 +263,18 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 		val len = end - start + 1; val count = AtomicInteger(start)
 		val numHandlers = Math.min(len, RandomizerSettings.romLimit)
 		val romsPerHandler = len / numHandlers; val remainingRoms = len % numHandlers
+		val lock = Semaphore(start); var last = 0
 
 		val saveRom = fun (_: Int) {
 			//update the progress notification
-			if (lock.tryAcquire()) {
-				builder.setProgress(len, count.get() - start + 1, false)
+			//only allow one thread to update it at a time
+			//make sure the progress is greater than the last update
+			val current = lock.availablePermits()
+			if (current > last && lock.tryAcquire(current)) {
+				builder.setProgress(len, current - start + 1, false)
 				manager.notify(CHANNEL_ID, builder.build())
-				lock.release()
+				last = current
+				lock.release(current)
 			}
 			val file = File(ctx.filesDir, Triple(prefix, count.getAndIncrement().toString().padStart(4, '0'), name.substringAfterLast('.')).fileName)
 			val fileUri = dir.createFile("application/octet-stream", file.name)?.uri ?: return
@@ -286,6 +289,8 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 					}
 				}
 			}
+			//we can use this to synchronize on the number of ROMs saved
+			lock.release()
 		}
 
 		if (numHandlers > 1) {
@@ -301,6 +306,13 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 			}
 		} else scope.launch(Dispatchers.IO) {
 			repeat(romsPerHandler, saveRom)
+		}
+
+		scope.launch(Dispatchers.Default) {
+			//dismiss notification when complete
+			//once the last ROM has been saved we will have one more permit than the ending ROM number
+			lock.acquireUninterruptibly(end + 1)
+			manager.cancel(CHANNEL_ID)
 		}
 	}
 
