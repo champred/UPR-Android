@@ -49,6 +49,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.lang.reflect.Field
 import java.util.concurrent.Semaphore
@@ -240,15 +241,19 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 	var prefix by rememberSaveable { mutableStateOf(name.substringBeforeLast('-')) }
 	var start by rememberSaveable { mutableStateOf(1) }
 	var end by rememberSaveable { mutableStateOf(10) }
+	var saveLog by rememberSaveable { mutableStateOf(false) }
+
 	val keyCon = LocalSoftwareKeyboardController.current
 	val (first, second) = remember { FocusRequester.createRefs() }
 	val scope = rememberCoroutineScope()
+
 	val ctx = LocalContext.current
 	val builder = NotificationCompat.Builder(ctx, CHANNEL_ID.toString()).apply {
 		setSmallIcon(R.drawable.ic_batch_save)
 		setContentTitle(ctx.getString(R.string.action_batch_random))
 	}
 	val manager = NotificationManagerCompat.from(ctx)
+
 	val lock = Semaphore(1)
 
 	val batchLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
@@ -270,8 +275,17 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 			}
 			val file = File(ctx.filesDir, Triple(prefix, count.getAndIncrement().toString().padStart(4, '0'), name.substringAfterLast('.')).fileName)
 			val fileUri = dir.createFile("application/octet-stream", file.name)?.uri ?: return
-			if (!RandomizerSettings.saveRom(file, pickSeed())) return
+			val log = if (saveLog) ByteArrayOutputStream(1024 * 1024) else null
+			val logUri = log?.let { dir.createFile("text/plain", "${file.name}.log.txt")?.uri }
+			if (!RandomizerSettings.saveRom(file, pickSeed(), log)) return
 			ctx.saveToUri(fileUri, file)
+			if (logUri != null) {
+				ctx.contentResolver.openOutputStream(logUri).use {
+					if (it != null) {
+						log.writeTo(it)
+					}
+				}
+			}
 		}
 
 		if (numHandlers > 1) {
@@ -299,13 +313,13 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 					keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
 					keyboardActions = KeyboardActions { first.requestFocus() }
 			)
-			Row(Modifier.padding(vertical = 8.dp)) {
+			Row(Modifier.padding(top = 8.dp)) {
 				val notNumPattern = Regex("\\D")
 				TextField(start.toString(), {
 						val tmp = it.replace(notNumPattern, "").trimStart('0')
 						start = if (tmp.isNotEmpty()) tmp.toInt() else 0
 					},
-					Modifier.weight(1f).focusRequester(first),
+					Modifier.weight(1f).focusRequester(first).padding(end = 2.dp),
 					label = { Text(stringResource(R.string.name_start)) },
 					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
 					keyboardActions = KeyboardActions { second.requestFocus() }
@@ -314,11 +328,15 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 						val tmp = it.replace(notNumPattern, "").trimStart('0')
 						end = if (tmp.isNotEmpty()) tmp.toInt() else 0
 					},
-					Modifier.weight(1f).focusRequester(second).offset(x = 2.dp),
+					Modifier.weight(1f).focusRequester(second).padding(start = 2.dp),
 					label = { Text(stringResource(R.string.name_end)) },
 					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
 					keyboardActions = KeyboardActions { batchLauncher.launch(null) }
 				)
+			}
+			Row(verticalAlignment = Alignment.CenterVertically) {
+				Checkbox(saveLog, { saveLog = it })
+				Text(stringResource(R.string.action_save_log))
 			}
 			Button({ batchLauncher.launch(null) }) { Text(stringResource(R.string.action_choose_dir) )}
 		}

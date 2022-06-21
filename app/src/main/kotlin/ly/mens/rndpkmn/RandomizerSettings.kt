@@ -26,8 +26,8 @@ object RandomizerSettings : Settings() {
 	private lateinit var romHandlerFactory: RomHandler.Factory
 	private lateinit var romHandler: RomHandler
 	private lateinit var inputFile: File
-	//allocate enough space to accommodate large logs without needing to resize
-	val outputLog = ByteArrayOutputStream(1024 * 1024 * 4)
+	//allocate enough space to accommodate large logs
+	val outputLog = ByteArrayOutputStream(1024 * 1024)
 	private val emptyLog = object : OutputStream() {
 		override fun write(b: Int) {
 			return
@@ -190,14 +190,14 @@ object RandomizerSettings : Settings() {
 		return saveRom(file, currentSeed, romHandler, out)
 	}
 
-	fun saveRom(file: File, seed: Long): Boolean {
+	fun saveRom(file: File, seed: Long, log: OutputStream? = null): Boolean {
 		val handler = try {
 			createRomHandler()
 		} catch (e: Exception) {
 			Log.e(TAG, "Failed to create ROM handler.", e)
 			return false
 		}
-		val out = PrintStream(emptyLog)
+		val out = PrintStream(log ?: emptyLog)
 		return saveRom(file, seed, handler, out)
 	}
 
