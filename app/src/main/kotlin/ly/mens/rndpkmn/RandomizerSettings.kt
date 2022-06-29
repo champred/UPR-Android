@@ -10,6 +10,7 @@ import com.dabomstew.pkrandom.romhandlers.*
 import java.io.*
 import java.lang.NumberFormatException
 import java.lang.reflect.Field
+import java.util.ResourceBundle.getBundle
 import kotlin.properties.Delegates
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
@@ -185,9 +186,7 @@ object RandomizerSettings : Settings() {
 
 	fun saveRom(file: File): Boolean {
 		outputLog.reset()
-		val out = PrintStream(outputLog, false, "UTF-8")
-		romHandler.setLog(out)
-		return saveRom(file, currentSeed, romHandler, out)
+		return saveRom(file, currentSeed, romHandler, PrintStream(outputLog))
 	}
 
 	fun saveRom(file: File, seed: Long, log: OutputStream? = null): Boolean {
@@ -197,25 +196,28 @@ object RandomizerSettings : Settings() {
 			Log.e(TAG, "Failed to create ROM handler.", e)
 			return false
 		}
-		val out = PrintStream(log ?: emptyLog)
-		return saveRom(file, seed, handler, out)
+		return saveRom(file, seed, handler, PrintStream(log ?: emptyLog))
 	}
 
-	private fun saveRom(file: File, seed: Long, handler: RomHandler, out: PrintStream): Boolean {
+	private fun saveRom(file: File, seed: Long, handler: RomHandler, log: PrintStream): Boolean {
 		return try {
-			Randomizer(this, handler, null, false).randomize(file.absolutePath, out, seed)
+			handler.setLog(log)
+			Randomizer(this, handler, getBundle("com.dabomstew.pkrandom.newgui.Bundle"), false).randomize(file.absolutePath, log, seed)
 			true
 		} catch (e: Exception) {
 			Log.e(TAG, "Failed to randomize ROM.", e)
 			false
 		} finally {
-			out.close()
+			log.close()
 		}
 	}
 
 	private fun createRomHandler(): RomHandler {
 		val romHandler = romHandlerFactory.create(random)
 		romHandler.loadRom(inputFile.absolutePath)
+		if (!romHandler.isRomValid) {
+			Log.i(TAG, "The loaded ROM is not valid.")
+		}
 		return romHandler
 	}
 
