@@ -629,7 +629,7 @@ public class NewRandomizerGUI {
                     initialState();
                     romLoaded();
                     Settings.TweakForROMFeedback feedback = settings.tweakForRom(this.romHandler);
-                    if (feedback.isChangedStarter() && settings.getStartersMod() == SettingsMod.StartersMod.CUSTOM) {
+                    if (feedback.isChangedStarter() && settings.getStartersMod() == Settings.StartersMod.CUSTOM) {
                         JOptionPane.showMessageDialog(frame, bundle.getString("GUI.starterUnavailable"));
                     }
                     this.restoreStateFromSettings(settings);
@@ -1101,16 +1101,16 @@ public class NewRandomizerGUI {
         tpRandomizeTrainerClassNamesCheckBox.setSelected(settings.isRandomizeTrainerClassNames());
         ptIsDualTypeCheckBox.setSelected(settings.isDualTypeOnly());
 
-        pbsRandomRadioButton.setSelected(settings.getBaseStatisticsMod() == SettingsMod.BaseStatisticsMod.RANDOM);
-        pbsShuffleRadioButton.setSelected(settings.getBaseStatisticsMod() == SettingsMod.BaseStatisticsMod.SHUFFLE);
-        pbsUnchangedRadioButton.setSelected(settings.getBaseStatisticsMod() == SettingsMod.BaseStatisticsMod.UNCHANGED);
+        pbsRandomRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.RANDOM);
+        pbsShuffleRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.SHUFFLE);
+        pbsUnchangedRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.UNCHANGED);
         pbsFollowEvolutionsCheckBox.setSelected(settings.isBaseStatsFollowEvolutions());
         pbsUpdateBaseStatsCheckBox.setSelected(settings.isUpdateBaseStats());
         pbsUpdateComboBox.setSelectedIndex(Math.max(0,settings.getUpdateBaseStatsToGeneration() - (Math.max(6,romHandler.generationOfPokemon()+1))));
         pbsStandardizeEXPCurvesCheckBox.setSelected(settings.isStandardizeEXPCurves());
-        pbsLegendariesSlowRadioButton.setSelected(settings.getExpCurveMod() == SettingsMod.ExpCurveMod.LEGENDARIES);
-        pbsStrongLegendariesSlowRadioButton.setSelected(settings.getExpCurveMod() == SettingsMod.ExpCurveMod.STRONG_LEGENDARIES);
-        pbsAllMediumFastRadioButton.setSelected(settings.getExpCurveMod() == SettingsMod.ExpCurveMod.ALL);
+        pbsLegendariesSlowRadioButton.setSelected(settings.getExpCurveMod() == Settings.ExpCurveMod.LEGENDARIES);
+        pbsStrongLegendariesSlowRadioButton.setSelected(settings.getExpCurveMod() == Settings.ExpCurveMod.STRONG_LEGENDARIES);
+        pbsAllMediumFastRadioButton.setSelected(settings.getExpCurveMod() == Settings.ExpCurveMod.ALL);
         ExpCurve[] expCurves = getEXPCurvesForGeneration(romHandler.generationOfPokemon());
         int index = 0;
         for (int i = 0; i < expCurves.length; i++) {
@@ -1122,8 +1122,8 @@ public class NewRandomizerGUI {
         pbsFollowMegaEvosCheckBox.setSelected(settings.isBaseStatsFollowMegaEvolutions());
         pbsAssignEvoStatsRandomlyCheckBox.setSelected(settings.isAssignEvoStatsRandomly());
 
-        paUnchangedRadioButton.setSelected(settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.UNCHANGED);
-        paRandomRadioButton.setSelected(settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.RANDOM);
+        paUnchangedRadioButton.setSelected(settings.getAbilitiesMod() == Settings.AbilitiesMod.UNCHANGED);
+        paRandomRadioButton.setSelected(settings.getAbilitiesMod() == Settings.AbilitiesMod.RANDOM);
         paAllowWonderGuardCheckBox.setSelected(settings.isAllowWonderGuard());
         paFollowEvolutionsCheckBox.setSelected(settings.isAbilitiesFollowEvolutions());
         paTrappingAbilitiesCheckBox.setSelected(settings.isBanTrappingAbilities());
@@ -1133,19 +1133,19 @@ public class NewRandomizerGUI {
         paWeighDuplicatesTogetherCheckBox.setSelected(settings.isWeighDuplicateAbilitiesTogether());
         paEnsureTwoAbilitiesCheckbox.setSelected(settings.isEnsureTwoAbilities());
 
-        ptRandomFollowEvolutionsRadioButton.setSelected(settings.getTypesMod() == SettingsMod.TypesMod.RANDOM_FOLLOW_EVOLUTIONS);
-        ptRandomCompletelyRadioButton.setSelected(settings.getTypesMod() == SettingsMod.TypesMod.RANDOM_COMPLETELY);
-        ptUnchangedRadioButton.setSelected(settings.getTypesMod() == SettingsMod.TypesMod.UNCHANGED);
+        ptRandomFollowEvolutionsRadioButton.setSelected(settings.getTypesMod() == Settings.TypesMod.RANDOM_FOLLOW_EVOLUTIONS);
+        ptRandomCompletelyRadioButton.setSelected(settings.getTypesMod() == Settings.TypesMod.RANDOM_COMPLETELY);
+        ptUnchangedRadioButton.setSelected(settings.getTypesMod() == Settings.TypesMod.UNCHANGED);
         ptFollowMegaEvosCheckBox.setSelected(settings.isTypesFollowMegaEvolutions());
         pmsNoGameBreakingMovesCheckBox.setSelected(settings.doBlockBrokenMoves());
 
         peMakeEvolutionsEasierCheckBox.setSelected(settings.isMakeEvolutionsEasier());
         peRemoveTimeBasedEvolutionsCheckBox.setSelected(settings.isRemoveTimeBasedEvolutions());
 
-        spCustomRadioButton.setSelected(settings.getStartersMod() == SettingsMod.StartersMod.CUSTOM);
-        spRandomCompletelyRadioButton.setSelected(settings.getStartersMod() == SettingsMod.StartersMod.RANDOM_COMPLETELY);
-        spUnchangedRadioButton.setSelected(settings.getStartersMod() == SettingsMod.StartersMod.UNCHANGED);
-        spRandomTwoEvosRadioButton.setSelected(settings.getStartersMod() == SettingsMod.StartersMod.RANDOM_TWO_EVOLUTIONS);
+        spCustomRadioButton.setSelected(settings.getStartersMod() == Settings.StartersMod.CUSTOM);
+        spRandomCompletelyRadioButton.setSelected(settings.getStartersMod() == Settings.StartersMod.RANDOM_COMPLETELY);
+        spUnchangedRadioButton.setSelected(settings.getStartersMod() == Settings.StartersMod.UNCHANGED);
+        spRandomTwoEvosRadioButton.setSelected(settings.getStartersMod() == Settings.StartersMod.RANDOM_TWO_EVOLUTIONS);
         spRandomizeStarterHeldItemsCheckBox.setSelected(settings.isRandomizeStartersHeldItems());
         spBanBadItemsCheckBox.setSelected(settings.isBanBadRandomStarterHeldItems());
         spAllowAltFormesCheckBox.setSelected(settings.isAllowStarterAltFormes());
@@ -1155,9 +1155,9 @@ public class NewRandomizerGUI {
         spComboBox2.setSelectedIndex(customStarters[1] - 1);
         spComboBox3.setSelectedIndex(customStarters[2] - 1);
 
-        peUnchangedRadioButton.setSelected(settings.getEvolutionsMod() == SettingsMod.EvolutionsMod.UNCHANGED);
-        peRandomRadioButton.setSelected(settings.getEvolutionsMod() == SettingsMod.EvolutionsMod.RANDOM);
-        peRandomEveryLevelRadioButton.setSelected(settings.getEvolutionsMod() == SettingsMod.EvolutionsMod.RANDOM_EVERY_LEVEL);
+        peUnchangedRadioButton.setSelected(settings.getEvolutionsMod() == Settings.EvolutionsMod.UNCHANGED);
+        peRandomRadioButton.setSelected(settings.getEvolutionsMod() == Settings.EvolutionsMod.RANDOM);
+        peRandomEveryLevelRadioButton.setSelected(settings.getEvolutionsMod() == Settings.EvolutionsMod.RANDOM_EVERY_LEVEL);
         peSimilarStrengthCheckBox.setSelected(settings.isEvosSimilarStrength());
         peSameTypingCheckBox.setSelected(settings.isEvosSameTyping());
         peLimitEvolutionsToThreeCheckBox.setSelected(settings.isEvosMaxThreeStages());
@@ -1170,10 +1170,10 @@ public class NewRandomizerGUI {
         mdRandomizeMovePPCheckBox.setSelected(settings.isRandomizeMovePPs());
         mdRandomizeMoveTypesCheckBox.setSelected(settings.isRandomizeMoveTypes());
 
-        pmsRandomCompletelyRadioButton.setSelected(settings.getMovesetsMod() == SettingsMod.MovesetsMod.RANDOM_COMPLETELY);
-        pmsRandomPreferringSameTypeRadioButton.setSelected(settings.getMovesetsMod() == SettingsMod.MovesetsMod.RANDOM_PREFER_SAME_TYPE);
-        pmsUnchangedRadioButton.setSelected(settings.getMovesetsMod() == SettingsMod.MovesetsMod.UNCHANGED);
-        pmsMetronomeOnlyModeRadioButton.setSelected(settings.getMovesetsMod() == SettingsMod.MovesetsMod.METRONOME_ONLY_MODE);
+        pmsRandomCompletelyRadioButton.setSelected(settings.getMovesetsMod() == Settings.MovesetsMod.RANDOM_COMPLETELY);
+        pmsRandomPreferringSameTypeRadioButton.setSelected(settings.getMovesetsMod() == Settings.MovesetsMod.RANDOM_PREFER_SAME_TYPE);
+        pmsUnchangedRadioButton.setSelected(settings.getMovesetsMod() == Settings.MovesetsMod.UNCHANGED);
+        pmsMetronomeOnlyModeRadioButton.setSelected(settings.getMovesetsMod() == Settings.MovesetsMod.METRONOME_ONLY_MODE);
         pmsGuaranteedLevel1MovesCheckBox.setSelected(settings.isStartWithGuaranteedMoves());
         pmsGuaranteedLevel1MovesSlider.setValue(settings.getGuaranteedMoveCount());
         pmsReorderDamagingMovesCheckBox.setSelected(settings.isReorderDamagingMoves());
@@ -1213,36 +1213,36 @@ public class NewRandomizerGUI {
         tpRandomShinyTrainerPokemonCheckBox.setSelected(settings.isShinyChance());
         tpBetterMovesetsCheckBox.setSelected(settings.isBetterTrainerMovesets());
 
-        totpUnchangedRadioButton.setSelected(settings.getTotemPokemonMod() == SettingsMod.TotemPokemonMod.UNCHANGED);
-        totpRandomRadioButton.setSelected(settings.getTotemPokemonMod() == SettingsMod.TotemPokemonMod.RANDOM);
-        totpRandomSimilarStrengthRadioButton.setSelected(settings.getTotemPokemonMod() == SettingsMod.TotemPokemonMod.RANDOM_SIMILAR_STRENGTH);
-        totpAllyUnchangedRadioButton.setSelected(settings.getAllyPokemonMod() == SettingsMod.AllyPokemonMod.UNCHANGED);
-        totpAllyRandomRadioButton.setSelected(settings.getAllyPokemonMod() == SettingsMod.AllyPokemonMod.RANDOM);
-        totpAllyRandomSimilarStrengthRadioButton.setSelected(settings.getAllyPokemonMod() == SettingsMod.AllyPokemonMod.SIMILAR_STRENGTH);
-        totpAuraUnchangedRadioButton.setSelected(settings.getAuraMod() == SettingsMod.AuraMod.UNCHANGED);
-        totpAuraRandomRadioButton.setSelected(settings.getAuraMod() == SettingsMod.AuraMod.RANDOM);
-        totpAuraRandomSameStrengthRadioButton.setSelected(settings.getAuraMod() == SettingsMod.AuraMod.SAME_STRENGTH);
+        totpUnchangedRadioButton.setSelected(settings.getTotemPokemonMod() == Settings.TotemPokemonMod.UNCHANGED);
+        totpRandomRadioButton.setSelected(settings.getTotemPokemonMod() == Settings.TotemPokemonMod.RANDOM);
+        totpRandomSimilarStrengthRadioButton.setSelected(settings.getTotemPokemonMod() == Settings.TotemPokemonMod.RANDOM_SIMILAR_STRENGTH);
+        totpAllyUnchangedRadioButton.setSelected(settings.getAllyPokemonMod() == Settings.AllyPokemonMod.UNCHANGED);
+        totpAllyRandomRadioButton.setSelected(settings.getAllyPokemonMod() == Settings.AllyPokemonMod.RANDOM);
+        totpAllyRandomSimilarStrengthRadioButton.setSelected(settings.getAllyPokemonMod() == Settings.AllyPokemonMod.SIMILAR_STRENGTH);
+        totpAuraUnchangedRadioButton.setSelected(settings.getAuraMod() == Settings.AuraMod.UNCHANGED);
+        totpAuraRandomRadioButton.setSelected(settings.getAuraMod() == Settings.AuraMod.RANDOM);
+        totpAuraRandomSameStrengthRadioButton.setSelected(settings.getAuraMod() == Settings.AuraMod.SAME_STRENGTH);
         totpRandomizeHeldItemsCheckBox.setSelected(settings.isRandomizeTotemHeldItems());
         totpAllowAltFormesCheckBox.setSelected(settings.isAllowTotemAltFormes());
         totpPercentageLevelModifierCheckBox.setSelected(settings.isTotemLevelsModified());
         totpPercentageLevelModifierSlider.setValue(settings.getTotemLevelModifier());
 
         wpARCatchEmAllModeRadioButton
-                .setSelected(settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.CATCH_EM_ALL);
-        wpArea1To1RadioButton.setSelected(settings.getWildPokemonMod() == SettingsMod.WildPokemonMod.AREA_MAPPING);
-        wpARNoneRadioButton.setSelected(settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.NONE);
+                .setSelected(settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.CATCH_EM_ALL);
+        wpArea1To1RadioButton.setSelected(settings.getWildPokemonMod() == Settings.WildPokemonMod.AREA_MAPPING);
+        wpARNoneRadioButton.setSelected(settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.NONE);
         wpARTypeThemeAreasRadioButton
-                .setSelected(settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.TYPE_THEME_AREAS);
-        wpGlobal1To1RadioButton.setSelected(settings.getWildPokemonMod() == SettingsMod.WildPokemonMod.GLOBAL_MAPPING);
-        wpRandomRadioButton.setSelected(settings.getWildPokemonMod() == SettingsMod.WildPokemonMod.RANDOM);
-        wpUnchangedRadioButton.setSelected(settings.getWildPokemonMod() == SettingsMod.WildPokemonMod.UNCHANGED);
+                .setSelected(settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.TYPE_THEME_AREAS);
+        wpGlobal1To1RadioButton.setSelected(settings.getWildPokemonMod() == Settings.WildPokemonMod.GLOBAL_MAPPING);
+        wpRandomRadioButton.setSelected(settings.getWildPokemonMod() == Settings.WildPokemonMod.RANDOM);
+        wpUnchangedRadioButton.setSelected(settings.getWildPokemonMod() == Settings.WildPokemonMod.UNCHANGED);
         wpUseTimeBasedEncountersCheckBox.setSelected(settings.isUseTimeBasedEncounters());
 
         wpSetMinimumCatchRateCheckBox.setSelected(settings.isUseMinimumCatchRate());
         wpSetMinimumCatchRateSlider.setValue(settings.getMinimumCatchRateLevel());
         wpDontUseLegendariesCheckBox.setSelected(settings.isBlockWildLegendaries());
         wpARSimilarStrengthRadioButton
-                .setSelected(settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.SIMILAR_STRENGTH);
+                .setSelected(settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.SIMILAR_STRENGTH);
         wpRandomizeHeldItemsCheckBox.setSelected(settings.isRandomizeWildPokemonHeldItems());
         wpBanBadItemsCheckBox.setSelected(settings.isBanBadRandomWildPokemonHeldItems());
         wpBalanceShakingGrassPokemonCheckBox.setSelected(settings.isBalanceShakingGrass());
@@ -1250,12 +1250,12 @@ public class NewRandomizerGUI {
         wpPercentageLevelModifierSlider.setValue(settings.getWildLevelModifier());
         wpAllowAltFormesCheckBox.setSelected(settings.isAllowWildAltFormes());
 
-        stpUnchangedRadioButton.setSelected(settings.getStaticPokemonMod() == SettingsMod.StaticPokemonMod.UNCHANGED);
-        stpSwapLegendariesSwapStandardsRadioButton.setSelected(settings.getStaticPokemonMod() == SettingsMod.StaticPokemonMod.SWAP_LEGENDARIES_SWAP_STANDARDS);
+        stpUnchangedRadioButton.setSelected(settings.getStaticPokemonMod() == Settings.StaticPokemonMod.UNCHANGED);
+        stpSwapLegendariesSwapStandardsRadioButton.setSelected(settings.getStaticPokemonMod() == Settings.StaticPokemonMod.SWAP_LEGENDARIES_SWAP_STANDARDS);
         stpRandomCompletelyRadioButton
-                .setSelected(settings.getStaticPokemonMod() == SettingsMod.StaticPokemonMod.RANDOM_COMPLETELY);
+                .setSelected(settings.getStaticPokemonMod() == Settings.StaticPokemonMod.RANDOM_COMPLETELY);
         stpRandomSimilarStrengthRadioButton
-                .setSelected(settings.getStaticPokemonMod() == SettingsMod.StaticPokemonMod.RANDOM_SIMILAR_STRENGTH);
+                .setSelected(settings.getStaticPokemonMod() == Settings.StaticPokemonMod.RANDOM_SIMILAR_STRENGTH);
         stpLimitMainGameLegendariesCheckBox.setSelected(settings.isLimitMainGameLegendaries());
         stpRandomize600BSTCheckBox.setSelected(settings.isLimit600());
         stpAllowAltFormesCheckBox.setSelected(settings.isAllowStaticAltFormes());
@@ -1265,16 +1265,16 @@ public class NewRandomizerGUI {
         stpFixMusicCheckBox.setSelected(settings.isCorrectStaticMusic());
 
         thcRandomCompletelyRadioButton
-                .setSelected(settings.getTmsHmsCompatibilityMod() == SettingsMod.TMsHMsCompatibilityMod.RANDOM_COMPLETELY);
+                .setSelected(settings.getTmsHmsCompatibilityMod() == Settings.TMsHMsCompatibilityMod.RANDOM_COMPLETELY);
         thcRandomPreferSameTypeRadioButton
-                .setSelected(settings.getTmsHmsCompatibilityMod() == SettingsMod.TMsHMsCompatibilityMod.RANDOM_PREFER_SAME_TYPE);
+                .setSelected(settings.getTmsHmsCompatibilityMod() == Settings.TMsHMsCompatibilityMod.RANDOM_PREFER_SAME_TYPE);
         thcUnchangedRadioButton
-                .setSelected(settings.getTmsHmsCompatibilityMod() == SettingsMod.TMsHMsCompatibilityMod.UNCHANGED);
-        tmRandomRadioButton.setSelected(settings.getTmsMod() == SettingsMod.TMsMod.RANDOM);
-        tmUnchangedRadioButton.setSelected(settings.getTmsMod() == SettingsMod.TMsMod.UNCHANGED);
+                .setSelected(settings.getTmsHmsCompatibilityMod() == Settings.TMsHMsCompatibilityMod.UNCHANGED);
+        tmRandomRadioButton.setSelected(settings.getTmsMod() == Settings.TMsMod.RANDOM);
+        tmUnchangedRadioButton.setSelected(settings.getTmsMod() == Settings.TMsMod.UNCHANGED);
         tmLevelupMoveSanityCheckBox.setSelected(settings.isTmLevelUpMoveSanity());
         tmKeepFieldMoveTMsCheckBox.setSelected(settings.isKeepFieldMoveTMs());
-        thcFullCompatibilityRadioButton.setSelected(settings.getTmsHmsCompatibilityMod() == SettingsMod.TMsHMsCompatibilityMod.FULL_COMPATIBILITY);
+        thcFullCompatibilityRadioButton.setSelected(settings.getTmsHmsCompatibilityMod() == Settings.TMsHMsCompatibilityMod.FULL_COMPATIBILITY);
         tmFullHMCompatibilityCheckBox.setSelected(settings.isFullHMCompat());
         tmForceGoodDamagingCheckBox.setSelected(settings.isTmsForceGoodDamaging());
         tmForceGoodDamagingSlider.setValue(settings.getTmsGoodDamagingPercent());
@@ -1282,40 +1282,40 @@ public class NewRandomizerGUI {
         tmFollowEvolutionsCheckBox.setSelected(settings.isTmsFollowEvolutions());
 
         mtcRandomCompletelyRadioButton
-                .setSelected(settings.getMoveTutorsCompatibilityMod() == SettingsMod.MoveTutorsCompatibilityMod.RANDOM_COMPLETELY);
+                .setSelected(settings.getMoveTutorsCompatibilityMod() == Settings.MoveTutorsCompatibilityMod.RANDOM_COMPLETELY);
         mtcRandomPreferSameTypeRadioButton
-                .setSelected(settings.getMoveTutorsCompatibilityMod() == SettingsMod.MoveTutorsCompatibilityMod.RANDOM_PREFER_SAME_TYPE);
+                .setSelected(settings.getMoveTutorsCompatibilityMod() == Settings.MoveTutorsCompatibilityMod.RANDOM_PREFER_SAME_TYPE);
         mtcUnchangedRadioButton
-                .setSelected(settings.getMoveTutorsCompatibilityMod() == SettingsMod.MoveTutorsCompatibilityMod.UNCHANGED);
-        mtRandomRadioButton.setSelected(settings.getMoveTutorMovesMod() == SettingsMod.MoveTutorMovesMod.RANDOM);
-        mtUnchangedRadioButton.setSelected(settings.getMoveTutorMovesMod() == SettingsMod.MoveTutorMovesMod.UNCHANGED);
+                .setSelected(settings.getMoveTutorsCompatibilityMod() == Settings.MoveTutorsCompatibilityMod.UNCHANGED);
+        mtRandomRadioButton.setSelected(settings.getMoveTutorMovesMod() == Settings.MoveTutorMovesMod.RANDOM);
+        mtUnchangedRadioButton.setSelected(settings.getMoveTutorMovesMod() == Settings.MoveTutorMovesMod.UNCHANGED);
         mtLevelupMoveSanityCheckBox.setSelected(settings.isTutorLevelUpMoveSanity());
         mtKeepFieldMoveTutorsCheckBox.setSelected(settings.isKeepFieldMoveTutors());
         mtcFullCompatibilityRadioButton
-                .setSelected(settings.getMoveTutorsCompatibilityMod() == SettingsMod.MoveTutorsCompatibilityMod.FULL_COMPATIBILITY);
+                .setSelected(settings.getMoveTutorsCompatibilityMod() == Settings.MoveTutorsCompatibilityMod.FULL_COMPATIBILITY);
         mtForceGoodDamagingCheckBox.setSelected(settings.isTutorsForceGoodDamaging());
         mtForceGoodDamagingSlider.setValue(settings.getTutorsGoodDamagingPercent());
         mtNoGameBreakingMovesCheckBox.setSelected(settings.isBlockBrokenTutorMoves());
         mtFollowEvolutionsCheckBox.setSelected(settings.isTutorFollowEvolutions());
 
         igtRandomizeBothRequestedGivenRadioButton
-                .setSelected(settings.getInGameTradesMod() == SettingsMod.InGameTradesMod.RANDOMIZE_BOTH_REQUESTED_GIVEN);
-        igtRandomizeGivenPokemonOnlyRadioButton.setSelected(settings.getInGameTradesMod() == SettingsMod.InGameTradesMod.RANDOMIZE_GIVEN_POKEMON_ONLY);
+                .setSelected(settings.getInGameTradesMod() == Settings.InGameTradesMod.RANDOMIZE_BOTH_REQUESTED_GIVEN);
+        igtRandomizeGivenPokemonOnlyRadioButton.setSelected(settings.getInGameTradesMod() == Settings.InGameTradesMod.RANDOMIZE_GIVEN_POKEMON_ONLY);
         igtRandomizeItemsCheckBox.setSelected(settings.isRandomizeInGameTradesItems());
         igtRandomizeIVsCheckBox.setSelected(settings.isRandomizeInGameTradesIVs());
         igtRandomizeNicknamesCheckBox.setSelected(settings.isRandomizeInGameTradesNicknames());
         igtRandomizeOTsCheckBox.setSelected(settings.isRandomizeInGameTradesOTs());
-        igtUnchangedRadioButton.setSelected(settings.getInGameTradesMod() == SettingsMod.InGameTradesMod.UNCHANGED);
+        igtUnchangedRadioButton.setSelected(settings.getInGameTradesMod() == Settings.InGameTradesMod.UNCHANGED);
 
-        fiRandomRadioButton.setSelected(settings.getFieldItemsMod() == SettingsMod.FieldItemsMod.RANDOM);
-        fiRandomEvenDistributionRadioButton.setSelected(settings.getFieldItemsMod() == SettingsMod.FieldItemsMod.RANDOM_EVEN_DISTRIBUTION);
-        fiShuffleRadioButton.setSelected(settings.getFieldItemsMod() == SettingsMod.FieldItemsMod.SHUFFLE);
-        fiUnchangedRadioButton.setSelected(settings.getFieldItemsMod() == SettingsMod.FieldItemsMod.UNCHANGED);
+        fiRandomRadioButton.setSelected(settings.getFieldItemsMod() == Settings.FieldItemsMod.RANDOM);
+        fiRandomEvenDistributionRadioButton.setSelected(settings.getFieldItemsMod() == Settings.FieldItemsMod.RANDOM_EVEN_DISTRIBUTION);
+        fiShuffleRadioButton.setSelected(settings.getFieldItemsMod() == Settings.FieldItemsMod.SHUFFLE);
+        fiUnchangedRadioButton.setSelected(settings.getFieldItemsMod() == Settings.FieldItemsMod.UNCHANGED);
         fiBanBadItemsCheckBox.setSelected(settings.isBanBadRandomFieldItems());
 
-        shRandomRadioButton.setSelected(settings.getShopItemsMod() == SettingsMod.ShopItemsMod.RANDOM);
-        shShuffleRadioButton.setSelected(settings.getShopItemsMod() == SettingsMod.ShopItemsMod.SHUFFLE);
-        shUnchangedRadioButton.setSelected(settings.getShopItemsMod() == SettingsMod.ShopItemsMod.UNCHANGED);
+        shRandomRadioButton.setSelected(settings.getShopItemsMod() == Settings.ShopItemsMod.RANDOM);
+        shShuffleRadioButton.setSelected(settings.getShopItemsMod() == Settings.ShopItemsMod.SHUFFLE);
+        shUnchangedRadioButton.setSelected(settings.getShopItemsMod() == Settings.ShopItemsMod.UNCHANGED);
         shBanBadItemsCheckBox.setSelected(settings.isBanBadRandomShopItems());
         shBanRegularShopItemsCheckBox.setSelected(settings.isBanRegularShopItems());
         shBanOverpoweredShopItemsCheckBox.setSelected(settings.isBanOPShopItems());
@@ -1323,8 +1323,8 @@ public class NewRandomizerGUI {
         shGuaranteeEvolutionItemsCheckBox.setSelected(settings.isGuaranteeEvolutionItems());
         shGuaranteeXItemsCheckBox.setSelected(settings.isGuaranteeXItems());
 
-        puUnchangedRadioButton.setSelected(settings.getPickupItemsMod() == SettingsMod.PickupItemsMod.UNCHANGED);
-        puRandomRadioButton.setSelected(settings.getPickupItemsMod() == SettingsMod.PickupItemsMod.RANDOM);
+        puUnchangedRadioButton.setSelected(settings.getPickupItemsMod() == Settings.PickupItemsMod.UNCHANGED);
+        puRandomRadioButton.setSelected(settings.getPickupItemsMod() == Settings.PickupItemsMod.RANDOM);
         puBanBadItemsCheckBox.setSelected(settings.isBanBadRandomPickupItems());
 
         int mtsSelected = settings.getCurrentMiscTweaks();

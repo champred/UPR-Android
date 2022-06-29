@@ -4,7 +4,6 @@ import com.dabomstew.pkrandom.FileFunctions;
 import com.dabomstew.pkrandom.RandomSource;
 import com.dabomstew.pkrandom.Randomizer;
 import com.dabomstew.pkrandom.Settings;
-import com.dabomstew.pkrandom.SettingsMod;
 import com.dabomstew.pkrandom.romhandlers.*;
 
 import java.io.*;
@@ -124,7 +123,7 @@ public class CliRandomizer {
 
     private static void displaySettingsWarnings(Settings settings, RomHandler romHandler) {
         Settings.TweakForROMFeedback feedback = settings.tweakForRom(romHandler);
-        if (feedback.isChangedStarter() && settings.getStartersMod() == SettingsMod.StartersMod.CUSTOM) {
+        if (feedback.isChangedStarter() && settings.getStartersMod() == Settings.StartersMod.CUSTOM) {
             printWarning(bundle.getString("GUI.starterUnavailable"));
         }
         if (settings.isUpdatedFromOldVersion()) {

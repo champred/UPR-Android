@@ -416,7 +416,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void randomizePokemonTypes(Settings settings) {
-        boolean evolutionSanity = settings.getTypesMod() == SettingsMod.TypesMod.RANDOM_FOLLOW_EVOLUTIONS;
+        boolean evolutionSanity = settings.getTypesMod() == Settings.TypesMod.RANDOM_FOLLOW_EVOLUTIONS;
         boolean megaEvolutionSanity = settings.isTypesFollowMegaEvolutions();
         boolean dualTypeOnly = settings.isDualTypeOnly();
 
@@ -677,15 +677,15 @@ public abstract class AbstractRomHandler implements RomHandler {
     @Override
     public void randomEncounters(Settings settings) {
         boolean useTimeOfDay = settings.isUseTimeBasedEncounters();
-        boolean catchEmAll = settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.CATCH_EM_ALL;
-        boolean typeThemed = settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.TYPE_THEME_AREAS;
-        boolean usePowerLevels = settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.SIMILAR_STRENGTH;
+        boolean catchEmAll = settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.CATCH_EM_ALL;
+        boolean typeThemed = settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.TYPE_THEME_AREAS;
+        boolean usePowerLevels = settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.SIMILAR_STRENGTH;
         boolean noLegendaries = settings.isBlockWildLegendaries();
         boolean balanceShakingGrass = settings.isBalanceShakingGrass();
         int levelModifier = settings.isWildLevelsModified() ? settings.getWildLevelModifier() : 0;
         boolean allowAltFormes = settings.isAllowWildAltFormes();
         boolean banIrregularAltFormes = settings.isBanIrregularAltFormes();
-        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.RANDOM;
+        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == Settings.AbilitiesMod.RANDOM;
 
         List<EncounterSet> currentEncounters = this.getEncounters(useTimeOfDay);
 
@@ -896,14 +896,14 @@ public abstract class AbstractRomHandler implements RomHandler {
     }
 
     private void area1to1EncountersImpl(List<EncounterSet> currentEncounters, Settings settings) {
-        boolean catchEmAll = settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.CATCH_EM_ALL;
-        boolean typeThemed = settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.TYPE_THEME_AREAS;
-        boolean usePowerLevels = settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.SIMILAR_STRENGTH;
+        boolean catchEmAll = settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.CATCH_EM_ALL;
+        boolean typeThemed = settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.TYPE_THEME_AREAS;
+        boolean usePowerLevels = settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.SIMILAR_STRENGTH;
         boolean noLegendaries = settings.isBlockWildLegendaries();
         int levelModifier = settings.isWildLevelsModified() ? settings.getWildLevelModifier() : 0;
         boolean allowAltFormes = settings.isAllowWildAltFormes();
         boolean banIrregularAltFormes = settings.isBanIrregularAltFormes();
-        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.RANDOM;
+        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == Settings.AbilitiesMod.RANDOM;
 
         checkPokemonRestrictions();
         List<Pokemon> banned = this.bannedForWildEncounters();
@@ -1111,12 +1111,12 @@ public abstract class AbstractRomHandler implements RomHandler {
     @Override
     public void game1to1Encounters(Settings settings) {
         boolean useTimeOfDay = settings.isUseTimeBasedEncounters();
-        boolean usePowerLevels = settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.SIMILAR_STRENGTH;
+        boolean usePowerLevels = settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.SIMILAR_STRENGTH;
         boolean noLegendaries = settings.isBlockWildLegendaries();
         int levelModifier = settings.isWildLevelsModified() ? settings.getWildLevelModifier() : 0;
         boolean allowAltFormes = settings.isAllowWildAltFormes();
         boolean banIrregularAltFormes = settings.isBanIrregularAltFormes();
-        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.RANDOM;
+        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == Settings.AbilitiesMod.RANDOM;
 
         checkPokemonRestrictions();
         // Build the full 1-to-1 map
@@ -1257,13 +1257,13 @@ public abstract class AbstractRomHandler implements RomHandler {
     }
 
     private void enhanceRandomEncountersORAS(List<EncounterSet> collapsedEncounters, Settings settings) {
-        boolean catchEmAll = settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.CATCH_EM_ALL;
-        boolean typeThemed = settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.TYPE_THEME_AREAS;
-        boolean usePowerLevels = settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.SIMILAR_STRENGTH;
+        boolean catchEmAll = settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.CATCH_EM_ALL;
+        boolean typeThemed = settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.TYPE_THEME_AREAS;
+        boolean usePowerLevels = settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.SIMILAR_STRENGTH;
         boolean noLegendaries = settings.isBlockWildLegendaries();
         boolean allowAltFormes = settings.isAllowWildAltFormes();
         boolean banIrregularAltFormes = settings.isBanIrregularAltFormes();
-        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.RANDOM;
+        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == Settings.AbilitiesMod.RANDOM;
 
         List<Pokemon> banned = this.bannedForWildEncounters();
         if (!abilitiesAreRandomized) {
@@ -1625,15 +1625,15 @@ public abstract class AbstractRomHandler implements RomHandler {
         boolean noLegendaries = settings.isTrainersBlockLegendaries();
         boolean noEarlyWonderGuard = settings.isTrainersBlockEarlyWonderGuard();
         int levelModifier = settings.isTrainersLevelModified() ? settings.getTrainersLevelModifier() : 0;
-        boolean isTypeThemed = settings.getTrainersMod() == SettingsMod.TrainersMod.TYPE_THEMED;
-        boolean isTypeThemedEliteFourGymOnly = settings.getTrainersMod() == SettingsMod.TrainersMod.TYPE_THEMED_ELITE4_GYMS;
-        boolean distributionSetting = settings.getTrainersMod() == SettingsMod.TrainersMod.RANDOM_EVEN_DISTRIBUTION;
-        boolean mainPlaythroughSetting = settings.getTrainersMod() == SettingsMod.TrainersMod.RANDOM_EVEN_DISTRIBUTION_MAIN;
+        boolean isTypeThemed = settings.getTrainersMod() == Settings.TrainersMod.TYPE_THEMED;
+        boolean isTypeThemedEliteFourGymOnly = settings.getTrainersMod() == Settings.TrainersMod.TYPE_THEMED_ELITE4_GYMS;
+        boolean distributionSetting = settings.getTrainersMod() == Settings.TrainersMod.RANDOM_EVEN_DISTRIBUTION;
+        boolean mainPlaythroughSetting = settings.getTrainersMod() == Settings.TrainersMod.RANDOM_EVEN_DISTRIBUTION_MAIN;
         boolean includeFormes = settings.isAllowTrainerAlternateFormes();
         boolean banIrregularAltFormes = settings.isBanIrregularAltFormes();
         boolean swapMegaEvos = settings.isSwapTrainerMegaEvos();
         boolean shinyChance = settings.isShinyChance();
-        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.RANDOM;
+        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == Settings.AbilitiesMod.RANDOM;
         int eliteFourUniquePokemonNumber = settings.getEliteFourUniquePokemonNumber();
         boolean forceFullyEvolved = settings.isTrainersForceFullyEvolved();
         int forceFullyEvolvedLevel = settings.getTrainersForceFullyEvolvedLevel();
@@ -3336,7 +3336,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void randomizeMovesLearnt(Settings settings) {
-        boolean typeThemed = settings.getMovesetsMod() == SettingsMod.MovesetsMod.RANDOM_PREFER_SAME_TYPE;
+        boolean typeThemed = settings.getMovesetsMod() == Settings.MovesetsMod.RANDOM_PREFER_SAME_TYPE;
         boolean noBroken = settings.isBlockBrokenMovesetMoves();
         boolean forceStartingMoves = supportsFourStartingMoves() && settings.isStartWithGuaranteedMoves();
         int forceStartingMoveCount = settings.getGuaranteedMoveCount();
@@ -3519,7 +3519,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void randomizeEggMoves(Settings settings) {
-        boolean typeThemed = settings.getMovesetsMod() == SettingsMod.MovesetsMod.RANDOM_PREFER_SAME_TYPE;
+        boolean typeThemed = settings.getMovesetsMod() == Settings.MovesetsMod.RANDOM_PREFER_SAME_TYPE;
         boolean noBroken = settings.isBlockBrokenMovesetMoves();
         double goodDamagingPercentage =
                 settings.isMovesetsForceGoodDamaging() ? settings.getMovesetsGoodDamagingPercent() / 100.0 : 0;
@@ -3922,7 +3922,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void randomizeStarters(Settings settings) {
-        boolean abilitiesUnchanged = settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.UNCHANGED;
+        boolean abilitiesUnchanged = settings.getAbilitiesMod() == Settings.AbilitiesMod.UNCHANGED;
         boolean allowAltFormes = settings.isAllowStarterAltFormes();
         boolean banIrregularAltFormes = settings.isBanIrregularAltFormes();
 
@@ -3948,7 +3948,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void randomizeBasicTwoEvosStarters(Settings settings) {
-        boolean abilitiesUnchanged = settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.UNCHANGED;
+        boolean abilitiesUnchanged = settings.getAbilitiesMod() == Settings.AbilitiesMod.UNCHANGED;
         boolean allowAltFormes = settings.isAllowStarterAltFormes();
         boolean banIrregularAltFormes = settings.isBanIrregularAltFormes();
 
@@ -3980,14 +3980,14 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void randomizeStaticPokemon(Settings settings) {
-        boolean swapLegendaries = settings.getStaticPokemonMod() == SettingsMod.StaticPokemonMod.SWAP_LEGENDARIES_SWAP_STANDARDS;
-        boolean similarStrength = settings.getStaticPokemonMod() == SettingsMod.StaticPokemonMod.RANDOM_SIMILAR_STRENGTH;
+        boolean swapLegendaries = settings.getStaticPokemonMod() == Settings.StaticPokemonMod.SWAP_LEGENDARIES_SWAP_STANDARDS;
+        boolean similarStrength = settings.getStaticPokemonMod() == Settings.StaticPokemonMod.RANDOM_SIMILAR_STRENGTH;
         boolean limitMainGameLegendaries = settings.isLimitMainGameLegendaries();
         boolean limit600 = settings.isLimit600();
         boolean allowAltFormes = settings.isAllowStaticAltFormes();
         boolean banIrregularAltFormes = settings.isBanIrregularAltFormes();
         boolean swapMegaEvos = settings.isSwapStaticMegaEvos();
-        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.RANDOM;
+        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == Settings.AbilitiesMod.RANDOM;
         int levelModifier = settings.isStaticLevelModified() ? settings.getStaticLevelModifier() : 0;
         boolean correctStaticMusic = settings.isCorrectStaticMusic();
 
@@ -4458,7 +4458,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void randomizeTMHMCompatibility(Settings settings) {
-        boolean preferSameType = settings.getTmsHmsCompatibilityMod() == SettingsMod.TMsHMsCompatibilityMod.RANDOM_PREFER_SAME_TYPE;
+        boolean preferSameType = settings.getTmsHmsCompatibilityMod() == Settings.TMsHMsCompatibilityMod.RANDOM_PREFER_SAME_TYPE;
         boolean followEvolutions = settings.isTmsFollowEvolutions();
 
         // Get current compatibility
@@ -4721,7 +4721,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void randomizeMoveTutorCompatibility(Settings settings) {
-        boolean preferSameType = settings.getMoveTutorsCompatibilityMod() == SettingsMod.MoveTutorsCompatibilityMod.RANDOM_PREFER_SAME_TYPE;
+        boolean preferSameType = settings.getMoveTutorsCompatibilityMod() == Settings.MoveTutorsCompatibilityMod.RANDOM_PREFER_SAME_TYPE;
         boolean followEvolutions = settings.isTutorFollowEvolutions();
 
         if (!this.hasMoveTutors()) {
@@ -5160,7 +5160,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     @Override
     public void randomizeFieldItems(Settings settings) {
         boolean banBadItems = settings.isBanBadRandomFieldItems();
-        boolean distributeItemsControl = settings.getFieldItemsMod() == SettingsMod.FieldItemsMod.RANDOM_EVEN_DISTRIBUTION;
+        boolean distributeItemsControl = settings.getFieldItemsMod() == Settings.FieldItemsMod.RANDOM_EVEN_DISTRIBUTION;
         boolean uniqueItems = !settings.isBalanceShopPrices();
 
         ItemList possibleItems = banBadItems ? this.getNonBadItems().copy() : this.getAllowedItems().copy();
@@ -5225,7 +5225,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void randomizeIngameTrades(Settings settings) {
-        boolean randomizeRequest = settings.getInGameTradesMod() == SettingsMod.InGameTradesMod.RANDOMIZE_BOTH_REQUESTED_GIVEN;
+        boolean randomizeRequest = settings.getInGameTradesMod() == Settings.InGameTradesMod.RANDOMIZE_BOTH_REQUESTED_GIVEN;
         boolean randomNickname = settings.isRandomizeInGameTradesNicknames();
         boolean randomOT = settings.isRandomizeInGameTradesOTs();
         boolean randomStats = settings.isRandomizeInGameTradesIVs();
@@ -5385,7 +5385,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         boolean forceChange = settings.isEvosForceChange();
         boolean allowAltFormes = settings.isEvosAllowAltFormes();
         boolean banIrregularAltFormes = settings.isBanIrregularAltFormes();
-        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.RANDOM;
+        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == Settings.AbilitiesMod.RANDOM;
 
         checkPokemonRestrictions();
         List<Pokemon> pokemonPool;
@@ -5629,7 +5629,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         boolean sameType = settings.isEvosSameTyping();
         boolean forceChange = settings.isEvosForceChange();
         boolean allowAltFormes = settings.isEvosAllowAltFormes();
-        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.RANDOM;
+        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == Settings.AbilitiesMod.RANDOM;
 
         checkPokemonRestrictions();
         List<Pokemon> pokemonPool;
@@ -5990,7 +5990,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void standardizeEXPCurves(Settings settings) {
-        SettingsMod.ExpCurveMod mod = settings.getExpCurveMod();
+        Settings.ExpCurveMod mod = settings.getExpCurveMod();
         ExpCurve expCurve = settings.getSelectedEXPCurve();
 
         List<Pokemon> pokes = getPokemonInclFormes();
@@ -7025,22 +7025,22 @@ public abstract class AbstractRomHandler implements RomHandler {
     @Override
     public void randomizeTotemPokemon(Settings settings) {
         boolean randomizeTotem =
-                settings.getTotemPokemonMod() == SettingsMod.TotemPokemonMod.RANDOM ||
-                        settings.getTotemPokemonMod() == SettingsMod.TotemPokemonMod.RANDOM_SIMILAR_STRENGTH;
+                settings.getTotemPokemonMod() == Settings.TotemPokemonMod.RANDOM ||
+                        settings.getTotemPokemonMod() == Settings.TotemPokemonMod.RANDOM_SIMILAR_STRENGTH;
         boolean randomizeAllies =
-                settings.getAllyPokemonMod() == SettingsMod.AllyPokemonMod.RANDOM ||
-                        settings.getAllyPokemonMod() == SettingsMod.AllyPokemonMod.SIMILAR_STRENGTH;
+                settings.getAllyPokemonMod() == Settings.AllyPokemonMod.RANDOM ||
+                        settings.getAllyPokemonMod() == Settings.AllyPokemonMod.SIMILAR_STRENGTH;
         boolean randomizeAuras =
-                settings.getAuraMod() == SettingsMod.AuraMod.RANDOM ||
-                        settings.getAuraMod() == SettingsMod.AuraMod.SAME_STRENGTH;
-        boolean similarStrengthTotem = settings.getTotemPokemonMod() == SettingsMod.TotemPokemonMod.RANDOM_SIMILAR_STRENGTH;
-        boolean similarStrengthAllies = settings.getAllyPokemonMod() == SettingsMod.AllyPokemonMod.SIMILAR_STRENGTH;
-        boolean similarStrengthAuras = settings.getAuraMod() == SettingsMod.AuraMod.SAME_STRENGTH;
+                settings.getAuraMod() == Settings.AuraMod.RANDOM ||
+                        settings.getAuraMod() == Settings.AuraMod.SAME_STRENGTH;
+        boolean similarStrengthTotem = settings.getTotemPokemonMod() == Settings.TotemPokemonMod.RANDOM_SIMILAR_STRENGTH;
+        boolean similarStrengthAllies = settings.getAllyPokemonMod() == Settings.AllyPokemonMod.SIMILAR_STRENGTH;
+        boolean similarStrengthAuras = settings.getAuraMod() == Settings.AuraMod.SAME_STRENGTH;
         boolean randomizeHeldItems = settings.isRandomizeTotemHeldItems();
         int levelModifier = settings.isTotemLevelsModified() ? settings.getTotemLevelModifier() : 0;
         boolean allowAltFormes = settings.isAllowTotemAltFormes();
         boolean banIrregularAltFormes = settings.isBanIrregularAltFormes();
-        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.RANDOM;
+        boolean abilitiesAreRandomized = settings.getAbilitiesMod() == Settings.AbilitiesMod.RANDOM;
 
         checkPokemonRestrictions();
         List<TotemPokemon> currentTotemPokemon = this.getTotemPokemon();

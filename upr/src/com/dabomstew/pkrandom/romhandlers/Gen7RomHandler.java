@@ -27,7 +27,6 @@ import com.dabomstew.pkrandom.FileFunctions;
 import com.dabomstew.pkrandom.MiscTweak;
 import com.dabomstew.pkrandom.RomFunctions;
 import com.dabomstew.pkrandom.Settings;
-import com.dabomstew.pkrandom.SettingsMod;
 import com.dabomstew.pkrandom.constants.*;
 import com.dabomstew.pkrandom.ctr.AMX;
 import com.dabomstew.pkrandom.ctr.BFLIM;
@@ -2670,7 +2669,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
 
     @Override
     public void removeImpossibleEvolutions(Settings settings) {
-        boolean changeMoveEvos = !(settings.getMovesetsMod() == SettingsMod.MovesetsMod.UNCHANGED);
+        boolean changeMoveEvos = !(settings.getMovesetsMod() == Settings.MovesetsMod.UNCHANGED);
 
         Map<Integer, List<MoveLearnt>> movesets = this.getMovesLearnt();
         Set<Evolution> extraEvolutions = new HashSet<>();
@@ -2751,7 +2750,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
 
     @Override
     public void makeEvolutionsEasier(Settings settings) {
-        boolean wildsRandomized = !settings.getWildPokemonMod().equals(SettingsMod.WildPokemonMod.UNCHANGED);
+        boolean wildsRandomized = !settings.getWildPokemonMod().equals(Settings.WildPokemonMod.UNCHANGED);
 
         for (Pokemon pkmn : pokes) {
             if (pkmn != null) {

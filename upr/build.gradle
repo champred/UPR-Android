@@ -1,7 +1,9 @@
 apply plugin: 'java'
 
-targetCompatibility = '1.8'
-sourceCompatibility = '1.8'
+java {
+    targetCompatibility = '1.8'
+    sourceCompatibility = '1.8'
+}
 
 jar {
     manifest {
