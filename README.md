@@ -12,7 +12,7 @@ The goal for this project is to build a complete UI using Jetpack Compose that s
 
 1. Download the APK from the "Releases" page to the right and expanding the "Assets" dropdown on the latest release.
 2. Open the downloaded APK from your web browser or file manager. You may need to allow your web browser or file manager to install apps by going to `Android Settings>Apps & Notifications>Advanced>Special app access>Install unknown apps`.
-3. Once the app is installed, you should see this after opening it and allowing storage access:
+3. Once the app is installed, you should see this after opening it:
 <img src="https://user-images.githubusercontent.com/46391895/173204207-f182c85c-ded6-42fd-9faa-7cbbfefbb8e3.png" height="440">
 4. Pressing "Open ROM" will allow you to select a ROM from your file manager:
 <img src="https://user-images.githubusercontent.com/46391895/173205001-6109b694-74bf-4c79-80b6-a629a415046c.png" width="440">
@@ -24,9 +24,27 @@ The goal for this project is to build a complete UI using Jetpack Compose that s
 <img src="https://user-images.githubusercontent.com/46391895/173205922-0d91e6cc-b25f-4695-8122-9509747bbae9.png" width="440">
 8. Pressing "Save Log" will allow you to do the same with the randomization log. It is saved with the `.txt` extension so that it can be viewed properly. Do note that some log files can be very large depending on what randomization settings you use.
 
+## FAQ
+
+**Q: What versions of Android are supported?**
+
+A: Officially, only Android 10+ is supported, however it can work on earlier versions of Android if you request so by messaging me on Discord (champred#6443).
+
+**Q: Are 3DS games supported?**
+
+A: 3DS games will not work due to the large size of the ROM not being feasible to load into the limited amount of RAM Android gives to apps.
+
+**Q: How to make multiple ROMs at once?**
+
+A: If you press the "Batch Randomize" button, it will open a dialog that allows you to choose a prefix, starting number, and ending number. This will generate a ROM for each number between the starting and ending numbers. The file name will simply be the prefix with the current number (0 padded so they sort correctly). The files will be saved to a folder using the "Choose Directory" button.
+
+**Q: How fast is batch randomization?**
+
+A: The speed at which ROMs can be randomized is limited by the amount of RAM your phone has and how big the ROM is. For GBA games, you can expect the speed to be about 10x faster than using the randomizer normally. However DS games are so big that only one can be done at a time, meaning the performance gain is not as drastic.
+
 ## Development
 
-The source code includes the randomizer itself as well as the Android app. It should work when imported into Android Studio. There is an additional configuration to run the randomizer JAR file from the IDE.
+The source code includes the [randomizer](https://github.com/Ajarmar/universal-pokemon-randomizer-zx) itself as well as the Android app. It should work when imported into Android Studio. There is an additional configuration to run the randomizer JAR file from the IDE.
 
 The randomizer was included as a subtree rather than a submodule so that I don't need to maintain a separate fork of the randomizer due to needing to make some changes:
 * Fixed invalid characters in source code
@@ -34,4 +52,4 @@ The randomizer was included as a subtree rather than a submodule so that I don't
 * Included Gradle build file
 * Ability to make other changes as necessary
 
-The subtree can be updated using the command `git subtree --squash -P upr pull https://github.com/Ajarmar/universal-pokemon-randomizer-zx.git master`. Alternatively, you can configure the upstream as a remote and use that instead of the URL.
+The subtree can be updated using the command `git subtree -P upr pull https://github.com/Ajarmar/universal-pokemon-randomizer-zx.git master`. Alternatively, you can configure the upstream as a remote and use that instead of the URL. Commits from the upstream are added to a different branch and squash merged into the master branch.
