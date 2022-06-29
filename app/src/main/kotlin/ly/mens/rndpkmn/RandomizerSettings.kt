@@ -41,17 +41,15 @@ object RandomizerSettings : Settings() {
 		return (mem / inputFile.length() / 3).toInt()
 	}
 	val currentGen: Int get() = if (this::romHandler.isInitialized) romHandler.generationOfPokemon() else 1
-	private var _currentStarters: Triple<Pokemon, Pokemon, Pokemon>? = null
-	var currentStarters: Triple<Pokemon, Pokemon, Pokemon>
+	var currentStarters: Triple<Pokemon?, Pokemon?, Pokemon?> = Triple(null, null, null)
 		set(value) {
-			customStarters = intArrayOf(value.first.number, value.second.number, value.third.number)
-			_currentStarters = value
-		}
-		get() {
-			val poke = Pokemon().apply {
-				name = ""
-			}
-			return _currentStarters ?: Triple(poke, poke, poke)
+			val (first, second, third) = value
+			customStarters = intArrayOf(
+					first?.number?.plus(1) ?: 1,
+					second?.number?.plus(1) ?: 1,
+					third?.number?.plus(1) ?: 1
+			)
+			field = value
 		}
 	val pokeTrie = Trie()
 	var currentSeed by Delegates.notNull<Long>()
@@ -231,6 +229,9 @@ object RandomizerSettings : Settings() {
 	}
 
 	fun getPokemon(name: String): Pokemon? {
+		if (name.isBlank()) {
+			return null
+		}
 		for (i in 1 until romHandler.pokemon.size) {
 			if (romHandler.pokemon[i].name.equals(name, true)) return romHandler.pokemon[i]
 		}

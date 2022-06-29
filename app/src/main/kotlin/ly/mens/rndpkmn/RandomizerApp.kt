@@ -657,13 +657,13 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 		}
 		if (get(RandomizerSettings) === StartersMod.CUSTOM && index == StartersMod.CUSTOM.ordinal) {
 			var (first, second, third) = RandomizerSettings.currentStarters
-			val firstName = rememberSaveable { mutableStateOf(first.name) }; SearchField(firstName)
-			val secondName = rememberSaveable { mutableStateOf(second.name) }; SearchField(secondName)
-			val thirdName = rememberSaveable { mutableStateOf(third.name) }; SearchField(thirdName)
+			val firstName = rememberSaveable { mutableStateOf(first?.name ?: "") }; SearchField(firstName)
+			val secondName = rememberSaveable { mutableStateOf(second?.name ?: "") }; SearchField(secondName)
+			val thirdName = rememberSaveable { mutableStateOf(third?.name ?: "") }; SearchField(thirdName)
 			Button({
-				first = RandomizerSettings.getPokemon(firstName.value) ?: first
-				second = RandomizerSettings.getPokemon(secondName.value) ?: second
-				third = RandomizerSettings.getPokemon(thirdName.value) ?: third
+				first = RandomizerSettings.getPokemon(firstName.value)
+				second = RandomizerSettings.getPokemon(secondName.value)
+				third = RandomizerSettings.getPokemon(thirdName.value)
 				RandomizerSettings.currentStarters = Triple(first, second, third)
 			}) { Text(stringResource(R.string.action_save_starters)) }
 		}
@@ -673,22 +673,29 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SearchField(search: MutableState<String>) {
-	var selected by remember { mutableStateOf(search.value) }
 	var expanded by remember { mutableStateOf(false) }
+	var useRandom by rememberSaveable { mutableStateOf(search.value.isBlank()) }
 	val options = RandomizerSettings.pokeTrie[search.value.uppercase()]?.children() ?: emptyList()
 	val keyCon = LocalSoftwareKeyboardController.current
-	ExposedDropdownMenuBox(expanded, { expanded = !expanded }) {
-		TextField(search.value, { search.value = it }, Modifier.padding(vertical = 2.dp), singleLine = true)
-		ExposedDropdownMenu(expanded, { expanded = false }) {
-			options.forEach { option ->
-				DropdownMenuItem({
-					selected = option
-					expanded = false
-					search.value = selected
-					keyCon?.hide()
-					//TODO update cursor position
-				}) { Text(option) }
+	Row(verticalAlignment = Alignment.CenterVertically) {
+		ExposedDropdownMenuBox(expanded, { expanded = !expanded }, Modifier.weight(1f)) {
+			TextField(search.value, { search.value = it }, Modifier.padding(vertical = 2.dp), !useRandom, singleLine = true)
+			ExposedDropdownMenu(expanded && !useRandom, { expanded = false }) {
+				options.forEach { option ->
+					DropdownMenuItem({
+						expanded = false
+						search.value = option
+						keyCon?.hide()
+						//TODO update cursor position
+					}) { Text(option) }
+				}
 			}
 		}
+		Checkbox(useRandom, {
+			useRandom = it
+			keyCon?.hide()
+			search.value = ""
+		})
+		Text(stringResource(R.string.random_starter), Modifier.weight(1f))
 	}
 }
