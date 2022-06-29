@@ -574,10 +574,11 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 moves[i].type = Gen4Constants.typeTable[moveData[4] & 0xFF];
                 moves[i].target = readWord(moveData, 8);
                 moves[i].category = Gen4Constants.moveCategoryIndices[moveData[2] & 0xFF];
-                moves[i].secondaryEffectChance = moveData[7] & 0xFF;
                 moves[i].priority = moveData[10];
                 int flags = moveData[11] & 0xFF;
                 moves[i].makesContact = (flags & 1) != 0;
+                moves[i].isPunchMove = Gen4Constants.punchMoves.contains(moves[i].number);
+                moves[i].isSoundMove = Gen4Constants.soundMoves.contains(moves[i].number);
 
                 if (i == Moves.swift) {
                     perfectAccuracy = (int)moves[i].hitratio;
@@ -591,29 +592,17 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     moves[i].hitCount = 2.71; // this assumes the first hit lands
                 }
 
-                loadStatChangesFromEffect(moves[i]);
-                loadStatusFromEffect(moves[i]);
-
-                switch (moves[i].effectIndex) {
-                    case Gen4Constants.flinchEffect:
-                    case Gen4Constants.skyAttackEffect:
-                    case Gen4Constants.snoreEffect:
-                    case Gen4Constants.twisterEffect:
-                    case Gen4Constants.stompEffect:
-                    case Gen4Constants.fakeOutEffect:
-                    case Gen4Constants.fireFangEffect:
-                    case Gen4Constants.iceFangEffect:
-                    case Gen4Constants.thunderFangEffect:
-                        moves[i].flinchPercentChance = moves[i].secondaryEffectChance;
-                        break;
-                }
+                int secondaryEffectChance = moveData[7] & 0xFF;
+                loadStatChangesFromEffect(moves[i], secondaryEffectChance);
+                loadStatusFromEffect(moves[i], secondaryEffectChance);
+                loadMiscMoveInfoFromEffect(moves[i], secondaryEffectChance);
             }
         } catch (IOException e) {
             throw new RandomizerIOException(e);
         }
     }
 
-    private void loadStatChangesFromEffect(Move move) {
+    private void loadStatChangesFromEffect(Move move, int secondaryEffectChance) {
         switch (move.effectIndex) {
             case Gen4Constants.noDamageAtkPlusOneEffect:
             case Gen4Constants.noDamageDefPlusOneEffect:
@@ -826,7 +815,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         if (move.statChangeMoveType == StatChangeMoveType.DAMAGE_TARGET || move.statChangeMoveType == StatChangeMoveType.DAMAGE_USER) {
             for (int i = 0; i < move.statChanges.length; i++) {
                 if (move.statChanges[i].type != StatChangeType.NONE) {
-                    move.statChanges[i].percentChance = move.secondaryEffectChance;
+                    move.statChanges[i].percentChance = secondaryEffectChance;
                     if (move.statChanges[i].percentChance == 0.0) {
                         move.statChanges[i].percentChance = 100.0;
                     }
@@ -835,7 +824,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         }
     }
 
-    private void loadStatusFromEffect(Move move) {
+    private void loadStatusFromEffect(Move move, int secondaryEffectChance) {
         switch (move.effectIndex) {
             case Gen4Constants.noDamageSleepEffect:
             case Gen4Constants.toxicEffect:
@@ -922,7 +911,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         }
 
         if (move.statusMoveType == StatusMoveType.DAMAGE) {
-            move.statusPercentChance = move.secondaryEffectChance;
+            move.statusPercentChance = secondaryEffectChance;
             if (move.statusPercentChance == 0.0) {
                 if (move.number == Moves.chatter) {
                     move.statusPercentChance = 1.0;
@@ -930,6 +919,79 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     move.statusPercentChance = 100.0;
                 }
             }
+        }
+    }
+
+    private void loadMiscMoveInfoFromEffect(Move move, int secondaryEffectChance) {
+        switch (move.effectIndex) {
+            case Gen4Constants.increasedCritEffect:
+            case Gen4Constants.blazeKickEffect:
+            case Gen4Constants.damagePoisonWithIncreasedCritEffect:
+                move.criticalChance = CriticalChance.INCREASED;
+                break;
+
+            case Gen4Constants.futureSightAndDoomDesireEffect:
+                move.criticalChance = CriticalChance.NONE;
+
+            case Gen4Constants.flinchEffect:
+            case Gen4Constants.snoreEffect:
+            case Gen4Constants.twisterEffect:
+            case Gen4Constants.stompEffect:
+            case Gen4Constants.fakeOutEffect:
+            case Gen4Constants.fireFangEffect:
+            case Gen4Constants.iceFangEffect:
+            case Gen4Constants.thunderFangEffect:
+                move.flinchPercentChance = secondaryEffectChance;
+                break;
+
+            case Gen4Constants.damageAbsorbEffect:
+            case Gen4Constants.dreamEaterEffect:
+                move.absorbPercent = 50;
+                break;
+
+            case Gen4Constants.damageRecoil25PercentEffect:
+                move.recoilPercent = 25;
+                break;
+
+            case Gen4Constants.damageRecoil33PercentEffect:
+            case Gen4Constants.flareBlitzEffect:
+            case Gen4Constants.voltTackleEffect:
+                move.recoilPercent = 33;
+                break;
+
+            case Gen4Constants.damageRecoil50PercentEffect:
+                move.recoilPercent = 50;
+                break;
+
+            case Gen4Constants.bindingEffect:
+            case Gen4Constants.trappingEffect:
+                move.isTrapMove = true;
+                break;
+
+            case Gen4Constants.skullBashEffect:
+            case Gen4Constants.solarbeamEffect:
+            case Gen4Constants.flyEffect:
+            case Gen4Constants.diveEffect:
+            case Gen4Constants.digEffect:
+            case Gen4Constants.bounceEffect:
+            case Gen4Constants.shadowForceEffect:
+                move.isChargeMove = true;
+                break;
+
+            case Gen3Constants.rechargeEffect:
+                move.isRechargeMove = true;
+                break;
+
+            case Gen4Constants.razorWindEffect:
+                move.criticalChance = CriticalChance.INCREASED;
+                move.isChargeMove = true;
+                break;
+
+            case Gen4Constants.skyAttackEffect:
+                move.criticalChance = CriticalChance.INCREASED;
+                move.flinchPercentChance = secondaryEffectChance;
+                move.isChargeMove = true;
+                break;
         }
     }
 
@@ -2749,7 +2811,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 Trainer tr = new Trainer();
                 tr.poketype = trainer[0] & 0xFF;
                 tr.trainerclass = trainer[1] & 0xFF;
-                tr.offset = i;
+                tr.index = i;
                 int numPokes = trainer[3] & 0xFF;
                 int pokeOffs = 0;
                 tr.fullDisplayName = tclasses.get(tr.trainerclass) + " " + tnames.get(i - 1);
@@ -2782,21 +2844,15 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     tpk.abilitySlot = abilitySlot;
                     tpk.forme = formnum;
                     tpk.formeSuffix = Gen4Constants.getFormeSuffixByBaseForme(species,formnum);
-                    tpk.absolutePokeNumber = Gen4Constants.getAbsolutePokeNumByBaseForme(species,formnum);
                     pokeOffs += 6;
                     if (tr.pokemonHaveItems()) {
                         tpk.heldItem = readWord(trpoke, pokeOffs);
                         pokeOffs += 2;
                     }
                     if (tr.pokemonHaveCustomMoves()) {
-                        int attack1 = readWord(trpoke, pokeOffs);
-                        int attack2 = readWord(trpoke, pokeOffs + 2);
-                        int attack3 = readWord(trpoke, pokeOffs + 4);
-                        int attack4 = readWord(trpoke, pokeOffs + 6);
-                        tpk.move1 = attack1;
-                        tpk.move2 = attack2;
-                        tpk.move3 = attack3;
-                        tpk.move4 = attack4;
+                        for (int move = 0; move < 4; move++) {
+                            tpk.moves[move] = readWord(trpoke, pokeOffs + (move*2));
+                        }
                         pokeOffs += 8;
                     }
                     // Plat/HGSS have another random pokeOffs +=2 here.
@@ -2868,7 +2924,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                         // If we set this flag for partner trainers (e.g., Cheryl), then the double wild battles
                         // will turn into trainer battles with glitchy trainers.
                         boolean excludedPartnerTrainer = romEntry.romType != Gen4Constants.Type_HGSS &&
-                                Gen4Constants.partnerTrainerIndices.contains(tr.offset);
+                                Gen4Constants.partnerTrainerIndices.contains(tr.index);
                         if (trainer[16] == 0 && !excludedPartnerTrainer) {
                             trainer[16] |= 3;
                         }
@@ -2908,15 +2964,15 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     }
                     if (tr.pokemonHaveCustomMoves()) {
                         if (tp.resetMoves) {
-                            int[] pokeMoves = RomFunctions.getMovesAtLevel(tp.absolutePokeNumber, movesets, tp.level);
+                            int[] pokeMoves = RomFunctions.getMovesAtLevel(getAltFormeOfPokemon(tp.pokemon, tp.forme).number, movesets, tp.level);
                             for (int m = 0; m < 4; m++) {
                                 writeWord(trpoke, pokeOffs + m * 2, pokeMoves[m]);
                             }
                         } else {
-                            writeWord(trpoke, pokeOffs, tp.move1);
-                            writeWord(trpoke, pokeOffs + 2, tp.move2);
-                            writeWord(trpoke, pokeOffs + 4, tp.move3);
-                            writeWord(trpoke, pokeOffs + 6, tp.move4);
+                            writeWord(trpoke, pokeOffs, tp.moves[0]);
+                            writeWord(trpoke, pokeOffs + 2, tp.moves[1]);
+                            writeWord(trpoke, pokeOffs + 4, tp.moves[2]);
+                            writeWord(trpoke, pokeOffs + 6, tp.moves[3]);
                         }
                         pokeOffs += 8;
                     }
@@ -5205,6 +5261,11 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         }
     }
 
+    @Override
+    public boolean isEffectivenessUpdated() {
+        return effectivenessUpdated;
+    }
+
     private void randomizeCatchingTutorial() {
         int opponentOffset = romEntry.getInt("CatchingTutorialOpponentMonOffset");
 
@@ -5628,7 +5689,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public List<Integer> getSensibleHeldItemsFor(TrainerPokemon tp, boolean consumableOnly, List<Move> moves, Map<Integer, List<MoveLearnt>> movesets) {
+    public List<Integer> getSensibleHeldItemsFor(TrainerPokemon tp, boolean consumableOnly, List<Move> moves, int[] pokeMoves) {
         List<Integer> items = new ArrayList<>();
         items.addAll(Gen4Constants.generalPurposeConsumableItems);
         int frequencyBoostCount = 6; // Make some very good items more common, but not too common
@@ -5636,7 +5697,6 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             frequencyBoostCount = 8; // bigger to account for larger item pool.
             items.addAll(Gen4Constants.generalPurposeItems);
         }
-        int[] pokeMoves = RomFunctions.getMovesAtLevel(tp.pokemon.number, movesets, tp.level);
         for (int moveIdx : pokeMoves) {
             Move move = moves.get(moveIdx);
             if (move == null) {

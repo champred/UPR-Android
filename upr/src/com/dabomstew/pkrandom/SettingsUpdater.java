@@ -291,6 +291,25 @@ public class SettingsUpdater {
             FileFunctions.writeFullIntBigEndian(dataBlock, 28, genRestrictions);
         }
 
+        if (oldVersion < 319) {
+
+            // 5-10 custom starters, offset by 1 because of new "Random" option
+            int starter1 = FileFunctions.read2ByteInt(dataBlock, 5);
+            int starter2 = FileFunctions.read2ByteInt(dataBlock, 7);
+            int starter3 = FileFunctions.read2ByteInt(dataBlock, 9);
+
+            starter1 += 1;
+            starter2 += 1;
+            starter3 += 1;
+
+            FileFunctions.write2ByteInt(dataBlock, 5, starter1);
+            FileFunctions.write2ByteInt(dataBlock, 7, starter2);
+            FileFunctions.write2ByteInt(dataBlock, 9, starter3);
+
+            // 50 elite four unique pokemon (3 bits)
+            insertExtraByte(50, (byte) 0);
+        }
+
         // fix checksum
         CRC32 checksum = new CRC32();
         checksum.update(dataBlock, 0, actualDataLength - 8);

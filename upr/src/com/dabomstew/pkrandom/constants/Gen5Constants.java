@@ -156,8 +156,11 @@ public class Gen5Constants {
         }
     }
 
+    public static final int trappingEffect = 106;
+
     public static final int noDamageStatusQuality = 1, noDamageStatChangeQuality = 2, damageStatusQuality = 4,
-            noDamageStatusAndStatChangeQuality = 5, damageTargetDebuffQuality = 6, damageUserBuffQuality = 7;
+            noDamageStatusAndStatChangeQuality = 5, damageTargetDebuffQuality = 6, damageUserBuffQuality = 7,
+            damageAbsorbQuality = 8;
 
     public static final Type[] typeTable = constructTypeTable();
 
@@ -255,6 +258,11 @@ public class Gen5Constants {
             766, 767, 768, 769, 770, 771, 772, 773, 774, 775, 776, 786, 787, 788,
             789, 797, 798, 799, 800, 801, 802, 803, 804, 805, 806,
             807, 808, 809, 810, 811, 812);
+
+    public static final List<Integer> bw2DriftveilTrainerOffsets = Arrays.asList(56, 57, 0, 1, 2, 3, 4, 68, 69, 70,
+            71, 72, 73, 74, 75, 76, 77);
+
+    public static final int normalTrainerNameLength = 813, normalTrainerClassLength = 236;
     
 //    public static final Map<Integer, String> bw1ShopIndex = new HashMap<Integer, String>() {1:"Check"};
 
@@ -816,7 +824,7 @@ public class Gen5Constants {
         }
     }
 
-    public static ItemList allowedItems, nonBadItems;
+    public static ItemList allowedItems, nonBadItemsBW1, nonBadItemsBW2;
     public static List<Integer> regularShopItems, opShopItems;
 
     public static String blackBoxLegendaryCheckPrefix1 = "79F6BAEF07B0F0BDC046", blackBoxLegendaryCheckPrefix2 = "DEDB0020C04302B0F8BDC046",
@@ -846,16 +854,20 @@ public class Gen5Constants {
 
         // non-bad items
         // ban specific pokemon hold items, berries, apricorns, mail
-        nonBadItems = allowedItems.copy();
+        nonBadItemsBW2 = allowedItems.copy();
 
-        nonBadItems.banSingles(Items.oddKeystone, Items.griseousOrb, Items.soulDew, Items.lightBall,
+        nonBadItemsBW2.banSingles(Items.oddKeystone, Items.griseousOrb, Items.soulDew, Items.lightBall,
                 Items.oranBerry, Items.quickPowder, Items.passOrb);
-        nonBadItems.banRange(Items.growthMulch, 4); // mulch
-        nonBadItems.banRange(Items.adamantOrb, 2); // orbs
-        nonBadItems.banRange(Items.mail1, 12); // mails
-        nonBadItems.banRange(Items.figyBerry, 25); // berries without useful battle effects
-        nonBadItems.banRange(Items.luckyPunch, 4); // pokemon specific
-        nonBadItems.banRange(Items.redScarf, 5); // contest scarves
+        nonBadItemsBW2.banRange(Items.growthMulch, 4); // mulch
+        nonBadItemsBW2.banRange(Items.adamantOrb, 2); // orbs
+        nonBadItemsBW2.banRange(Items.mail1, 12); // mails
+        nonBadItemsBW2.banRange(Items.figyBerry, 25); // berries without useful battle effects
+        nonBadItemsBW2.banRange(Items.luckyPunch, 4); // pokemon specific
+        nonBadItemsBW2.banRange(Items.redScarf, 5); // contest scarves
+
+        // Ban the shards in BW1; even the maniac only gives you $200 for them, and they serve no other purpose.
+        nonBadItemsBW1 = nonBadItemsBW2.copy();
+        nonBadItemsBW1.banRange(Items.redShard, 4);
 
         regularShopItems = new ArrayList<>();
 
@@ -877,6 +889,14 @@ public class Gen5Constants {
         opShopItems.add(Items.luckyEgg);
         opShopItems.add(Items.prettyFeather);
         opShopItems.addAll(IntStream.rangeClosed(Items.balmMushroom, Items.casteliacone).boxed().collect(Collectors.toList()));
+    }
+
+    public static ItemList getNonBadItems(int romType) {
+        if (romType == Gen5Constants.Type_BW2) {
+            return nonBadItemsBW2;
+        } else {
+            return nonBadItemsBW1;
+        }
     }
 
     public static final Map<Integer,Integer> balancedItemPrices = Stream.of(new Integer[][] {

@@ -24,11 +24,20 @@ package com.dabomstew.pkrandom.pokemon;
 /*--  along with this program. If not, see <http://www.gnu.org/licenses/>.  --*/
 /*----------------------------------------------------------------------------*/
 
+import com.dabomstew.pkrandom.constants.GlobalConstants;
+
 public class Move {
     public class StatChange {
         public StatChangeType type;
         public int stages;
         public double percentChance;
+
+        @Override
+        public boolean equals(Object obj) {
+            StatChange other = (StatChange)obj;
+            return this.type == other.type && this.stages == other.stages && this.percentChance == other.percentChance;
+        }
+
     }
 
     public String name;
@@ -38,19 +47,26 @@ public class Move {
     public int pp;
     public double hitratio;
     public Type type;
+    public MoveCategory category;
     public StatChangeMoveType statChangeMoveType = StatChangeMoveType.NONE_OR_UNKNOWN;
     public StatChange[] statChanges = new StatChange[3];
     public StatusMoveType statusMoveType = StatusMoveType.NONE_OR_UNKNOWN;
     public StatusType statusType = StatusType.NONE;
+    public CriticalChance criticalChance = CriticalChance.NORMAL;
     public double statusPercentChance;
     public double flinchPercentChance;
-    public int effectIndex;
-    public int target;
-    public MoveCategory category;
-    public double hitCount = 1; // not saved, only used in randomized move powers.
-    public double secondaryEffectChance;
+    public int recoilPercent;
+    public int absorbPercent;
     public int priority;
     public boolean makesContact;
+    public boolean isChargeMove;
+    public boolean isRechargeMove;
+    public boolean isPunchMove;
+    public boolean isSoundMove;
+    public boolean isTrapMove; // True for both binding moves (like Wrap) and trapping moves (like Mean Look)
+    public int effectIndex;
+    public int target;
+    public double hitCount = 1; // not saved, only used in randomized move powers.
 
     public Move() {
         // Initialize all statStageChanges to something sensible so that we don't need to have
@@ -59,6 +75,25 @@ public class Move {
             this.statChanges[i] = new StatChange();
             this.statChanges[i].type = StatChangeType.NONE;
         }
+    }
+
+    public boolean hasSpecificStatChange(StatChangeType type, boolean isPositive) {
+        for (StatChange sc: this.statChanges) {
+            if (sc.type == type && (isPositive ^ sc.stages < 0)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasBeneficialStatChange() {
+        return (statChangeMoveType == StatChangeMoveType.DAMAGE_TARGET && statChanges[0].stages < 0) ||
+                statChangeMoveType == StatChangeMoveType.DAMAGE_USER && statChanges[0].stages > 0;
+    }
+
+    public boolean isGoodDamaging(int perfectAccuracy) {
+        return (power * hitCount) >= 2 * GlobalConstants.MIN_DAMAGING_MOVE_POWER
+                || ((power * hitCount) >= GlobalConstants.MIN_DAMAGING_MOVE_POWER && (hitratio >= 90 || hitratio == perfectAccuracy));
     }
 
     public String toString() {

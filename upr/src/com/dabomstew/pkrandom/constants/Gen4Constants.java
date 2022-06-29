@@ -681,26 +681,42 @@ public class Gen4Constants {
         }
     }
 
-    public static final int noDamageSleepEffect = 1, damagePoisonEffect = 2, damageBurnEffect = 4, damageFreezeEffect = 5,
-            damageParalyzeEffect = 6, noDamageAtkPlusOneEffect = 10, noDamageDefPlusOneEffect = 11, noDamageSpAtkPlusOneEffect = 13,
-            noDamageEvasionPlusOneEffect = 16, noDamageAtkMinusOneEffect = 18, noDamageDefMinusOneEffect = 19,
-            noDamageSpeMinusOneEffect = 20, noDamageAccuracyMinusOneEffect = 23, noDamageEvasionMinusOneEffect = 24,
-            flinchEffect = 31, toxicEffect = 33, noDamageConfusionEffect = 49, noDamageAtkPlusTwoEffect = 50,
-            noDamageDefPlusTwoEffect = 51, noDamageSpePlusTwoEffect = 52, noDamageSpAtkPlusTwoEffect = 53, noDamageSpDefPlusTwoEffect = 54,
-            noDamageAtkMinusTwoEffect = 58, noDamageDefMinusTwoEffect = 59, noDamageSpeMinusTwoEffect = 60, noDamageSpDefMinusTwoEffect = 62,
-            noDamagePoisonEffect = 66, noDamageParalyzeEffect = 67, damageAtkMinusOneEffect = 68, damageDefMinusOneEffect = 69,
-            damageSpeMinusOneEffect = 70, damageSpAtkMinusOneEffect = 71, damageSpDefMinusOneEffect = 72,
-            damageAccuracyMinusOneEffect = 73, skyAttackEffect = 75, damageConfusionEffect = 76, twineedleEffect = 77, snoreEffect = 92,
-            minimizeEffect = 108, swaggerEffect = 118, damageBurnAndThawUserEffect = 125, damageUserDefPlusOneEffect = 138,
-            damageUserAtkPlusOneEffect = 139, damageUserAllPlusOneEffect = 140, twisterEffect = 146, stompEffect = 150,
-            thunderEffect = 152, defenseCurlEffect = 156, fakeOutEffect = 158, flatterEffect = 166, noDamageBurnEffect = 167,
-            chargeEffect = 174, damageUserAtkAndDefMinusOneEffect = 182, teeterDanceEffect = 199, blazeKickEffect = 200,
-            poisonFangEffect = 202, damageUserSpAtkMinusTwoEffect = 204, noDamageAtkAndDefMinusOneEffect = 205,
-            noDamageDefAndSpDefPlusOneEffect = 206, noDamageAtkAndDefPlusOneEffect = 208, damagePoisonWithIncreasedCritEffect = 209,
-            noDamageSpAtkAndSpDefPlusOneEffect = 211, noDamageAtkAndSpePlusOneEffect = 212, damageUserSpeMinusOneEffect = 218,
-            damageUserDefAndSpDefMinusOneEffect = 229, flareBlitzEffect = 253, blizzardEffect = 260, voltTackleEffect = 262,
-            bounceEffect = 263, noDamageSpAtkMinusTwoEffect = 265, chatterEffect = 267, damageSpDefMinusTwoEffect = 271,
-            fireFangEffect = 273, iceFangEffect = 274, thunderFangEffect = 275, damageUserSpAtkPlusOneEffect = 276;
+    public static final int noDamageSleepEffect = 1, damagePoisonEffect = 2, damageAbsorbEffect = 3, damageBurnEffect = 4,
+            damageFreezeEffect = 5, damageParalyzeEffect = 6, dreamEaterEffect = 8, noDamageAtkPlusOneEffect = 10,
+            noDamageDefPlusOneEffect = 11, noDamageSpAtkPlusOneEffect = 13, noDamageEvasionPlusOneEffect = 16,
+            noDamageAtkMinusOneEffect = 18, noDamageDefMinusOneEffect = 19, noDamageSpeMinusOneEffect = 20,
+            noDamageAccuracyMinusOneEffect = 23, noDamageEvasionMinusOneEffect = 24, flinchEffect = 31, toxicEffect = 33,
+            razorWindEffect = 39, bindingEffect = 42, increasedCritEffect = 43, damageRecoil25PercentEffect = 48,
+            noDamageConfusionEffect = 49, noDamageAtkPlusTwoEffect = 50, noDamageDefPlusTwoEffect = 51,
+            noDamageSpePlusTwoEffect = 52, noDamageSpAtkPlusTwoEffect = 53, noDamageSpDefPlusTwoEffect = 54,
+            noDamageAtkMinusTwoEffect = 58, noDamageDefMinusTwoEffect = 59, noDamageSpeMinusTwoEffect = 60,
+            noDamageSpDefMinusTwoEffect = 62, noDamagePoisonEffect = 66, noDamageParalyzeEffect = 67,
+            damageAtkMinusOneEffect = 68, damageDefMinusOneEffect = 69, damageSpeMinusOneEffect = 70,
+            damageSpAtkMinusOneEffect = 71, damageSpDefMinusOneEffect = 72, damageAccuracyMinusOneEffect = 73,
+            skyAttackEffect = 75, damageConfusionEffect = 76, twineedleEffect = 77, rechargeEffect = 80, snoreEffect = 92,
+            trappingEffect = 106, minimizeEffect = 108, swaggerEffect = 118, damageBurnAndThawUserEffect = 125,
+            damageUserDefPlusOneEffect = 138, damageUserAtkPlusOneEffect = 139, damageUserAllPlusOneEffect = 140,
+            skullBashEffect = 145, twisterEffect = 146, futureSightAndDoomDesireEffect = 148, stompEffect = 150,
+            solarbeamEffect = 151, thunderEffect = 152, flyEffect = 155, defenseCurlEffect = 156,
+            fakeOutEffect = 158, flatterEffect = 166, noDamageBurnEffect = 167, chargeEffect = 174,
+            damageUserAtkAndDefMinusOneEffect = 182, damageRecoil33PercentEffect = 198, teeterDanceEffect = 199,
+            blazeKickEffect = 200, poisonFangEffect = 202, damageUserSpAtkMinusTwoEffect = 204,
+            noDamageAtkAndDefMinusOneEffect = 205, noDamageDefAndSpDefPlusOneEffect = 206,
+            noDamageAtkAndDefPlusOneEffect = 208, damagePoisonWithIncreasedCritEffect = 209,
+            noDamageSpAtkAndSpDefPlusOneEffect = 211, noDamageAtkAndSpePlusOneEffect = 212,
+            damageUserSpeMinusOneEffect = 218, damageUserDefAndSpDefMinusOneEffect = 229, flareBlitzEffect = 253,
+            diveEffect = 255, digEffect = 256, blizzardEffect = 260, voltTackleEffect = 262, bounceEffect = 263,
+            noDamageSpAtkMinusTwoEffect = 265, chatterEffect = 267, damageRecoil50PercentEffect = 269,
+            damageSpDefMinusTwoEffect = 271, shadowForceEffect = 272, fireFangEffect = 273, iceFangEffect = 274,
+            thunderFangEffect = 275, damageUserSpAtkPlusOneEffect = 276;
+
+    public static final List<Integer> soundMoves = Arrays.asList(Moves.growl, Moves.roar, Moves.sing, Moves.supersonic,
+            Moves.screech, Moves.snore, Moves.uproar, Moves.metalSound, Moves.grassWhistle, Moves.hyperVoice,
+            Moves.bugBuzz, Moves.chatter, Moves.perishSong, Moves.healBell);
+
+    public static final List<Integer> punchMoves = Arrays.asList(Moves.icePunch, Moves.firePunch, Moves.thunderPunch,
+            Moves.machPunch, Moves.focusPunch, Moves.dizzyPunch, Moves.dynamicPunch, Moves.hammerArm, Moves.megaPunch,
+            Moves.cometPunch, Moves.meteorMash, Moves.shadowPunch, Moves.drainPunch, Moves.bulletPunch, Moves.skyUppercut);
 
     public static final List<Integer> dpRequiredFieldTMs = Arrays.asList(2, 3, 5, 9, 12, 19, 23, 28,
             34, 39, 41, 43, 46, 47, 49, 50, 62, 69, 79, 80, 82, 84, 85, 87);
@@ -1822,7 +1838,7 @@ public class Gen4Constants {
         tag(trs, "GYM1", 0x32, 0x1D);
         tag(trs, "GYM2", 0x43, 0x44, 0x45, 0x0a);
         tag(trs, "GYM3", 0x05, 0x46, 0x47, 0x16);
-        tag(trs, "GYM4", 0x57, 0x58, 0x59, 0x2e);
+        tag(trs, "GYM4", 0x1ed, 0x1ee, 0x59, 0x2e);
         tag(trs, "GYM5", 0x9c, 0x9d, 0x9f, 0xfb);
         tag(trs, "GYM7", 0x1e0, 0x1e1, 0x1e2, 0x1e3, 0x1e4);
         tag(trs, "GYM8", 0x6e, 0x6f, 0x70, 0x75, 0x77);

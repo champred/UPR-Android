@@ -72,18 +72,27 @@ public class Gen2Constants {
 
     public static final int mapGroupCount = 26, mapsInLastGroup = 11;
 
-    public static final int noDamageSleepEffect = 1, damagePoisonEffect = 2, damageBurnEffect = 4, damageFreezeEffect = 5,
-            damageParalyzeEffect = 6, noDamageAtkPlusOneEffect = 10, noDamageDefPlusOneEffect = 11, noDamageSpAtkPlusOneEffect = 13,
-            noDamageEvasionPlusOneEffect = 16, noDamageAtkMinusOneEffect = 18, noDamageDefMinusOneEffect = 19,
-            noDamageSpeMinusOneEffect = 20, noDamageAccuracyMinusOneEffect = 23, noDamageEvasionMinusOneEffect = 24, flinchEffect = 31,
-            toxicEffect = 33, noDamageConfusionEffect = 49, noDamageAtkPlusTwoEffect = 50, noDamageDefPlusTwoEffect = 51,
-            noDamageSpePlusTwoEffect = 52, noDamageSpDefPlusTwoEffect = 54, noDamageAtkMinusTwoEffect = 58,
-            noDamageDefMinusTwoEffect = 59, noDamageSpeMinusTwoEffect = 60, noDamageSpDefMinusTwoEffect = 62, noDamagePoisonEffect = 66,
-            noDamageParalyzeEffect = 67, damageAtkMinusOneEffect = 68, damageDefMinusOneEffect = 69, damageSpeMinusOneEffect = 70,
-            damageSpDefMinusOneEffect = 72, damageAccuracyMinusOneEffect = 73, damageConfusionEffect = 76, twineedleEffect = 77,
-            snoreEffect = 92, swaggerEffect = 118, damageBurnAndThawUserEffect = 125, damageUserDefPlusOneEffect = 138,
-            damageUserAtkPlusOneEffect = 139, damageUserAllPlusOneEffect = 140, twisterEffect = 146, stompEffect = 150,
-            thunderEffect = 152, defenseCurlEffect = 156;
+    public static final int noDamageSleepEffect = 1, damagePoisonEffect = 2, damageAbsorbEffect = 3, damageBurnEffect = 4,
+            damageFreezeEffect = 5, damageParalyzeEffect = 6, dreamEaterEffect = 8, noDamageAtkPlusOneEffect = 10,
+            noDamageDefPlusOneEffect = 11, noDamageSpAtkPlusOneEffect = 13, noDamageEvasionPlusOneEffect = 16,
+            noDamageAtkMinusOneEffect = 18, noDamageDefMinusOneEffect = 19, noDamageSpeMinusOneEffect = 20,
+            noDamageAccuracyMinusOneEffect = 23, noDamageEvasionMinusOneEffect = 24, flinchEffect = 31, toxicEffect = 33,
+            razorWindEffect = 39, bindingEffect = 42, damageRecoilEffect = 48, noDamageConfusionEffect = 49,
+            noDamageAtkPlusTwoEffect = 50, noDamageDefPlusTwoEffect = 51, noDamageSpePlusTwoEffect = 52,
+            noDamageSpDefPlusTwoEffect = 54, noDamageAtkMinusTwoEffect = 58, noDamageDefMinusTwoEffect = 59,
+            noDamageSpeMinusTwoEffect = 60, noDamageSpDefMinusTwoEffect = 62, noDamagePoisonEffect = 66,
+            noDamageParalyzeEffect = 67, damageAtkMinusOneEffect = 68, damageDefMinusOneEffect = 69,
+            damageSpeMinusOneEffect = 70, damageSpDefMinusOneEffect = 72, damageAccuracyMinusOneEffect = 73,
+            skyAttackEffect = 75, damageConfusionEffect = 76, twineedleEffect = 77, hyperBeamEffect = 80,
+            snoreEffect = 92, flailAndReversalEffect = 102, trappingEffect = 106, swaggerEffect = 118,
+            damageBurnAndThawUserEffect = 125, damageUserDefPlusOneEffect = 138, damageUserAtkPlusOneEffect = 139,
+            damageUserAllPlusOneEffect = 140, skullBashEffect = 145, twisterEffect = 146, futureSightEffect = 148,
+            stompEffect = 150, solarbeamEffect = 151, thunderEffect = 152, semiInvulnerableEffect = 155,
+            defenseCurlEffect = 156;
+
+    // Taken from critical_hit_moves.asm; we could read this from the ROM, but it's easier to hardcode it.
+    public static final List<Integer> increasedCritMoves = Arrays.asList(Moves.karateChop, Moves.razorWind, Moves.razorLeaf,
+            Moves.crabhammer, Moves.slash, Moves.aeroblast, Moves.crossChop);
 
     public static final List<Integer> requiredFieldTMs = Arrays.asList(4, 20, 22, 26, 28, 34, 35, 39,
             40, 43, 44, 46);

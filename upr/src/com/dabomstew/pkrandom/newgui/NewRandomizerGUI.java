@@ -52,9 +52,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class NewRandomizerGUI {
-    private JCheckBox mdLegacyCheckBox;
+	private JCheckBox mdLegacyCheckBox;
 
-    private static JFrame frame;
+	private static JFrame frame;
 
     private static String launcherInput = "";
     public static boolean usedLauncher = false;
@@ -97,8 +97,8 @@ public class NewRandomizerGUI {
                         TRAINER_TYPE_THEMED = 4, TRAINER_TYPE_THEMED_ELITE4_GYMS = 5;
 
     public NewRandomizerGUI() {
-        initComponents();
-        ToolTipManager.sharedInstance().setInitialDelay(400);
+		initComponents();
+		ToolTipManager.sharedInstance().setInitialDelay(400);
         ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
         bundle = ResourceBundle.getBundle("com/dabomstew/pkrandom/newgui/Bundle");
         testForRequiredConfigs();
@@ -1131,6 +1131,7 @@ public class NewRandomizerGUI {
         paBadAbilitiesCheckBox.setSelected(settings.isBanBadAbilities());
         paFollowMegaEvosCheckBox.setSelected(settings.isAbilitiesFollowMegaEvolutions());
         paWeighDuplicatesTogetherCheckBox.setSelected(settings.isWeighDuplicateAbilitiesTogether());
+        paEnsureTwoAbilitiesCheckbox.setSelected(settings.isEnsureTwoAbilities());
 
         ptRandomFollowEvolutionsRadioButton.setSelected(settings.getTypesMod() == Settings.TypesMod.RANDOM_FOLLOW_EVOLUTIONS);
         ptRandomCompletelyRadioButton.setSelected(settings.getTypesMod() == Settings.TypesMod.COMPLETELY_RANDOM);
@@ -1210,6 +1211,7 @@ public class NewRandomizerGUI {
         tpHighestLevelGetsItemCheckBox.setSelected(settings.isHighestLevelGetsItemsForTrainers());
 
         tpRandomShinyTrainerPokemonCheckBox.setSelected(settings.isShinyChance());
+        tpBetterMovesetsCheckBox.setSelected(settings.isBetterTrainerMovesets());
 
         totpUnchangedRadioButton.setSelected(settings.getTotemPokemonMod() == Settings.TotemPokemonMod.UNCHANGED);
         totpRandomRadioButton.setSelected(settings.getTotemPokemonMod() == Settings.TotemPokemonMod.RANDOM);
@@ -1373,6 +1375,7 @@ public class NewRandomizerGUI {
         settings.setBanBadAbilities(paBadAbilitiesCheckBox.isSelected());
         settings.setAbilitiesFollowMegaEvolutions(paFollowMegaEvosCheckBox.isSelected());
         settings.setWeighDuplicateAbilitiesTogether(paWeighDuplicatesTogetherCheckBox.isSelected());
+        settings.setEnsureTwoAbilities(paEnsureTwoAbilitiesCheckbox.isSelected());
 
         settings.setTypesMod(ptUnchangedRadioButton.isSelected(), ptRandomFollowEvolutionsRadioButton.isSelected(),
                 ptRandomCompletelyRadioButton.isSelected());
@@ -1415,7 +1418,8 @@ public class NewRandomizerGUI {
         settings.setMovesetsForceGoodDamaging(pmsForceGoodDamagingCheckBox.isSelected());
         settings.setMovesetsGoodDamagingPercent(pmsForceGoodDamagingSlider.getValue());
         settings.setBlockBrokenMovesetMoves(pmsNoGameBreakingMovesCheckBox.isSelected());
-        settings.setEvolutionMovesForAll(pmsEvolutionMovesCheckBox.isSelected());
+        settings.setEvolutionMovesForAll(pmsEvolutionMovesCheckBox.isVisible() &&
+                pmsEvolutionMovesCheckBox.isSelected());
 
         settings.setTrainersMod(isTrainerSetting(TRAINER_UNCHANGED), isTrainerSetting(TRAINER_RANDOM),
                 isTrainerSetting(TRAINER_RANDOM_EVEN), isTrainerSetting(TRAINER_RANDOM_EVEN_MAIN),
@@ -1437,6 +1441,7 @@ public class NewRandomizerGUI {
         settings.setAdditionalImportantTrainerPokemon(tpImportantTrainersCheckBox.isVisible() && tpImportantTrainersCheckBox.isSelected() ? (int)tpImportantTrainersSpinner.getValue() : 0);
         settings.setAdditionalRegularTrainerPokemon(tpRegularTrainersCheckBox.isVisible() && tpRegularTrainersCheckBox.isSelected() ? (int)tpRegularTrainersSpinner.getValue() : 0);
         settings.setShinyChance(tpRandomShinyTrainerPokemonCheckBox.isVisible() && tpRandomShinyTrainerPokemonCheckBox.isSelected());
+        settings.setBetterTrainerMovesets(tpBetterMovesetsCheckBox.isVisible() && tpBetterMovesetsCheckBox.isSelected());
         settings.setRandomizeHeldItemsForBossTrainerPokemon(tpBossTrainersItemsCheckBox.isVisible() && tpBossTrainersItemsCheckBox.isSelected());
         settings.setRandomizeHeldItemsForImportantTrainerPokemon(tpImportantTrainersItemsCheckBox.isVisible() && tpImportantTrainersItemsCheckBox.isSelected());
         settings.setRandomizeHeldItemsForRegularTrainerPokemon(tpRegularTrainersItemsCheckBox.isVisible() && tpRegularTrainersItemsCheckBox.isSelected());
@@ -1749,6 +1754,9 @@ public class NewRandomizerGUI {
         paWeighDuplicatesTogetherCheckBox.setVisible(true);
         paWeighDuplicatesTogetherCheckBox.setEnabled(false);
         paWeighDuplicatesTogetherCheckBox.setSelected(false);
+        paEnsureTwoAbilitiesCheckbox.setVisible(true);
+        paEnsureTwoAbilitiesCheckbox.setEnabled(false);
+        paEnsureTwoAbilitiesCheckbox.setSelected(false);
         peUnchangedRadioButton.setVisible(true);
         peUnchangedRadioButton.setEnabled(false);
         peUnchangedRadioButton.setSelected(false);
@@ -2017,6 +2025,9 @@ public class NewRandomizerGUI {
         tpHighestLevelGetsItemCheckBox.setSelected(false);
         tpRandomShinyTrainerPokemonCheckBox.setVisible(true);
         tpRandomShinyTrainerPokemonCheckBox.setEnabled(false);
+        tpBetterMovesetsCheckBox.setVisible(true);
+        tpBetterMovesetsCheckBox.setEnabled(false);
+        tpBetterMovesetsCheckBox.setSelected(false);
         totpPanel.setVisible(true);
         totpAllyPanel.setVisible(true);
         totpAuraPanel.setVisible(true);
@@ -2298,6 +2309,18 @@ public class NewRandomizerGUI {
             romSupportLabel.setText(bundle.getString("GUI.romSupportPrefix") + " "
                     + this.romHandler.getSupportLevel());
 
+            if (!romHandler.isRomValid()) {
+                romNameLabel.setForeground(Color.RED);
+                romCodeLabel.setForeground(Color.RED);
+                romSupportLabel.setForeground(Color.RED);
+                romSupportLabel.setText("<html>" + bundle.getString("GUI.romSupportPrefix") + " <b>Unofficial ROM</b>");
+                showInvalidRomPopup();
+            } else {
+                romNameLabel.setForeground(Color.BLACK);
+                romCodeLabel.setForeground(Color.BLACK);
+                romSupportLabel.setForeground(Color.BLACK);
+            }
+
             limitPokemonCheckBox.setVisible(true);
             limitPokemonCheckBox.setEnabled(true);
             limitPokemonButton.setVisible(true);
@@ -2352,6 +2375,7 @@ public class NewRandomizerGUI {
                 paBadAbilitiesCheckBox.setEnabled(false);
                 paFollowMegaEvosCheckBox.setVisible(romHandler.hasMegaEvolutions());
                 paWeighDuplicatesTogetherCheckBox.setEnabled(false);
+                paEnsureTwoAbilitiesCheckbox.setEnabled(false);
             } else {
                 pokemonAbilitiesPanel.setVisible(false);
             }
@@ -2494,6 +2518,7 @@ public class NewRandomizerGUI {
             tpRandomizeTrainerClassNamesCheckBox.setEnabled(true);
             tpNoEarlyWonderGuardCheckBox.setVisible(pokemonGeneration >= 3);
             tpRandomShinyTrainerPokemonCheckBox.setVisible(pokemonGeneration >= 7);
+            tpBetterMovesetsCheckBox.setVisible(pokemonGeneration >= 3);
 
             totpPanel.setVisible(pokemonGeneration == 7);
             if (totpPanel.isVisible()) {
@@ -2647,13 +2672,6 @@ public class NewRandomizerGUI {
         } else {
             romNameLabel.setText(romHandler.getROMName());
         }
-        if (!romHandler.isRomValid()) {
-            romNameLabel.setForeground(Color.RED);
-            romNameLabel.setText(romNameLabel.getText() + " [Bad CRC32]");
-            showInvalidRomPopup();
-        } else {
-            romNameLabel.setForeground(Color.BLACK);
-        }
     }
 
     private void setTweaksPanel(List<JCheckBox> usableCheckBoxes) {
@@ -2795,6 +2813,7 @@ public class NewRandomizerGUI {
             paNegativeAbilitiesCheckBox.setEnabled(true);
             paBadAbilitiesCheckBox.setEnabled(true);
             paWeighDuplicatesTogetherCheckBox.setEnabled(true);
+            paEnsureTwoAbilitiesCheckbox.setEnabled(true);
         } else {
             paAllowWonderGuardCheckBox.setEnabled(false);
             paAllowWonderGuardCheckBox.setSelected(false);
@@ -2810,6 +2829,8 @@ public class NewRandomizerGUI {
             paFollowMegaEvosCheckBox.setSelected(false);
             paWeighDuplicatesTogetherCheckBox.setEnabled(false);
             paWeighDuplicatesTogetherCheckBox.setSelected(false);
+            paEnsureTwoAbilitiesCheckbox.setEnabled(false);
+            paEnsureTwoAbilitiesCheckbox.setSelected(false);
         }
 
         if (peRandomRadioButton.isSelected()) {
@@ -2956,6 +2977,8 @@ public class NewRandomizerGUI {
             tpSwapMegaEvosCheckBox.setSelected(false);
             tpRandomShinyTrainerPokemonCheckBox.setEnabled(false);
             tpRandomShinyTrainerPokemonCheckBox.setSelected(false);
+            tpBetterMovesetsCheckBox.setEnabled(false);
+            tpBetterMovesetsCheckBox.setSelected(false);
             tpDoubleBattleModeCheckBox.setEnabled(false);
             tpDoubleBattleModeCheckBox.setSelected(false);
             tpBossTrainersCheckBox.setEnabled(false);
@@ -2991,6 +3014,7 @@ public class NewRandomizerGUI {
                 tpSwapMegaEvosCheckBox.setSelected(false);
             }
             tpRandomShinyTrainerPokemonCheckBox.setEnabled(true);
+            tpBetterMovesetsCheckBox.setEnabled(true);
             tpDoubleBattleModeCheckBox.setEnabled(tpDoubleBattleModeCheckBox.isVisible());
             tpBossTrainersCheckBox.setEnabled(tpBossTrainersCheckBox.isVisible());
             tpImportantTrainersCheckBox.setEnabled(tpImportantTrainersCheckBox.isVisible());
@@ -3363,17 +3387,20 @@ public class NewRandomizerGUI {
                                 .filter(pk -> pk == null || !pk.actuallyCosmetic)
                                 .collect(Collectors.toList()) :
                         romHandler.getPokemon();
-        String[] pokeNames = new String[allPokes.size() - 1];
+        String[] pokeNames = new String[allPokes.size()];
+        pokeNames[0] = "Random";
         for (int i = 1; i < allPokes.size(); i++) {
-            pokeNames[i - 1] = allPokes.get(i).fullName();
+            pokeNames[i] = allPokes.get(i).fullName();
+
         }
+
         spComboBox1.setModel(new DefaultComboBoxModel<>(pokeNames));
-        spComboBox1.setSelectedIndex(allPokes.indexOf(currentStarters.get(0)) - 1);
+        spComboBox1.setSelectedIndex(allPokes.indexOf(currentStarters.get(0)));
         spComboBox2.setModel(new DefaultComboBoxModel<>(pokeNames));
-        spComboBox2.setSelectedIndex(allPokes.indexOf(currentStarters.get(1)) - 1);
+        spComboBox2.setSelectedIndex(allPokes.indexOf(currentStarters.get(1)));
         if (!romHandler.isYellow()) {
             spComboBox3.setModel(new DefaultComboBoxModel<>(pokeNames));
-            spComboBox3.setSelectedIndex(allPokes.indexOf(currentStarters.get(2)) - 1);
+            spComboBox3.setSelectedIndex(allPokes.indexOf(currentStarters.get(2)));
         }
 
         String[] baseStatGenerationNumbers = new String[Math.min(3, GlobalConstants.HIGHEST_POKEMON_GEN - romHandler.generationOfPokemon())];
@@ -3666,8 +3693,9 @@ public class NewRandomizerGUI {
 		paTrappingAbilitiesCheckBox = new JCheckBox();
 		paNegativeAbilitiesCheckBox = new JCheckBox();
 		paBadAbilitiesCheckBox = new JCheckBox();
-		paFollowMegaEvosCheckBox = new JCheckBox();
 		paWeighDuplicatesTogetherCheckBox = new JCheckBox();
+		paEnsureTwoAbilitiesCheckbox = new JCheckBox();
+		paFollowMegaEvosCheckBox = new JCheckBox();
 		JPanel panel6 = new JPanel();
 		peUnchangedRadioButton = new JRadioButton();
 		JPanel hSpacer10 = new JPanel(null);
@@ -3804,6 +3832,7 @@ public class NewRandomizerGUI {
 		tpConsumableItemsOnlyCheckBox = new JCheckBox();
 		tpSensibleItemsCheckBox = new JCheckBox();
 		tpHighestLevelGetsItemCheckBox = new JCheckBox();
+		tpBetterMovesetsCheckBox = new JCheckBox();
 		JPanel hSpacer28 = new JPanel(null);
 		JPanel vSpacer28 = new JPanel(null);
 		JPanel hSpacer29 = new JPanel(null);
@@ -4063,15 +4092,13 @@ public class NewRandomizerGUI {
 					new Insets(0, 0, 0, 0), 0, 0));
 
 				//---- romNameLabel ----
-				romNameLabel.setHorizontalAlignment(0);
-				//romNameLabel.setLabelFor();
+				romNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 				romNameLabel.setText(bundle.getString("GUI.noRomLoaded"));
 				panel2.add(romNameLabel, new GridBagConstraints(0, 0, 1, 1, 0.1, 0.1,
 					GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 					new Insets(5, 5, 5, 0), 0, 0));
 
 				//---- romCodeLabel ----
-				//romCodeLabel.setLabelFor();
 				romCodeLabel.setText("");
 				panel2.add(romCodeLabel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.1,
 					GridBagConstraints.WEST, GridBagConstraints.NONE,
@@ -4089,8 +4116,8 @@ public class NewRandomizerGUI {
 
 			//======== tabbedPane1 ========
 			{
-				tabbedPane1.setTabLayoutPolicy(1);
-				tabbedPane1.setTabPlacement(1);
+				tabbedPane1.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+				tabbedPane1.setTabPlacement(JTabbedPane.TOP);
 
 				//======== panel3 ========
 				{
@@ -4310,7 +4337,7 @@ public class NewRandomizerGUI {
 						pokemonAbilitiesPanel.add(paUnchangedRadioButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
-						pokemonAbilitiesPanel.add(hSpacer8, new GridBagConstraints(5, 1, 1, 1, 0.1, 0.0,
+						pokemonAbilitiesPanel.add(hSpacer8, new GridBagConstraints(6, 1, 1, 1, 0.1, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 							new Insets(0, 0, 0, 0), 0, 0));
 						pokemonAbilitiesPanel.add(vSpacer7, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.1,
@@ -4374,15 +4401,7 @@ public class NewRandomizerGUI {
 						paBadAbilitiesCheckBox.setEnabled(false);
 						paBadAbilitiesCheckBox.setText(bundle.getString("GUI.paBadAbilitiesCheckBox.text"));
 						paBadAbilitiesCheckBox.setToolTipText(bundle.getString("GUI.paBadAbilitiesCheckBox.toolTipText"));
-						pokemonAbilitiesPanel.add(paBadAbilitiesCheckBox, new GridBagConstraints(4, 3, 1, 1, 0.0, 0.0,
-							GridBagConstraints.WEST, GridBagConstraints.NONE,
-							new Insets(0, 0, 0, 0), 0, 0));
-
-						//---- paFollowMegaEvosCheckBox ----
-						paFollowMegaEvosCheckBox.setEnabled(false);
-						paFollowMegaEvosCheckBox.setText(bundle.getString("GUI.paFollowMegaEvosCheckBox.text"));
-						paFollowMegaEvosCheckBox.setToolTipText(bundle.getString("GUI.paFollowMegaEvosCheckBox.toolTipText"));
-						pokemonAbilitiesPanel.add(paFollowMegaEvosCheckBox, new GridBagConstraints(3, 2, 2, 1, 0.0, 0.0,
+						pokemonAbilitiesPanel.add(paBadAbilitiesCheckBox, new GridBagConstraints(4, 3, 2, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
@@ -4391,6 +4410,22 @@ public class NewRandomizerGUI {
 						paWeighDuplicatesTogetherCheckBox.setText(bundle.getString("GUI.paWeighDuplicatesTogetherCheckBox.text"));
 						paWeighDuplicatesTogetherCheckBox.setToolTipText(bundle.getString("GUI.paWeighDuplicatesTogetherCheckBox.toolTipText"));
 						pokemonAbilitiesPanel.add(paWeighDuplicatesTogetherCheckBox, new GridBagConstraints(3, 1, 2, 1, 0.0, 0.0,
+							GridBagConstraints.WEST, GridBagConstraints.NONE,
+							new Insets(0, 0, 0, 0), 0, 0));
+
+						//---- paEnsureTwoAbilitiesCheckbox ----
+						paEnsureTwoAbilitiesCheckbox.setEnabled(false);
+						paEnsureTwoAbilitiesCheckbox.setText(bundle.getString("GUI.paEnsureTwoAbilitiesCheckbox.text"));
+						paEnsureTwoAbilitiesCheckbox.setToolTipText(bundle.getString("GUI.paEnsureTwoAbilitiesCheckbox.toolTipText"));
+						pokemonAbilitiesPanel.add(paEnsureTwoAbilitiesCheckbox, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0,
+							GridBagConstraints.WEST, GridBagConstraints.NONE,
+							new Insets(0, 0, 0, 0), 0, 0));
+
+						//---- paFollowMegaEvosCheckBox ----
+						paFollowMegaEvosCheckBox.setEnabled(false);
+						paFollowMegaEvosCheckBox.setText(bundle.getString("GUI.paFollowMegaEvosCheckBox.text"));
+						paFollowMegaEvosCheckBox.setToolTipText(bundle.getString("GUI.paFollowMegaEvosCheckBox.toolTipText"));
+						pokemonAbilitiesPanel.add(paFollowMegaEvosCheckBox, new GridBagConstraints(3, 2, 2, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 					}
@@ -5326,6 +5361,14 @@ public class NewRandomizerGUI {
 						tpHighestLevelGetsItemCheckBox.setText(bundle.getString("GUI.tpHighestLevelGetsItemCheckBox.text"));
 						tpHighestLevelGetsItemCheckBox.setToolTipText(bundle.getString("GUI.tpHighestLevelGetsItemCheckBox.tooltip"));
 						panel15.add(tpHighestLevelGetsItemCheckBox, new GridBagConstraints(4, 10, 1, 1, 0.0, 0.0,
+							GridBagConstraints.WEST, GridBagConstraints.NONE,
+							new Insets(0, 0, 0, 0), 0, 0));
+
+						//---- tpBetterMovesetsCheckBox ----
+						tpBetterMovesetsCheckBox.setEnabled(false);
+						tpBetterMovesetsCheckBox.setText(bundle.getString("GUI.tpBetterMovesetsCheckBox.text"));
+						tpBetterMovesetsCheckBox.setToolTipText(bundle.getString("GUI.tpBetterMovesetsCheckBox.toolTipText"));
+						panel15.add(tpBetterMovesetsCheckBox, new GridBagConstraints(1, 3, 2, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 					}
@@ -6551,7 +6594,7 @@ public class NewRandomizerGUI {
 				new Insets(0, 0, 0, 0), 0, 0));
 
 			//---- gameMascotLabel ----
-			gameMascotLabel.setIcon(new ImageIcon("emptyIcon.png"));
+			gameMascotLabel.setIcon(new ImageIcon(getClass().getResource("/com/dabomstew/pkrandom/newgui/emptyIcon.png")));
 			gameMascotLabel.setText("");
 			mainPanel.add(gameMascotLabel, new GridBagConstraints(7, 1, 1, 4, 0.1, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
@@ -6586,7 +6629,7 @@ public class NewRandomizerGUI {
 				new Insets(0, 0, 0, 0), 0, 0));
 
 			//---- wikiLinkLabel ----
-			wikiLinkLabel.setHorizontalAlignment(10);
+			wikiLinkLabel.setHorizontalAlignment(SwingConstants.LEADING);
 			wikiLinkLabel.setText(bundle.getString("GUI.wikiLinkLabel.text"));
 			mainPanel.add(wikiLinkLabel, new GridBagConstraints(10, 6, 1, 1, 0.0, 0.0,
 				GridBagConstraints.EAST, GridBagConstraints.NONE,
@@ -6759,8 +6802,9 @@ public class NewRandomizerGUI {
 	private JCheckBox paTrappingAbilitiesCheckBox;
 	private JCheckBox paNegativeAbilitiesCheckBox;
 	private JCheckBox paBadAbilitiesCheckBox;
-	private JCheckBox paFollowMegaEvosCheckBox;
 	private JCheckBox paWeighDuplicatesTogetherCheckBox;
+	private JCheckBox paEnsureTwoAbilitiesCheckbox;
+	private JCheckBox paFollowMegaEvosCheckBox;
 	private JRadioButton peUnchangedRadioButton;
 	private JRadioButton peRandomRadioButton;
 	private JCheckBox peSimilarStrengthCheckBox;
@@ -6850,6 +6894,7 @@ public class NewRandomizerGUI {
 	private JCheckBox tpConsumableItemsOnlyCheckBox;
 	private JCheckBox tpSensibleItemsCheckBox;
 	private JCheckBox tpHighestLevelGetsItemCheckBox;
+	private JCheckBox tpBetterMovesetsCheckBox;
 	private JPanel totpPanel;
 	private JRadioButton totpUnchangedRadioButton;
 	private JPanel totpAllyPanel;

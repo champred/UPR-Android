@@ -185,23 +185,34 @@ public class Gen3Constants {
 
     public static final int frlgMapLabelsStart = 0x58;
 
-    public static final int noDamageSleepEffect = 1, damagePoisonEffect = 2, damageBurnEffect = 4, damageFreezeEffect = 5,
-            damageParalyzeEffect = 6, noDamageAtkPlusOneEffect = 10, noDamageDefPlusOneEffect = 11, noDamageSpAtkPlusOneEffect = 13,
-            noDamageEvasionPlusOneEffect = 16, noDamageAtkMinusOneEffect = 18, noDamageDefMinusOneEffect = 19,
-            noDamageSpeMinusOneEffect = 20, noDamageAccuracyMinusOneEffect = 23, noDamageEvasionMinusOneEffect = 24,
-            flinchEffect = 31, toxicEffect = 33, noDamageConfusionEffect = 49, noDamageAtkPlusTwoEffect = 50,
-            noDamageDefPlusTwoEffect = 51, noDamageSpePlusTwoEffect = 52, noDamageSpAtkPlusTwoEffect = 53, noDamageSpDefPlusTwoEffect = 54,
-            noDamageAtkMinusTwoEffect = 58, noDamageDefMinusTwoEffect = 59, noDamageSpeMinusTwoEffect = 60, noDamageSpDefMinusTwoEffect = 62,
-            noDamagePoisonEffect = 66, noDamageParalyzeEffect = 67, damageAtkMinusOneEffect = 68, damageDefMinusOneEffect = 69,
-            damageSpeMinusOneEffect = 70, damageSpAtkMinusOneEffect = 71, damageSpDefMinusOneEffect = 72,
-            damageAccuracyMinusOneEffect = 73, skyAttackEffect = 75, damageConfusionEffect = 76, twineedleEffect = 77, snoreEffect = 92,
-            minimizeEffect = 108, swaggerEffect = 118, damageBurnAndThawUserEffect = 125, damageUserDefPlusOneEffect = 138,
-            damageUserAtkPlusOneEffect = 139, damageUserAllPlusOneEffect = 140, twisterEffect = 146, flinchWithMinimizeBonusEffect = 150,
-            thunderEffect = 152, defenseCurlEffect = 156, fakeOutEffect = 158, flatterEffect = 166, noDamageBurnEffect = 167,
-            chargeEffect = 174, damageUserAtkAndDefMinusOneEffect = 182, teeterDanceEffect = 199, blazeKickEffect = 200,
-            poisonFangEffect = 202, damageUserSpAtkMinusTwoEffect = 204, noDamageAtkAndDefMinusOneEffect = 205,
-            noDamageDefAndSpDefPlusOneEffect = 206, noDamageAtkAndDefPlusOneEffect = 208, damagePoisonWithIncreasedCritEffect = 209,
-            noDamageSpAtkAndSpDefPlusOneEffect = 211, noDamageAtkAndSpePlusOneEffect = 212;
+    public static final int noDamageSleepEffect = 1, damagePoisonEffect = 2, damageAbsorbEffect = 3, damageBurnEffect = 4,
+            damageFreezeEffect = 5, damageParalyzeEffect = 6, dreamEaterEffect = 8, noDamageAtkPlusOneEffect = 10,
+            noDamageDefPlusOneEffect = 11, noDamageSpAtkPlusOneEffect = 13, noDamageEvasionPlusOneEffect = 16,
+            noDamageAtkMinusOneEffect = 18, noDamageDefMinusOneEffect = 19, noDamageSpeMinusOneEffect = 20,
+            noDamageAccuracyMinusOneEffect = 23, noDamageEvasionMinusOneEffect = 24, flinchEffect = 31, toxicEffect = 33,
+            razorWindEffect = 39, bindingEffect = 42, increasedCritEffect = 43, damageRecoil25PercentEffect = 48,
+            noDamageConfusionEffect = 49, noDamageAtkPlusTwoEffect = 50, noDamageDefPlusTwoEffect = 51,
+            noDamageSpePlusTwoEffect = 52, noDamageSpAtkPlusTwoEffect = 53, noDamageSpDefPlusTwoEffect = 54,
+            noDamageAtkMinusTwoEffect = 58, noDamageDefMinusTwoEffect = 59, noDamageSpeMinusTwoEffect = 60,
+            noDamageSpDefMinusTwoEffect = 62, noDamagePoisonEffect = 66, noDamageParalyzeEffect = 67,
+            damageAtkMinusOneEffect = 68, damageDefMinusOneEffect = 69, damageSpeMinusOneEffect = 70,
+            damageSpAtkMinusOneEffect = 71, damageSpDefMinusOneEffect = 72, damageAccuracyMinusOneEffect = 73,
+            skyAttackEffect = 75, damageConfusionEffect = 76, twineedleEffect = 77, rechargeEffect = 80,
+            snoreEffect = 92, trappingEffect = 106, minimizeEffect = 108, swaggerEffect = 118,
+            damageBurnAndThawUserEffect = 125, damageUserDefPlusOneEffect = 138, damageUserAtkPlusOneEffect = 139,
+            damageUserAllPlusOneEffect = 140, skullBashEffect = 145, twisterEffect = 146,
+            futureSightAndDoomDesireEffect = 148, flinchWithMinimizeBonusEffect = 150, solarbeamEffect = 151,
+            thunderEffect = 152, semiInvulnerableEffect = 155, defenseCurlEffect = 156, fakeOutEffect = 158,
+            spitUpEffect = 161, flatterEffect = 166, noDamageBurnEffect = 167, chargeEffect = 174,
+            damageUserAtkAndDefMinusOneEffect = 182, damageRecoil33PercentEffect = 198, teeterDanceEffect = 199,
+            blazeKickEffect = 200, poisonFangEffect = 202, damageUserSpAtkMinusTwoEffect = 204,
+            noDamageAtkAndDefMinusOneEffect = 205, noDamageDefAndSpDefPlusOneEffect = 206,
+            noDamageAtkAndDefPlusOneEffect = 208, poisonTailEffect = 209, noDamageSpAtkAndSpDefPlusOneEffect = 211,
+            noDamageAtkAndSpePlusOneEffect = 212;
+
+    public static final List<Integer> soundMoves = Arrays.asList(Moves.growl, Moves.roar, Moves.sing, Moves.supersonic,
+            Moves.screech, Moves.snore, Moves.uproar, Moves.metalSound, Moves.grassWhistle, Moves.hyperVoice,
+            Moves.perishSong, Moves.healBell);
 
     public static final List<Integer> rsRequiredFieldTMs = Arrays.asList(1, 2, 6, 7, 11, 18, 22, 23,
             26, 30, 37, 48);
@@ -469,7 +480,7 @@ public class Gen3Constants {
         }
     }
 
-    public static ItemList allowedItems, nonBadItems;
+    public static ItemList allowedItems, nonBadItemsRSE, nonBadItemsFRLG;
     public static List<Integer> regularShopItems, opShopItems;
 
     public static String getRunningShoesCheckPrefix(int romType) {
@@ -507,12 +518,17 @@ public class Gen3Constants {
 
         // non-bad items
         // ban specific pokemon hold items, berries, apricorns, mail
-        nonBadItems = allowedItems.copy();
-        nonBadItems.banSingles(Gen3Items.lightBall, Gen3Items.oranBerry, Gen3Items.soulDew);
-        nonBadItems.banRange(Gen3Items.orangeMail, 12); // mail
-        nonBadItems.banRange(Gen3Items.figyBerry, 33); // berries
-        nonBadItems.banRange(Gen3Items.luckyPunch, 4); // pokemon specific
-        nonBadItems.banRange(Gen3Items.redScarf, 5); // contest scarves
+        nonBadItemsRSE = allowedItems.copy();
+        nonBadItemsRSE.banSingles(Gen3Items.lightBall, Gen3Items.oranBerry, Gen3Items.soulDew);
+        nonBadItemsRSE.banRange(Gen3Items.orangeMail, 12); // mail
+        nonBadItemsRSE.banRange(Gen3Items.figyBerry, 33); // berries
+        nonBadItemsRSE.banRange(Gen3Items.luckyPunch, 4); // pokemon specific
+        nonBadItemsRSE.banRange(Gen3Items.redScarf, 5); // contest scarves
+
+        // FRLG-exclusive bad items
+        // Ban Shoal items and Shards, since they don't do anything
+        nonBadItemsFRLG = nonBadItemsRSE.copy();
+        nonBadItemsFRLG.banRange(Gen3Items.shoalSalt, 6);
 
         regularShopItems = new ArrayList<>();
 
@@ -527,6 +543,14 @@ public class Gen3Constants {
         opShopItems.addAll(IntStream.rangeClosed(Gen3Items.tinyMushroom,Gen3Items.bigMushroom).boxed().collect(Collectors.toList()));
         opShopItems.addAll(IntStream.rangeClosed(Gen3Items.pearl,Gen3Items.nugget).boxed().collect(Collectors.toList()));
         opShopItems.add(Gen3Items.luckyEgg);
+    }
+
+    public static ItemList getNonBadItems(int romType) {
+        if (romType == Gen3Constants.RomType_FRLG) {
+            return nonBadItemsFRLG;
+        } else {
+            return nonBadItemsRSE;
+        }
     }
 
     public static void trainerTagsRS(List<Trainer> trs, int romType) {

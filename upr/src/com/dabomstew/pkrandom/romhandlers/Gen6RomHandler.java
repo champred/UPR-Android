@@ -602,6 +602,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 moves[i].name = moveNames.get(i);
                 moves[i].number = i;
                 moves[i].internalId = i;
+                moves[i].effectIndex = readWord(moveData, 16);
                 moves[i].hitratio = (moveData[4] & 0xFF);
                 moves[i].power = moveData[3] & 0xFF;
                 moves[i].pp = moveData[5] & 0xFF;
@@ -610,8 +611,37 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 moves[i].target = moveData[20] & 0xFF;
                 moves[i].category = Gen6Constants.moveCategoryIndices[moveData[2] & 0xFF];
                 moves[i].priority = moveData[6];
+
+                int critStages = moveData[14] & 0xFF;
+                if (critStages == 6) {
+                    moves[i].criticalChance = CriticalChance.GUARANTEED;
+                } else if (critStages > 0) {
+                    moves[i].criticalChance = CriticalChance.INCREASED;
+                }
+
+                int internalStatusType = readWord(moveData, 8);
                 int flags = FileFunctions.readFullInt(moveData, 32);
-                moves[i].makesContact = (flags & 1) != 0;
+                moves[i].makesContact = (flags & 0x001) != 0;
+                moves[i].isChargeMove = (flags & 0x002) != 0;
+                moves[i].isRechargeMove = (flags & 0x004) != 0;
+                moves[i].isPunchMove = (flags & 0x080) != 0;
+                moves[i].isSoundMove = (flags & 0x100) != 0;
+                moves[i].isTrapMove = internalStatusType == 8;
+                switch (moves[i].effectIndex) {
+                    case Gen6Constants.noDamageTargetTrappingEffect:
+                    case Gen6Constants.noDamageFieldTrappingEffect:
+                    case Gen6Constants.damageAdjacentFoesTrappingEffect:
+                        moves[i].isTrapMove = true;
+                        break;
+                }
+
+                int qualities = moveData[1];
+                int recoilOrAbsorbPercent = moveData[18];
+                if (qualities == Gen6Constants.damageAbsorbQuality) {
+                    moves[i].absorbPercent = recoilOrAbsorbPercent;
+                } else {
+                    moves[i].recoilPercent = -recoilOrAbsorbPercent;
+                }
 
                 if (i == Moves.swift) {
                     perfectAccuracy = (int)moves[i].hitratio;
@@ -625,7 +655,6 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                     moves[i].hitCount = 2.71; // this assumes the first hit lands
                 }
 
-                int qualities = moveData[1];
                 switch (qualities) {
                     case Gen6Constants.noDamageStatChangeQuality:
                     case Gen6Constants.noDamageStatusAndStatChangeQuality:
@@ -657,7 +686,6 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                     moves[i].statChanges[statChange].percentChance = moveData[27 + statChange];
                 }
 
-                int internalStatusType = readWord(moveData, 8);
                 // Exclude status types that aren't in the StatusType enum.
                 if (internalStatusType < 7) {
                     moves[i].statusType = StatusType.values()[internalStatusType];
@@ -1846,7 +1874,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 byte[] trpoke = trpokes.files.get(i).get(0);
                 Trainer tr = new Trainer();
                 tr.poketype = isORAS ? readWord(trainer,0) : trainer[0] & 0xFF;
-                tr.offset = i;
+                tr.index = i;
                 tr.trainerclass = isORAS ? readWord(trainer,2) : trainer[1] & 0xFF;
                 int offset = isORAS ? 6 : 2;
                 int battleType = trainer[offset] & 0xFF;
@@ -1892,9 +1920,6 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                     tpk.forcedGenderFlag = (abilityAndFlag & 0xF);
                     tpk.forme = formnum;
                     tpk.formeSuffix = Gen6Constants.getFormeSuffixByBaseForme(species,formnum);
-                    tpk.absolutePokeNumber = absolutePokeNumByBaseForme
-                            .getOrDefault(species,dummyAbsolutePokeNums)
-                            .getOrDefault(formnum,species);
                     pokeOffs += 8;
                     if (tr.pokemonHaveItems()) {
                         tpk.heldItem = readWord(trpoke, pokeOffs);
@@ -1902,14 +1927,9 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                         tpk.hasMegaStone = Gen6Constants.isMegaStone(tpk.heldItem);
                     }
                     if (tr.pokemonHaveCustomMoves()) {
-                        int attack1 = readWord(trpoke, pokeOffs);
-                        int attack2 = readWord(trpoke, pokeOffs + 2);
-                        int attack3 = readWord(trpoke, pokeOffs + 4);
-                        int attack4 = readWord(trpoke, pokeOffs + 6);
-                        tpk.move1 = attack1;
-                        tpk.move2 = attack2;
-                        tpk.move3 = attack3;
-                        tpk.move4 = attack4;
+                        for (int move = 0; move < 4; move++) {
+                            tpk.moves[move] = readWord(trpoke, pokeOffs + (move*2));
+                        }
                         pokeOffs += 8;
                     }
                     tr.pokemon.add(tpk);
@@ -2003,15 +2023,15 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                     }
                     if (tr.pokemonHaveCustomMoves()) {
                         if (tp.resetMoves) {
-                            int[] pokeMoves = RomFunctions.getMovesAtLevel(tp.absolutePokeNumber, movesets, tp.level);
+                            int[] pokeMoves = RomFunctions.getMovesAtLevel(getAltFormeOfPokemon(tp.pokemon, tp.forme).number, movesets, tp.level);
                             for (int m = 0; m < 4; m++) {
                                 writeWord(trpoke, pokeOffs + m * 2, pokeMoves[m]);
                             }
                         } else {
-                            writeWord(trpoke, pokeOffs, tp.move1);
-                            writeWord(trpoke, pokeOffs + 2, tp.move2);
-                            writeWord(trpoke, pokeOffs + 4, tp.move3);
-                            writeWord(trpoke, pokeOffs + 6, tp.move4);
+                            writeWord(trpoke, pokeOffs, tp.moves[0]);
+                            writeWord(trpoke, pokeOffs + 2, tp.moves[1]);
+                            writeWord(trpoke, pokeOffs + 4, tp.moves[2]);
+                            writeWord(trpoke, pokeOffs + 6, tp.moves[3]);
                         }
                         pokeOffs += 8;
                     }
@@ -2579,6 +2599,11 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         } else if (tweak == MiscTweak.NATIONAL_DEX_AT_START) {
             patchForNationalDex();
         }
+    }
+
+    @Override
+    public boolean isEffectivenessUpdated() {
+        return false;
     }
 
     private void applyFastestText() {
@@ -4074,7 +4099,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
-    public List<Integer> getSensibleHeldItemsFor(TrainerPokemon tp, boolean consumableOnly, List<Move> moves, Map<Integer, List<MoveLearnt>> movesets) {
+    public List<Integer> getSensibleHeldItemsFor(TrainerPokemon tp, boolean consumableOnly, List<Move> moves, int[] pokeMoves) {
         List<Integer> items = new ArrayList<>();
         items.addAll(Gen6Constants.generalPurposeConsumableItems);
         int frequencyBoostCount = 6; // Make some very good items more common, but not too common
@@ -4082,7 +4107,6 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             frequencyBoostCount = 8; // bigger to account for larger item pool.
             items.addAll(Gen6Constants.generalPurposeItems);
         }
-        int[] pokeMoves = RomFunctions.getMovesAtLevel(tp.pokemon.number, movesets, tp.level);
         int numDamagingMoves = 0;
         for (int moveIdx : pokeMoves) {
             Move move = moves.get(moveIdx);

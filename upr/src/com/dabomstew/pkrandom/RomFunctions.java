@@ -101,7 +101,7 @@ public class RomFunctions {
 
     /**
      * Get the 4 moves known by a Pokemon at a particular level.
-     *
+     * 
      * @param pkmn Pokemon index to get moves for.
      * @param movesets Map of Pokemon indices mapped to movesets.
      * @param level Level to get at.
@@ -159,7 +159,7 @@ public class RomFunctions {
                 string[j] = Character.toUpperCase(current);
                 docap = false;
             } else {
-                if (!docap && !Character.isLetter(current) && current != '\'') {
+                if (!docap && !Character.isLetter(current) && current != '\'' && current != '’') {
                     docap = true;
                 }
             }
@@ -402,7 +402,7 @@ public class RomFunctions {
                 }
                 if ((currLineCC + reqLength > maxLineLength)
                         || (currLineCC >= sentenceNewLineSize && (currLineLastChar == '.' || currLineLastChar == '?'
-                        || currLineLastChar == '!' || currLineLastChar == '\u2026' || currLineLastChar == ','))) {
+                        || currLineLastChar == '!' || currLineLastChar == '…' || currLineLastChar == ','))) {
                     // new line
                     // Save current line, if applicable
                     if (currLineWC > 0) {

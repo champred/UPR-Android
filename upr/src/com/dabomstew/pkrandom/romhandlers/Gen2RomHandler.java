@@ -280,6 +280,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
     private boolean isVietCrystal;
     private ItemList allowedItems, nonBadItems;
     private long actualCRC32;
+    private boolean effectivenessUpdated;
 
     @Override
     public boolean detectRom(byte[] rom) {
@@ -412,7 +413,9 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             moves[i].pp = rom[offs + (i - 1) * 7 + 5] & 0xFF;
             moves[i].type = Gen2Constants.typeTable[rom[offs + (i - 1) * 7 + 3]];
             moves[i].category = GBConstants.physicalTypes.contains(moves[i].type) ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL;
-            moves[i].secondaryEffectChance = ((rom[offs + (i - 1) * 7 + 6] & 0xFF)) / 255.0 * 100;
+            if (moves[i].power == 0 && !GlobalConstants.noPowerNonStatusMoves.contains(i)) {
+                moves[i].category = MoveCategory.STATUS;
+            }
 
             if (i == Moves.swift) {
                 perfectAccuracy = (int)moves[i].hitratio;
@@ -440,21 +443,14 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                 moves[i].priority = 1;
             }
 
-            loadStatChangesFromEffect(moves[i]);
-            loadStatusFromEffect(moves[i]);
-
-            switch (moves[i].effectIndex) {
-                case Gen2Constants.flinchEffect:
-                case Gen2Constants.snoreEffect:
-                case Gen2Constants.twisterEffect:
-                case Gen2Constants.stompEffect:
-                    moves[i].flinchPercentChance = moves[i].secondaryEffectChance;
-                    break;
-            }
+            double secondaryEffectChance = ((rom[offs + (i - 1) * 7 + 6] & 0xFF)) / 255.0 * 100;
+            loadStatChangesFromEffect(moves[i], secondaryEffectChance);
+            loadStatusFromEffect(moves[i], secondaryEffectChance);
+            loadMiscMoveInfoFromEffect(moves[i], secondaryEffectChance);
         }
     }
 
-    private void loadStatChangesFromEffect(Move move) {
+    private void loadStatChangesFromEffect(Move move, double secondaryEffectChance) {
         switch (move.effectIndex) {
             case Gen2Constants.noDamageAtkPlusOneEffect:
             case Gen2Constants.damageUserAtkPlusOneEffect:
@@ -590,7 +586,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         if (move.statChangeMoveType == StatChangeMoveType.DAMAGE_TARGET || move.statChangeMoveType == StatChangeMoveType.DAMAGE_USER) {
             for (int i = 0; i < move.statChanges.length; i++) {
                 if (move.statChanges[i].type != StatChangeType.NONE) {
-                    move.statChanges[i].percentChance = move.secondaryEffectChance;
+                    move.statChanges[i].percentChance = secondaryEffectChance;
                     if (move.statChanges[i].percentChance == 0.0) {
                         move.statChanges[i].percentChance = 100.0;
                     }
@@ -599,7 +595,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         }
     }
 
-    private void loadStatusFromEffect(Move move) {
+    private void loadStatusFromEffect(Move move, double secondaryEffectChance) {
         switch (move.effectIndex) {
             case Gen2Constants.noDamageSleepEffect:
             case Gen2Constants.toxicEffect:
@@ -658,10 +654,56 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         }
 
         if (move.statusMoveType == StatusMoveType.DAMAGE) {
-            move.statusPercentChance = move.secondaryEffectChance;
+            move.statusPercentChance = secondaryEffectChance;
             if (move.statusPercentChance == 0.0) {
                 move.statusPercentChance = 100.0;
             }
+        }
+    }
+
+    private void loadMiscMoveInfoFromEffect(Move move, double secondaryEffectChance) {
+        switch (move.effectIndex) {
+            case Gen2Constants.flinchEffect:
+            case Gen2Constants.snoreEffect:
+            case Gen2Constants.twisterEffect:
+            case Gen2Constants.stompEffect:
+                move.flinchPercentChance = secondaryEffectChance;
+                break;
+
+            case Gen2Constants.damageAbsorbEffect:
+            case Gen2Constants.dreamEaterEffect:
+                move.absorbPercent = 50;
+                break;
+
+            case Gen2Constants.damageRecoilEffect:
+                move.recoilPercent = 25;
+                break;
+
+            case Gen2Constants.flailAndReversalEffect:
+            case Gen2Constants.futureSightEffect:
+                move.criticalChance = CriticalChance.NONE;
+                break;
+
+            case Gen2Constants.bindingEffect:
+            case Gen2Constants.trappingEffect:
+                move.isTrapMove = true;
+                break;
+
+            case Gen2Constants.razorWindEffect:
+            case Gen2Constants.skyAttackEffect:
+            case Gen2Constants.skullBashEffect:
+            case Gen2Constants.solarbeamEffect:
+            case Gen2Constants.semiInvulnerableEffect:
+                move.isChargeMove = true;
+                break;
+
+            case Gen2Constants.hyperBeamEffect:
+                move.isRechargeMove = true;
+                break;
+        }
+
+        if (Gen2Constants.increasedCritMoves.contains(move.number)) {
+            move.criticalChance = CriticalChance.INCREASED;
         }
     }
 
@@ -1106,12 +1148,15 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         List<String> tcnames = this.getTrainerClassNames();
 
         List<Trainer> allTrainers = new ArrayList<>();
+        int index = 0;
         for (int i = 0; i < traineramount; i++) {
             int offs = pointers[i];
             int limit = trainerclasslimits[i];
             for (int trnum = 0; trnum < limit; trnum++) {
+                index++;
                 Trainer tr = new Trainer();
                 tr.offset = offs;
+                tr.index = index;
                 tr.trainerclass = i;
                 String name = readVariableLengthString(offs, false);
                 tr.name = name;
@@ -1130,10 +1175,9 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                         offs++;
                     }
                     if ((dataType & 1) == 1) {
-                        tp.move1 = rom[offs] & 0xFF;
-                        tp.move2 = rom[offs + 1] & 0xFF;
-                        tp.move3 = rom[offs + 2] & 0xFF;
-                        tp.move4 = rom[offs + 3] & 0xFF;
+                        for (int move = 0; move < 4; move++) {
+                            tp.moves[move] = rom[offs + move] & 0xFF;
+                        }
                         offs += 4;
                     }
                     tr.pokemon.add(tp);
@@ -1211,10 +1255,10 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                                 rom[offs + m] = (byte) pokeMoves[m];
                             }
                         } else {
-                            rom[offs] = (byte) tp.move1;
-                            rom[offs + 1] = (byte) tp.move2;
-                            rom[offs + 2] = (byte) tp.move3;
-                            rom[offs + 3] = (byte) tp.move4;
+                            rom[offs] = (byte) tp.moves[0];
+                            rom[offs + 1] = (byte) tp.moves[1];
+                            rom[offs + 2] = (byte) tp.moves[2];
+                            rom[offs + 3] = (byte) tp.moves[3];
                         }
                         offs += 4;
                     }
@@ -2158,6 +2202,11 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         }
     }
 
+    @Override
+    public boolean isEffectivenessUpdated() {
+        return effectivenessUpdated;
+    }
+
     private void randomizeCatchingTutorial() {
         if (romEntry.arrayEntries.containsKey("CatchingTutorialOffsets")) {
             // Pick a pokemon
@@ -2212,6 +2261,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         }
         logBlankLine();
         writeTypeEffectivenessTable(typeEffectivenessTable);
+        effectivenessUpdated = true;
     }
 
     private List<TypeRelationship> readTypeEffectivenessTable() {

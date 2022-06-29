@@ -216,8 +216,12 @@ public class Gen7Constants {
         }
     }
 
+    public static final int noDamageTargetTrappingEffect = 106, noDamageFieldTrappingEffect = 354,
+            damageAdjacentFoesTrappingEffect = 373, damageTargetTrappingEffect = 384;
+
     public static final int noDamageStatusQuality = 1, noDamageStatChangeQuality = 2, damageStatusQuality = 4,
-            noDamageStatusAndStatChangeQuality = 5, damageTargetDebuffQuality = 6, damageUserBuffQuality = 7;
+            noDamageStatusAndStatChangeQuality = 5, damageTargetDebuffQuality = 6, damageUserBuffQuality = 7,
+            damageAbsorbQuality = 8;
 
     public static List<Integer> bannedMoves = Arrays.asList(Moves.darkVoid, Moves.hyperspaceFury);
 
@@ -1018,6 +1022,8 @@ public class Gen7Constants {
         nonBadItems.banRange(Items.cameruptite, 4); // Mega Stones, part 3
         nonBadItems.banRange(Items.fightingMemory,17); // Memories
         nonBadItems.banRange(Items.relicCopper,7); // relic items
+        nonBadItems.banSingles(Items.shoalSalt, Items.shoalShell); // Shoal items; have no purpose and sell for $10.
+        nonBadItems.banRange(Items.blueFlute, 5); // Flutes; have no purpose and sell for $10.
 
         regularShopItemsSM = new ArrayList<>();
 
@@ -1037,7 +1043,6 @@ public class Gen7Constants {
         opShopItems.add(Items.berryJuice);
         opShopItems.add(Items.rareCandy);
         opShopItems.add(Items.oldGateau);
-        opShopItems.addAll(IntStream.rangeClosed(Items.blueFlute, Items.shoalShell).boxed().collect(Collectors.toList()));
         opShopItems.addAll(IntStream.rangeClosed(Items.tinyMushroom, Items.nugget).boxed().collect(Collectors.toList()));
         opShopItems.add(Items.rareBone);
         opShopItems.addAll(IntStream.rangeClosed(Items.lansatBerry, Items.rowapBerry).boxed().collect(Collectors.toList()));

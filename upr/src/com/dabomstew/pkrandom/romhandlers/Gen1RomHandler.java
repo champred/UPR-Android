@@ -331,6 +331,7 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
     private SubMap[] maps;
     private boolean xAccNerfed;
     private long actualCRC32;
+    private boolean effectivenessUpdated;
 
     @Override
     public boolean detectRom(byte[] rom) {
@@ -450,6 +451,9 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
                 moves[trueMoveIndex].pp = rom[movesOffset + (i - 1) * 6 + 5] & 0xFF;
                 moves[trueMoveIndex].type = idToType(rom[movesOffset + (i - 1) * 6 + 3] & 0xFF);
                 moves[trueMoveIndex].category = GBConstants.physicalTypes.contains(moves[trueMoveIndex].type) ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL;
+                if (moves[trueMoveIndex].power == 0 && !GlobalConstants.noPowerNonStatusMoves.contains(trueMoveIndex)) {
+                    moves[trueMoveIndex].category = MoveCategory.STATUS;
+                }
 
                 if (moves[trueMoveIndex].name.equals("Swift")) {
                     perfectAccuracy = (int)moves[trueMoveIndex].hitratio;
@@ -463,12 +467,7 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
 
                 loadStatChangesFromEffect(moves[trueMoveIndex]);
                 loadStatusFromEffect(moves[trueMoveIndex]);
-
-                if (moves[i].effectIndex == Gen1Constants.flinch10PercentEffect) {
-                    moves[i].flinchPercentChance = 10.0;
-                } else if (moves[i].effectIndex == Gen1Constants.flinch30PercentEffect) {
-                    moves[i].flinchPercentChance = 30.0;
-                }
+                loadMiscMoveInfoFromEffect(moves[trueMoveIndex]);
             }
         }
     }
@@ -657,6 +656,40 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
                     move.statusPercentChance = 40.0;
                     break;
             }
+        }
+    }
+
+    private void loadMiscMoveInfoFromEffect(Move move) {
+        switch (move.effectIndex) {
+            case Gen1Constants.flinch10PercentEffect:
+                move.flinchPercentChance = 10.0;
+                break;
+
+            case Gen1Constants.flinch30PercentEffect:
+                move.flinchPercentChance = 30.0;
+                break;
+
+            case Gen1Constants.damageAbsorbEffect:
+            case Gen1Constants.dreamEaterEffect:
+                move.absorbPercent = 50;
+                break;
+
+            case Gen1Constants.damageRecoilEffect:
+                move.recoilPercent = 25;
+                break;
+
+            case Gen1Constants.chargeEffect:
+            case Gen1Constants.flyEffect:
+                move.isChargeMove = true;
+                break;
+
+            case Gen1Constants.hyperBeamEffect:
+                move.isRechargeMove = true;
+                break;
+        }
+
+        if (Gen1Constants.increasedCritMoves.contains(move.number)) {
+            move.criticalChance = CriticalChance.INCREASED;
         }
     }
 
@@ -1242,13 +1275,16 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         List<String> tcnames = getTrainerClassesForText();
 
         List<Trainer> allTrainers = new ArrayList<>();
+        int index = 0;
         for (int i = 1; i <= traineramount; i++) {
             int offs = pointers[i];
             int limit = trainerclasslimits[i];
             String tcname = tcnames.get(i - 1);
             for (int trnum = 0; trnum < limit; trnum++) {
+                index++;
                 Trainer tr = new Trainer();
                 tr.offset = offs;
+                tr.index = index;
                 tr.trainerclass = i;
                 tr.fullDisplayName = tcname;
                 int dataType = rom[offs] & 0xFF;
@@ -1410,6 +1446,7 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         }
         logBlankLine();
         writeTypeEffectivenessTable(typeEffectivenessTable);
+        effectivenessUpdated = true;
     }
 
     private List<TypeRelationship> readTypeEffectivenessTable() {
@@ -2072,6 +2109,11 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         } else if (tweak == MiscTweak.RANDOMIZE_CATCHING_TUTORIAL) {
             randomizeCatchingTutorial();
         }
+    }
+
+    @Override
+    public boolean isEffectivenessUpdated() {
+        return effectivenessUpdated;
     }
 
     private void applyBWEXPPatch() {

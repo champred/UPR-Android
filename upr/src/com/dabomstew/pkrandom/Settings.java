@@ -97,6 +97,7 @@ public class Settings {
     private boolean banNegativeAbilities;
     private boolean banBadAbilities;
     private boolean weighDuplicateAbilitiesTogether;
+    private boolean ensureTwoAbilities;
 
     public enum StartersMod {
         UNCHANGED, CUSTOM, COMPLETELY_RANDOM, RANDOM_WITH_TWO_EVOLUTIONS
@@ -188,6 +189,7 @@ public class Settings {
     private boolean highestLevelOnlyGetsItemsForTrainerPokemon;
     private boolean doubleBattleMode;
     private boolean shinyChance;
+    private boolean betterTrainerMovesets;
 
     public enum WildPokemonMod {
         UNCHANGED, RANDOM, AREA_MAPPING, GLOBAL_MAPPING
@@ -483,7 +485,8 @@ public class Settings {
                 trainersBlockLegendaries,
                 trainersBlockEarlyWonderGuard,
                 swapTrainerMegaEvos,
-                shinyChance));
+                shinyChance,
+                betterTrainerMovesets));
 
         // 28 - 31: pokemon restrictions
         try {
@@ -563,13 +566,14 @@ public class Settings {
         // 47 Static level modifier
         out.write((staticLevelModified ? 0x80 : 0) | (staticLevelModifier+50));
 
-        // 48 trainer pokemon held items.
+        // 48 trainer pokemon held items / pokemon ensure two abilities
         out.write(makeByteSelected(randomizeHeldItemsForBossTrainerPokemon,
                 randomizeHeldItemsForImportantTrainerPokemon,
                 randomizeHeldItemsForRegularTrainerPokemon,
                 consumableItemsOnlyForTrainerPokemon,
                 sensibleItemsOnlyForTrainerPokemon,
-                highestLevelOnlyGetsItemsForTrainerPokemon));
+                highestLevelOnlyGetsItemsForTrainerPokemon,
+                ensureTwoAbilities));
 
         // 49 pickup item randomization
         out.write(makeByteSelected(pickupItemsMod == PickupItemsMod.RANDOM,
@@ -788,6 +792,7 @@ public class Settings {
         settings.setTrainersBlockEarlyWonderGuard(restoreState(data[27], 4));
         settings.setSwapTrainerMegaEvos(restoreState(data[27], 5));
         settings.setShinyChance(restoreState(data[27], 6));
+        settings.setBetterTrainerMovesets(restoreState(data[27], 7));
 
         // gen restrictions
         int genLimit = FileFunctions.readFullIntBigEndian(data, 28);
@@ -858,6 +863,7 @@ public class Settings {
         settings.setConsumableItemsOnlyForTrainers(restoreState(data[48], 3));
         settings.setSensibleItemsOnlyForTrainers(restoreState(data[48], 4));
         settings.setHighestLevelGetsItemsForTrainers(restoreState(data[48], 5));
+        settings.setEnsureTwoAbilities(restoreState(data[48], 6));
 
         settings.setPickupItemsMod(restoreEnum(PickupItemsMod.class, data[49],
                 1, // UNCHANGED
@@ -1292,6 +1298,12 @@ public class Settings {
 
     public void setWeighDuplicateAbilitiesTogether(boolean weighDuplicateAbilitiesTogether) {
         this.weighDuplicateAbilitiesTogether = weighDuplicateAbilitiesTogether;
+    }
+
+    public boolean isEnsureTwoAbilities() { return ensureTwoAbilities; }
+
+    public void setEnsureTwoAbilities(boolean ensureTwoAbilities) {
+        this.ensureTwoAbilities = ensureTwoAbilities;
     }
 
     public StartersMod getStartersMod() {
@@ -1741,6 +1753,14 @@ public class Settings {
 
     public void setShinyChance(boolean shinyChance) {
         this.shinyChance = shinyChance;
+    }
+
+    public boolean isBetterTrainerMovesets() {
+        return betterTrainerMovesets;
+    }
+
+    public void setBetterTrainerMovesets(boolean betterTrainerMovesets) {
+        this.betterTrainerMovesets = betterTrainerMovesets;
     }
 
     public WildPokemonMod getWildPokemonMod() {
