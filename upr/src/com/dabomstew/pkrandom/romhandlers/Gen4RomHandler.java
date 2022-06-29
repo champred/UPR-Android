@@ -4260,7 +4260,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
 
     @Override
     public void removeImpossibleEvolutions(Settings settings) {
-        boolean changeMoveEvos = !(settings.getMovesetsMod() == Settings.MovesetsMod.UNCHANGED);
+        boolean changeMoveEvos = !(settings.getMovesetsMod() == SettingsMod.MovesetsMod.UNCHANGED);
 
         Map<Integer, List<MoveLearnt>> movesets = this.getMovesLearnt();
         Set<Evolution> extraEvolutions = new HashSet<>();
@@ -4360,7 +4360,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
 
     @Override
     public void makeEvolutionsEasier(Settings settings) {
-        boolean wildsRandomized = !settings.getWildPokemonMod().equals(Settings.WildPokemonMod.UNCHANGED);
+        boolean wildsRandomized = !settings.getWildPokemonMod().equals(SettingsMod.WildPokemonMod.UNCHANGED);
 
         if (wildsRandomized) {
             for (Pokemon pkmn : pokes) {

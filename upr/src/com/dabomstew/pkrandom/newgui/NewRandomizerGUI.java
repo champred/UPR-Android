@@ -629,7 +629,7 @@ public class NewRandomizerGUI {
                     initialState();
                     romLoaded();
                     Settings.TweakForROMFeedback feedback = settings.tweakForRom(this.romHandler);
-                    if (feedback.isChangedStarter() && settings.getStartersMod() == Settings.StartersMod.CUSTOM) {
+                    if (feedback.isChangedStarter() && settings.getStartersMod() == SettingsMod.StartersMod.CUSTOM) {
                         JOptionPane.showMessageDialog(frame, bundle.getString("GUI.starterUnavailable"));
                     }
                     this.restoreStateFromSettings(settings);
@@ -1101,16 +1101,16 @@ public class NewRandomizerGUI {
         tpRandomizeTrainerClassNamesCheckBox.setSelected(settings.isRandomizeTrainerClassNames());
         ptIsDualTypeCheckBox.setSelected(settings.isDualTypeOnly());
 
-        pbsRandomRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.RANDOM);
-        pbsShuffleRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.SHUFFLE);
-        pbsUnchangedRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.UNCHANGED);
+        pbsRandomRadioButton.setSelected(settings.getBaseStatisticsMod() == SettingsMod.BaseStatisticsMod.RANDOM);
+        pbsShuffleRadioButton.setSelected(settings.getBaseStatisticsMod() == SettingsMod.BaseStatisticsMod.SHUFFLE);
+        pbsUnchangedRadioButton.setSelected(settings.getBaseStatisticsMod() == SettingsMod.BaseStatisticsMod.UNCHANGED);
         pbsFollowEvolutionsCheckBox.setSelected(settings.isBaseStatsFollowEvolutions());
         pbsUpdateBaseStatsCheckBox.setSelected(settings.isUpdateBaseStats());
         pbsUpdateComboBox.setSelectedIndex(Math.max(0,settings.getUpdateBaseStatsToGeneration() - (Math.max(6,romHandler.generationOfPokemon()+1))));
         pbsStandardizeEXPCurvesCheckBox.setSelected(settings.isStandardizeEXPCurves());
-        pbsLegendariesSlowRadioButton.setSelected(settings.getExpCurveMod() == Settings.ExpCurveMod.LEGENDARIES);
-        pbsStrongLegendariesSlowRadioButton.setSelected(settings.getExpCurveMod() == Settings.ExpCurveMod.STRONG_LEGENDARIES);
-        pbsAllMediumFastRadioButton.setSelected(settings.getExpCurveMod() == Settings.ExpCurveMod.ALL);
+        pbsLegendariesSlowRadioButton.setSelected(settings.getExpCurveMod() == SettingsMod.ExpCurveMod.LEGENDARIES);
+        pbsStrongLegendariesSlowRadioButton.setSelected(settings.getExpCurveMod() == SettingsMod.ExpCurveMod.STRONG_LEGENDARIES);
+        pbsAllMediumFastRadioButton.setSelected(settings.getExpCurveMod() == SettingsMod.ExpCurveMod.ALL);
         ExpCurve[] expCurves = getEXPCurvesForGeneration(romHandler.generationOfPokemon());
         int index = 0;
         for (int i = 0; i < expCurves.length; i++) {
@@ -1122,8 +1122,8 @@ public class NewRandomizerGUI {
         pbsFollowMegaEvosCheckBox.setSelected(settings.isBaseStatsFollowMegaEvolutions());
         pbsAssignEvoStatsRandomlyCheckBox.setSelected(settings.isAssignEvoStatsRandomly());
 
-        paUnchangedRadioButton.setSelected(settings.getAbilitiesMod() == Settings.AbilitiesMod.UNCHANGED);
-        paRandomRadioButton.setSelected(settings.getAbilitiesMod() == Settings.AbilitiesMod.RANDOMIZE);
+        paUnchangedRadioButton.setSelected(settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.UNCHANGED);
+        paRandomRadioButton.setSelected(settings.getAbilitiesMod() == SettingsMod.AbilitiesMod.RANDOM);
         paAllowWonderGuardCheckBox.setSelected(settings.isAllowWonderGuard());
         paFollowEvolutionsCheckBox.setSelected(settings.isAbilitiesFollowEvolutions());
         paTrappingAbilitiesCheckBox.setSelected(settings.isBanTrappingAbilities());
@@ -1133,19 +1133,19 @@ public class NewRandomizerGUI {
         paWeighDuplicatesTogetherCheckBox.setSelected(settings.isWeighDuplicateAbilitiesTogether());
         paEnsureTwoAbilitiesCheckbox.setSelected(settings.isEnsureTwoAbilities());
 
-        ptRandomFollowEvolutionsRadioButton.setSelected(settings.getTypesMod() == Settings.TypesMod.RANDOM_FOLLOW_EVOLUTIONS);
-        ptRandomCompletelyRadioButton.setSelected(settings.getTypesMod() == Settings.TypesMod.COMPLETELY_RANDOM);
-        ptUnchangedRadioButton.setSelected(settings.getTypesMod() == Settings.TypesMod.UNCHANGED);
+        ptRandomFollowEvolutionsRadioButton.setSelected(settings.getTypesMod() == SettingsMod.TypesMod.RANDOM_FOLLOW_EVOLUTIONS);
+        ptRandomCompletelyRadioButton.setSelected(settings.getTypesMod() == SettingsMod.TypesMod.RANDOM_COMPLETELY);
+        ptUnchangedRadioButton.setSelected(settings.getTypesMod() == SettingsMod.TypesMod.UNCHANGED);
         ptFollowMegaEvosCheckBox.setSelected(settings.isTypesFollowMegaEvolutions());
         pmsNoGameBreakingMovesCheckBox.setSelected(settings.doBlockBrokenMoves());
 
         peMakeEvolutionsEasierCheckBox.setSelected(settings.isMakeEvolutionsEasier());
         peRemoveTimeBasedEvolutionsCheckBox.setSelected(settings.isRemoveTimeBasedEvolutions());
 
-        spCustomRadioButton.setSelected(settings.getStartersMod() == Settings.StartersMod.CUSTOM);
-        spRandomCompletelyRadioButton.setSelected(settings.getStartersMod() == Settings.StartersMod.COMPLETELY_RANDOM);
-        spUnchangedRadioButton.setSelected(settings.getStartersMod() == Settings.StartersMod.UNCHANGED);
-        spRandomTwoEvosRadioButton.setSelected(settings.getStartersMod() == Settings.StartersMod.RANDOM_WITH_TWO_EVOLUTIONS);
+        spCustomRadioButton.setSelected(settings.getStartersMod() == SettingsMod.StartersMod.CUSTOM);
+        spRandomCompletelyRadioButton.setSelected(settings.getStartersMod() == SettingsMod.StartersMod.RANDOM_COMPLETELY);
+        spUnchangedRadioButton.setSelected(settings.getStartersMod() == SettingsMod.StartersMod.UNCHANGED);
+        spRandomTwoEvosRadioButton.setSelected(settings.getStartersMod() == SettingsMod.StartersMod.RANDOM_TWO_EVOLUTIONS);
         spRandomizeStarterHeldItemsCheckBox.setSelected(settings.isRandomizeStartersHeldItems());
         spBanBadItemsCheckBox.setSelected(settings.isBanBadRandomStarterHeldItems());
         spAllowAltFormesCheckBox.setSelected(settings.isAllowStarterAltFormes());
@@ -1155,9 +1155,9 @@ public class NewRandomizerGUI {
         spComboBox2.setSelectedIndex(customStarters[1] - 1);
         spComboBox3.setSelectedIndex(customStarters[2] - 1);
 
-        peUnchangedRadioButton.setSelected(settings.getEvolutionsMod() == Settings.EvolutionsMod.UNCHANGED);
-        peRandomRadioButton.setSelected(settings.getEvolutionsMod() == Settings.EvolutionsMod.RANDOM);
-        peRandomEveryLevelRadioButton.setSelected(settings.getEvolutionsMod() == Settings.EvolutionsMod.RANDOM_EVERY_LEVEL);
+        peUnchangedRadioButton.setSelected(settings.getEvolutionsMod() == SettingsMod.EvolutionsMod.UNCHANGED);
+        peRandomRadioButton.setSelected(settings.getEvolutionsMod() == SettingsMod.EvolutionsMod.RANDOM);
+        peRandomEveryLevelRadioButton.setSelected(settings.getEvolutionsMod() == SettingsMod.EvolutionsMod.RANDOM_EVERY_LEVEL);
         peSimilarStrengthCheckBox.setSelected(settings.isEvosSimilarStrength());
         peSameTypingCheckBox.setSelected(settings.isEvosSameTyping());
         peLimitEvolutionsToThreeCheckBox.setSelected(settings.isEvosMaxThreeStages());
@@ -1170,10 +1170,10 @@ public class NewRandomizerGUI {
         mdRandomizeMovePPCheckBox.setSelected(settings.isRandomizeMovePPs());
         mdRandomizeMoveTypesCheckBox.setSelected(settings.isRandomizeMoveTypes());
 
-        pmsRandomCompletelyRadioButton.setSelected(settings.getMovesetsMod() == Settings.MovesetsMod.COMPLETELY_RANDOM);
-        pmsRandomPreferringSameTypeRadioButton.setSelected(settings.getMovesetsMod() == Settings.MovesetsMod.RANDOM_PREFER_SAME_TYPE);
-        pmsUnchangedRadioButton.setSelected(settings.getMovesetsMod() == Settings.MovesetsMod.UNCHANGED);
-        pmsMetronomeOnlyModeRadioButton.setSelected(settings.getMovesetsMod() == Settings.MovesetsMod.METRONOME_ONLY);
+        pmsRandomCompletelyRadioButton.setSelected(settings.getMovesetsMod() == SettingsMod.MovesetsMod.RANDOM_COMPLETELY);
+        pmsRandomPreferringSameTypeRadioButton.setSelected(settings.getMovesetsMod() == SettingsMod.MovesetsMod.RANDOM_PREFER_SAME_TYPE);
+        pmsUnchangedRadioButton.setSelected(settings.getMovesetsMod() == SettingsMod.MovesetsMod.UNCHANGED);
+        pmsMetronomeOnlyModeRadioButton.setSelected(settings.getMovesetsMod() == SettingsMod.MovesetsMod.METRONOME_ONLY_MODE);
         pmsGuaranteedLevel1MovesCheckBox.setSelected(settings.isStartWithGuaranteedMoves());
         pmsGuaranteedLevel1MovesSlider.setValue(settings.getGuaranteedMoveCount());
         pmsReorderDamagingMovesCheckBox.setSelected(settings.isReorderDamagingMoves());
@@ -1213,36 +1213,36 @@ public class NewRandomizerGUI {
         tpRandomShinyTrainerPokemonCheckBox.setSelected(settings.isShinyChance());
         tpBetterMovesetsCheckBox.setSelected(settings.isBetterTrainerMovesets());
 
-        totpUnchangedRadioButton.setSelected(settings.getTotemPokemonMod() == Settings.TotemPokemonMod.UNCHANGED);
-        totpRandomRadioButton.setSelected(settings.getTotemPokemonMod() == Settings.TotemPokemonMod.RANDOM);
-        totpRandomSimilarStrengthRadioButton.setSelected(settings.getTotemPokemonMod() == Settings.TotemPokemonMod.SIMILAR_STRENGTH);
-        totpAllyUnchangedRadioButton.setSelected(settings.getAllyPokemonMod() == Settings.AllyPokemonMod.UNCHANGED);
-        totpAllyRandomRadioButton.setSelected(settings.getAllyPokemonMod() == Settings.AllyPokemonMod.RANDOM);
-        totpAllyRandomSimilarStrengthRadioButton.setSelected(settings.getAllyPokemonMod() == Settings.AllyPokemonMod.SIMILAR_STRENGTH);
-        totpAuraUnchangedRadioButton.setSelected(settings.getAuraMod() == Settings.AuraMod.UNCHANGED);
-        totpAuraRandomRadioButton.setSelected(settings.getAuraMod() == Settings.AuraMod.RANDOM);
-        totpAuraRandomSameStrengthRadioButton.setSelected(settings.getAuraMod() == Settings.AuraMod.SAME_STRENGTH);
+        totpUnchangedRadioButton.setSelected(settings.getTotemPokemonMod() == SettingsMod.TotemPokemonMod.UNCHANGED);
+        totpRandomRadioButton.setSelected(settings.getTotemPokemonMod() == SettingsMod.TotemPokemonMod.RANDOM);
+        totpRandomSimilarStrengthRadioButton.setSelected(settings.getTotemPokemonMod() == SettingsMod.TotemPokemonMod.RANDOM_SIMILAR_STRENGTH);
+        totpAllyUnchangedRadioButton.setSelected(settings.getAllyPokemonMod() == SettingsMod.AllyPokemonMod.UNCHANGED);
+        totpAllyRandomRadioButton.setSelected(settings.getAllyPokemonMod() == SettingsMod.AllyPokemonMod.RANDOM);
+        totpAllyRandomSimilarStrengthRadioButton.setSelected(settings.getAllyPokemonMod() == SettingsMod.AllyPokemonMod.SIMILAR_STRENGTH);
+        totpAuraUnchangedRadioButton.setSelected(settings.getAuraMod() == SettingsMod.AuraMod.UNCHANGED);
+        totpAuraRandomRadioButton.setSelected(settings.getAuraMod() == SettingsMod.AuraMod.RANDOM);
+        totpAuraRandomSameStrengthRadioButton.setSelected(settings.getAuraMod() == SettingsMod.AuraMod.SAME_STRENGTH);
         totpRandomizeHeldItemsCheckBox.setSelected(settings.isRandomizeTotemHeldItems());
         totpAllowAltFormesCheckBox.setSelected(settings.isAllowTotemAltFormes());
         totpPercentageLevelModifierCheckBox.setSelected(settings.isTotemLevelsModified());
         totpPercentageLevelModifierSlider.setValue(settings.getTotemLevelModifier());
 
         wpARCatchEmAllModeRadioButton
-                .setSelected(settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.CATCH_EM_ALL);
-        wpArea1To1RadioButton.setSelected(settings.getWildPokemonMod() == Settings.WildPokemonMod.AREA_MAPPING);
-        wpARNoneRadioButton.setSelected(settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.NONE);
+                .setSelected(settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.CATCH_EM_ALL);
+        wpArea1To1RadioButton.setSelected(settings.getWildPokemonMod() == SettingsMod.WildPokemonMod.AREA_MAPPING);
+        wpARNoneRadioButton.setSelected(settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.NONE);
         wpARTypeThemeAreasRadioButton
-                .setSelected(settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.TYPE_THEME_AREAS);
-        wpGlobal1To1RadioButton.setSelected(settings.getWildPokemonMod() == Settings.WildPokemonMod.GLOBAL_MAPPING);
-        wpRandomRadioButton.setSelected(settings.getWildPokemonMod() == Settings.WildPokemonMod.RANDOM);
-        wpUnchangedRadioButton.setSelected(settings.getWildPokemonMod() == Settings.WildPokemonMod.UNCHANGED);
+                .setSelected(settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.TYPE_THEME_AREAS);
+        wpGlobal1To1RadioButton.setSelected(settings.getWildPokemonMod() == SettingsMod.WildPokemonMod.GLOBAL_MAPPING);
+        wpRandomRadioButton.setSelected(settings.getWildPokemonMod() == SettingsMod.WildPokemonMod.RANDOM);
+        wpUnchangedRadioButton.setSelected(settings.getWildPokemonMod() == SettingsMod.WildPokemonMod.UNCHANGED);
         wpUseTimeBasedEncountersCheckBox.setSelected(settings.isUseTimeBasedEncounters());
 
         wpSetMinimumCatchRateCheckBox.setSelected(settings.isUseMinimumCatchRate());
         wpSetMinimumCatchRateSlider.setValue(settings.getMinimumCatchRateLevel());
         wpDontUseLegendariesCheckBox.setSelected(settings.isBlockWildLegendaries());
         wpARSimilarStrengthRadioButton
-                .setSelected(settings.getWildPokemonRestrictionMod() == Settings.WildPokemonRestrictionMod.SIMILAR_STRENGTH);
+                .setSelected(settings.getWildPokemonRestrictionMod() == SettingsMod.WildPokemonRestrictionMod.SIMILAR_STRENGTH);
         wpRandomizeHeldItemsCheckBox.setSelected(settings.isRandomizeWildPokemonHeldItems());
         wpBanBadItemsCheckBox.setSelected(settings.isBanBadRandomWildPokemonHeldItems());
         wpBalanceShakingGrassPokemonCheckBox.setSelected(settings.isBalanceShakingGrass());
@@ -1250,12 +1250,12 @@ public class NewRandomizerGUI {
         wpPercentageLevelModifierSlider.setValue(settings.getWildLevelModifier());
         wpAllowAltFormesCheckBox.setSelected(settings.isAllowWildAltFormes());
 
-        stpUnchangedRadioButton.setSelected(settings.getStaticPokemonMod() == Settings.StaticPokemonMod.UNCHANGED);
-        stpSwapLegendariesSwapStandardsRadioButton.setSelected(settings.getStaticPokemonMod() == Settings.StaticPokemonMod.RANDOM_MATCHING);
+        stpUnchangedRadioButton.setSelected(settings.getStaticPokemonMod() == SettingsMod.StaticPokemonMod.UNCHANGED);
+        stpSwapLegendariesSwapStandardsRadioButton.setSelected(settings.getStaticPokemonMod() == SettingsMod.StaticPokemonMod.SWAP_LEGENDARIES_SWAP_STANDARDS);
         stpRandomCompletelyRadioButton
-                .setSelected(settings.getStaticPokemonMod() == Settings.StaticPokemonMod.COMPLETELY_RANDOM);
+                .setSelected(settings.getStaticPokemonMod() == SettingsMod.StaticPokemonMod.RANDOM_COMPLETELY);
         stpRandomSimilarStrengthRadioButton
-                .setSelected(settings.getStaticPokemonMod() == Settings.StaticPokemonMod.SIMILAR_STRENGTH);
+                .setSelected(settings.getStaticPokemonMod() == SettingsMod.StaticPokemonMod.RANDOM_SIMILAR_STRENGTH);
         stpLimitMainGameLegendariesCheckBox.setSelected(settings.isLimitMainGameLegendaries());
         stpRandomize600BSTCheckBox.setSelected(settings.isLimit600());
         stpAllowAltFormesCheckBox.setSelected(settings.isAllowStaticAltFormes());
@@ -1265,16 +1265,16 @@ public class NewRandomizerGUI {
         stpFixMusicCheckBox.setSelected(settings.isCorrectStaticMusic());
 
         thcRandomCompletelyRadioButton
-                .setSelected(settings.getTmsHmsCompatibilityMod() == Settings.TMsHMsCompatibilityMod.COMPLETELY_RANDOM);
+                .setSelected(settings.getTmsHmsCompatibilityMod() == SettingsMod.TMsHMsCompatibilityMod.RANDOM_COMPLETELY);
         thcRandomPreferSameTypeRadioButton
-                .setSelected(settings.getTmsHmsCompatibilityMod() == Settings.TMsHMsCompatibilityMod.RANDOM_PREFER_TYPE);
+                .setSelected(settings.getTmsHmsCompatibilityMod() == SettingsMod.TMsHMsCompatibilityMod.RANDOM_PREFER_SAME_TYPE);
         thcUnchangedRadioButton
-                .setSelected(settings.getTmsHmsCompatibilityMod() == Settings.TMsHMsCompatibilityMod.UNCHANGED);
-        tmRandomRadioButton.setSelected(settings.getTmsMod() == Settings.TMsMod.RANDOM);
-        tmUnchangedRadioButton.setSelected(settings.getTmsMod() == Settings.TMsMod.UNCHANGED);
+                .setSelected(settings.getTmsHmsCompatibilityMod() == SettingsMod.TMsHMsCompatibilityMod.UNCHANGED);
+        tmRandomRadioButton.setSelected(settings.getTmsMod() == SettingsMod.TMsMod.RANDOM);
+        tmUnchangedRadioButton.setSelected(settings.getTmsMod() == SettingsMod.TMsMod.UNCHANGED);
         tmLevelupMoveSanityCheckBox.setSelected(settings.isTmLevelUpMoveSanity());
         tmKeepFieldMoveTMsCheckBox.setSelected(settings.isKeepFieldMoveTMs());
-        thcFullCompatibilityRadioButton.setSelected(settings.getTmsHmsCompatibilityMod() == Settings.TMsHMsCompatibilityMod.FULL);
+        thcFullCompatibilityRadioButton.setSelected(settings.getTmsHmsCompatibilityMod() == SettingsMod.TMsHMsCompatibilityMod.FULL_COMPATIBILITY);
         tmFullHMCompatibilityCheckBox.setSelected(settings.isFullHMCompat());
         tmForceGoodDamagingCheckBox.setSelected(settings.isTmsForceGoodDamaging());
         tmForceGoodDamagingSlider.setValue(settings.getTmsGoodDamagingPercent());
@@ -1282,40 +1282,40 @@ public class NewRandomizerGUI {
         tmFollowEvolutionsCheckBox.setSelected(settings.isTmsFollowEvolutions());
 
         mtcRandomCompletelyRadioButton
-                .setSelected(settings.getMoveTutorsCompatibilityMod() == Settings.MoveTutorsCompatibilityMod.COMPLETELY_RANDOM);
+                .setSelected(settings.getMoveTutorsCompatibilityMod() == SettingsMod.MoveTutorsCompatibilityMod.RANDOM_COMPLETELY);
         mtcRandomPreferSameTypeRadioButton
-                .setSelected(settings.getMoveTutorsCompatibilityMod() == Settings.MoveTutorsCompatibilityMod.RANDOM_PREFER_TYPE);
+                .setSelected(settings.getMoveTutorsCompatibilityMod() == SettingsMod.MoveTutorsCompatibilityMod.RANDOM_PREFER_SAME_TYPE);
         mtcUnchangedRadioButton
-                .setSelected(settings.getMoveTutorsCompatibilityMod() == Settings.MoveTutorsCompatibilityMod.UNCHANGED);
-        mtRandomRadioButton.setSelected(settings.getMoveTutorMovesMod() == Settings.MoveTutorMovesMod.RANDOM);
-        mtUnchangedRadioButton.setSelected(settings.getMoveTutorMovesMod() == Settings.MoveTutorMovesMod.UNCHANGED);
+                .setSelected(settings.getMoveTutorsCompatibilityMod() == SettingsMod.MoveTutorsCompatibilityMod.UNCHANGED);
+        mtRandomRadioButton.setSelected(settings.getMoveTutorMovesMod() == SettingsMod.MoveTutorMovesMod.RANDOM);
+        mtUnchangedRadioButton.setSelected(settings.getMoveTutorMovesMod() == SettingsMod.MoveTutorMovesMod.UNCHANGED);
         mtLevelupMoveSanityCheckBox.setSelected(settings.isTutorLevelUpMoveSanity());
         mtKeepFieldMoveTutorsCheckBox.setSelected(settings.isKeepFieldMoveTutors());
         mtcFullCompatibilityRadioButton
-                .setSelected(settings.getMoveTutorsCompatibilityMod() == Settings.MoveTutorsCompatibilityMod.FULL);
+                .setSelected(settings.getMoveTutorsCompatibilityMod() == SettingsMod.MoveTutorsCompatibilityMod.FULL_COMPATIBILITY);
         mtForceGoodDamagingCheckBox.setSelected(settings.isTutorsForceGoodDamaging());
         mtForceGoodDamagingSlider.setValue(settings.getTutorsGoodDamagingPercent());
         mtNoGameBreakingMovesCheckBox.setSelected(settings.isBlockBrokenTutorMoves());
         mtFollowEvolutionsCheckBox.setSelected(settings.isTutorFollowEvolutions());
 
         igtRandomizeBothRequestedGivenRadioButton
-                .setSelected(settings.getInGameTradesMod() == Settings.InGameTradesMod.RANDOMIZE_GIVEN_AND_REQUESTED);
-        igtRandomizeGivenPokemonOnlyRadioButton.setSelected(settings.getInGameTradesMod() == Settings.InGameTradesMod.RANDOMIZE_GIVEN);
+                .setSelected(settings.getInGameTradesMod() == SettingsMod.InGameTradesMod.RANDOMIZE_BOTH_REQUESTED_GIVEN);
+        igtRandomizeGivenPokemonOnlyRadioButton.setSelected(settings.getInGameTradesMod() == SettingsMod.InGameTradesMod.RANDOMIZE_GIVEN_POKEMON_ONLY);
         igtRandomizeItemsCheckBox.setSelected(settings.isRandomizeInGameTradesItems());
         igtRandomizeIVsCheckBox.setSelected(settings.isRandomizeInGameTradesIVs());
         igtRandomizeNicknamesCheckBox.setSelected(settings.isRandomizeInGameTradesNicknames());
         igtRandomizeOTsCheckBox.setSelected(settings.isRandomizeInGameTradesOTs());
-        igtUnchangedRadioButton.setSelected(settings.getInGameTradesMod() == Settings.InGameTradesMod.UNCHANGED);
+        igtUnchangedRadioButton.setSelected(settings.getInGameTradesMod() == SettingsMod.InGameTradesMod.UNCHANGED);
 
-        fiRandomRadioButton.setSelected(settings.getFieldItemsMod() == Settings.FieldItemsMod.RANDOM);
-        fiRandomEvenDistributionRadioButton.setSelected(settings.getFieldItemsMod() == Settings.FieldItemsMod.RANDOM_EVEN);
-        fiShuffleRadioButton.setSelected(settings.getFieldItemsMod() == Settings.FieldItemsMod.SHUFFLE);
-        fiUnchangedRadioButton.setSelected(settings.getFieldItemsMod() == Settings.FieldItemsMod.UNCHANGED);
+        fiRandomRadioButton.setSelected(settings.getFieldItemsMod() == SettingsMod.FieldItemsMod.RANDOM);
+        fiRandomEvenDistributionRadioButton.setSelected(settings.getFieldItemsMod() == SettingsMod.FieldItemsMod.RANDOM_EVEN_DISTRIBUTION);
+        fiShuffleRadioButton.setSelected(settings.getFieldItemsMod() == SettingsMod.FieldItemsMod.SHUFFLE);
+        fiUnchangedRadioButton.setSelected(settings.getFieldItemsMod() == SettingsMod.FieldItemsMod.UNCHANGED);
         fiBanBadItemsCheckBox.setSelected(settings.isBanBadRandomFieldItems());
 
-        shRandomRadioButton.setSelected(settings.getShopItemsMod() == Settings.ShopItemsMod.RANDOM);
-        shShuffleRadioButton.setSelected(settings.getShopItemsMod() == Settings.ShopItemsMod.SHUFFLE);
-        shUnchangedRadioButton.setSelected(settings.getShopItemsMod() == Settings.ShopItemsMod.UNCHANGED);
+        shRandomRadioButton.setSelected(settings.getShopItemsMod() == SettingsMod.ShopItemsMod.RANDOM);
+        shShuffleRadioButton.setSelected(settings.getShopItemsMod() == SettingsMod.ShopItemsMod.SHUFFLE);
+        shUnchangedRadioButton.setSelected(settings.getShopItemsMod() == SettingsMod.ShopItemsMod.UNCHANGED);
         shBanBadItemsCheckBox.setSelected(settings.isBanBadRandomShopItems());
         shBanRegularShopItemsCheckBox.setSelected(settings.isBanRegularShopItems());
         shBanOverpoweredShopItemsCheckBox.setSelected(settings.isBanOPShopItems());
@@ -1323,8 +1323,8 @@ public class NewRandomizerGUI {
         shGuaranteeEvolutionItemsCheckBox.setSelected(settings.isGuaranteeEvolutionItems());
         shGuaranteeXItemsCheckBox.setSelected(settings.isGuaranteeXItems());
 
-        puUnchangedRadioButton.setSelected(settings.getPickupItemsMod() == Settings.PickupItemsMod.UNCHANGED);
-        puRandomRadioButton.setSelected(settings.getPickupItemsMod() == Settings.PickupItemsMod.RANDOM);
+        puUnchangedRadioButton.setSelected(settings.getPickupItemsMod() == SettingsMod.PickupItemsMod.UNCHANGED);
+        puRandomRadioButton.setSelected(settings.getPickupItemsMod() == SettingsMod.PickupItemsMod.RANDOM);
         puBanBadItemsCheckBox.setSelected(settings.isBanBadRandomPickupItems());
 
         int mtsSelected = settings.getCurrentMiscTweaks();
@@ -4150,16 +4150,16 @@ public class NewRandomizerGUI {
 
 						//---- pbsLegendariesSlowRadioButton ----
 						pbsLegendariesSlowRadioButton.setEnabled(false);
-						pbsLegendariesSlowRadioButton.setText(bundle.getString("GUI.pbsLegendariesSlowRadioButton.text"));
-						pbsLegendariesSlowRadioButton.setToolTipText(bundle.getString("GUI.pbsLegendariesSlowRadioButton.toolTipText"));
+						pbsLegendariesSlowRadioButton.setText(bundle.getString("GUI.pbsLegendariesRadioButton.text"));
+						pbsLegendariesSlowRadioButton.setToolTipText(bundle.getString("GUI.pbsLegendariesRadioButton.toolTipText"));
 						panel4.add(pbsLegendariesSlowRadioButton, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- pbsStrongLegendariesSlowRadioButton ----
 						pbsStrongLegendariesSlowRadioButton.setEnabled(false);
-						pbsStrongLegendariesSlowRadioButton.setText(bundle.getString("GUI.pbsStrongLegendariesSlowRadioButton.text"));
-						pbsStrongLegendariesSlowRadioButton.setToolTipText(bundle.getString("GUI.pbsStrongLegendariesSlowRadioButton.toolTipText"));
+						pbsStrongLegendariesSlowRadioButton.setText(bundle.getString("GUI.pbsStrongLegendariesRadioButton.text"));
+						pbsStrongLegendariesSlowRadioButton.setToolTipText(bundle.getString("GUI.pbsStrongLegendariesRadioButton.toolTipText"));
 						panel4.add(pbsStrongLegendariesSlowRadioButton, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4174,8 +4174,8 @@ public class NewRandomizerGUI {
 
 						//---- pbsFollowEvolutionsCheckBox ----
 						pbsFollowEvolutionsCheckBox.setEnabled(false);
-						pbsFollowEvolutionsCheckBox.setText(bundle.getString("GUI.pbsFollowEvolutionsCheckBox.text"));
-						pbsFollowEvolutionsCheckBox.setToolTipText(bundle.getString("GUI.pbsFollowEvolutionsCheckBox.toolTipText"));
+						pbsFollowEvolutionsCheckBox.setText(bundle.getString("GUI.pbsBaseStatsFollowEvolutionsCheckBox.text"));
+						pbsFollowEvolutionsCheckBox.setToolTipText(bundle.getString("GUI.pbsBaseStatsFollowEvolutionsCheckBox.toolTipText"));
 						panel4.add(pbsFollowEvolutionsCheckBox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4199,8 +4199,8 @@ public class NewRandomizerGUI {
 
 						//---- pbsFollowMegaEvosCheckBox ----
 						pbsFollowMegaEvosCheckBox.setEnabled(false);
-						pbsFollowMegaEvosCheckBox.setText(bundle.getString("GUI.pbsFollowMegaEvosCheckBox.text"));
-						pbsFollowMegaEvosCheckBox.setToolTipText(bundle.getString("GUI.pbsFollowMegaEvosCheckBox.toolTipText"));
+						pbsFollowMegaEvosCheckBox.setText(bundle.getString("GUI.pbsBaseStatsFollowMegaEvolutionsCheckBox.text"));
+						pbsFollowMegaEvosCheckBox.setToolTipText(bundle.getString("GUI.pbsBaseStatsFollowMegaEvolutionsCheckBox.toolTipText"));
 						panel4.add(pbsFollowMegaEvosCheckBox, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4241,8 +4241,8 @@ public class NewRandomizerGUI {
 
 						//---- pbsAllMediumFastRadioButton ----
 						pbsAllMediumFastRadioButton.setEnabled(false);
-						pbsAllMediumFastRadioButton.setText(bundle.getString("GUI.pbsAllMediumFastRadioButton.text"));
-						pbsAllMediumFastRadioButton.setToolTipText(bundle.getString("GUI.pbsAllMediumFastRadioButton.toolTipText"));
+						pbsAllMediumFastRadioButton.setText(bundle.getString("GUI.pbsAllRadioButton.text"));
+						pbsAllMediumFastRadioButton.setToolTipText(bundle.getString("GUI.pbsAllRadioButton.toolTipText"));
 						panel4.add(pbsAllMediumFastRadioButton, new GridBagConstraints(5, 3, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4305,8 +4305,8 @@ public class NewRandomizerGUI {
 
 						//---- ptFollowMegaEvosCheckBox ----
 						ptFollowMegaEvosCheckBox.setEnabled(false);
-						ptFollowMegaEvosCheckBox.setText(bundle.getString("GUI.ptFollowMegaEvosCheckBox.text"));
-						ptFollowMegaEvosCheckBox.setToolTipText(bundle.getString("GUI.ptFollowMegaEvosCheckBox.toolTipText"));
+						ptFollowMegaEvosCheckBox.setText(bundle.getString("GUI.ptTypesFollowMegaEvolutionsCheckBox.text"));
+						ptFollowMegaEvosCheckBox.setToolTipText(bundle.getString("GUI.ptTypesFollowMegaEvolutionsCheckBox.toolTipText"));
 						panel5.add(ptFollowMegaEvosCheckBox, new GridBagConstraints(1, 4, 2, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4368,8 +4368,8 @@ public class NewRandomizerGUI {
 
 						//---- paFollowEvolutionsCheckBox ----
 						paFollowEvolutionsCheckBox.setEnabled(false);
-						paFollowEvolutionsCheckBox.setText(bundle.getString("GUI.paFollowEvolutionsCheckBox.text"));
-						paFollowEvolutionsCheckBox.setToolTipText(bundle.getString("GUI.paFollowEvolutionsCheckBox.toolTipText"));
+						paFollowEvolutionsCheckBox.setText(bundle.getString("GUI.paAbilitiesFollowEvolutionsCheckBox.text"));
+						paFollowEvolutionsCheckBox.setToolTipText(bundle.getString("GUI.paAbilitiesFollowEvolutionsCheckBox.toolTipText"));
 						pokemonAbilitiesPanel.add(paFollowEvolutionsCheckBox, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 5, 0, 0), 0, 0));
@@ -4382,8 +4382,8 @@ public class NewRandomizerGUI {
 
 						//---- paTrappingAbilitiesCheckBox ----
 						paTrappingAbilitiesCheckBox.setEnabled(false);
-						paTrappingAbilitiesCheckBox.setText(bundle.getString("GUI.paTrappingAbilitiesCheckBox.text"));
-						paTrappingAbilitiesCheckBox.setToolTipText(bundle.getString("GUI.paTrappingAbilitiesCheckBox.toolTipText"));
+						paTrappingAbilitiesCheckBox.setText(bundle.getString("GUI.paBanTrappingAbilitiesCheckBox.text"));
+						paTrappingAbilitiesCheckBox.setToolTipText(bundle.getString("GUI.paBanTrappingAbilitiesCheckBox.toolTipText"));
 						pokemonAbilitiesPanel.add(paTrappingAbilitiesCheckBox, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 5, 0, 0), 0, 0));
@@ -4391,24 +4391,32 @@ public class NewRandomizerGUI {
 						//---- paNegativeAbilitiesCheckBox ----
 						paNegativeAbilitiesCheckBox.setEnabled(false);
 						paNegativeAbilitiesCheckBox.setSelected(false);
-						paNegativeAbilitiesCheckBox.setText(bundle.getString("GUI.paNegativeAbilitiesCheckBox.text"));
-						paNegativeAbilitiesCheckBox.setToolTipText(bundle.getString("GUI.paNegativeAbilitiesCheckBox.toolTipText"));
+						paNegativeAbilitiesCheckBox.setText(bundle.getString("GUI.paBanNegativeAbilitiesCheckBox.text"));
+						paNegativeAbilitiesCheckBox.setToolTipText(bundle.getString("GUI.paBanNegativeAbilitiesCheckBox.toolTipText"));
 						pokemonAbilitiesPanel.add(paNegativeAbilitiesCheckBox, new GridBagConstraints(3, 3, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- paBadAbilitiesCheckBox ----
 						paBadAbilitiesCheckBox.setEnabled(false);
-						paBadAbilitiesCheckBox.setText(bundle.getString("GUI.paBadAbilitiesCheckBox.text"));
-						paBadAbilitiesCheckBox.setToolTipText(bundle.getString("GUI.paBadAbilitiesCheckBox.toolTipText"));
-						pokemonAbilitiesPanel.add(paBadAbilitiesCheckBox, new GridBagConstraints(4, 3, 2, 1, 0.0, 0.0,
+						paBadAbilitiesCheckBox.setText(bundle.getString("GUI.paBanBadAbilitiesCheckBox.text"));
+						paBadAbilitiesCheckBox.setToolTipText(bundle.getString("GUI.paBanBadAbilitiesCheckBox.toolTipText"));
+						pokemonAbilitiesPanel.add(paBadAbilitiesCheckBox, new GridBagConstraints(4, 3, 1, 1, 0.0, 0.0,
+							GridBagConstraints.WEST, GridBagConstraints.NONE,
+							new Insets(0, 0, 0, 0), 0, 0));
+
+						//---- paFollowMegaEvosCheckBox ----
+						paFollowMegaEvosCheckBox.setEnabled(false);
+						paFollowMegaEvosCheckBox.setText(bundle.getString("GUI.paAbilitiesFollowMegaEvolutionsCheckBox.text"));
+						paFollowMegaEvosCheckBox.setToolTipText(bundle.getString("GUI.paAbilitiesFollowMegaEvolutionsCheckBox.toolTipText"));
+						pokemonAbilitiesPanel.add(paFollowMegaEvosCheckBox, new GridBagConstraints(3, 2, 2, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- paWeighDuplicatesTogetherCheckBox ----
 						paWeighDuplicatesTogetherCheckBox.setEnabled(false);
-						paWeighDuplicatesTogetherCheckBox.setText(bundle.getString("GUI.paWeighDuplicatesTogetherCheckBox.text"));
-						paWeighDuplicatesTogetherCheckBox.setToolTipText(bundle.getString("GUI.paWeighDuplicatesTogetherCheckBox.toolTipText"));
+						paWeighDuplicatesTogetherCheckBox.setText(bundle.getString("GUI.paWeighDuplicateAbilitiesTogetherCheckBox.text"));
+						paWeighDuplicatesTogetherCheckBox.setToolTipText(bundle.getString("GUI.paWeighDuplicateAbilitiesTogetherCheckBox.toolTipText"));
 						pokemonAbilitiesPanel.add(paWeighDuplicatesTogetherCheckBox, new GridBagConstraints(3, 1, 2, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4418,14 +4426,6 @@ public class NewRandomizerGUI {
 						paEnsureTwoAbilitiesCheckbox.setText(bundle.getString("GUI.paEnsureTwoAbilitiesCheckbox.text"));
 						paEnsureTwoAbilitiesCheckbox.setToolTipText(bundle.getString("GUI.paEnsureTwoAbilitiesCheckbox.toolTipText"));
 						pokemonAbilitiesPanel.add(paEnsureTwoAbilitiesCheckbox, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0,
-							GridBagConstraints.WEST, GridBagConstraints.NONE,
-							new Insets(0, 0, 0, 0), 0, 0));
-
-						//---- paFollowMegaEvosCheckBox ----
-						paFollowMegaEvosCheckBox.setEnabled(false);
-						paFollowMegaEvosCheckBox.setText(bundle.getString("GUI.paFollowMegaEvosCheckBox.text"));
-						paFollowMegaEvosCheckBox.setToolTipText(bundle.getString("GUI.paFollowMegaEvosCheckBox.toolTipText"));
-						pokemonAbilitiesPanel.add(paFollowMegaEvosCheckBox, new GridBagConstraints(3, 2, 2, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 					}
@@ -4469,40 +4469,40 @@ public class NewRandomizerGUI {
 
 						//---- peSimilarStrengthCheckBox ----
 						peSimilarStrengthCheckBox.setEnabled(false);
-						peSimilarStrengthCheckBox.setText(bundle.getString("GUI.peSimilarStrengthCheckBox.text"));
-						peSimilarStrengthCheckBox.setToolTipText(bundle.getString("GUI.peSimilarStrengthCheckBox.toolTipText"));
+						peSimilarStrengthCheckBox.setText(bundle.getString("GUI.peEvosSimilarStrengthCheckBox.text"));
+						peSimilarStrengthCheckBox.setToolTipText(bundle.getString("GUI.peEvosSimilarStrengthCheckBox.toolTipText"));
 						panel6.add(peSimilarStrengthCheckBox, new GridBagConstraints(2, 1, 1, 1, 0.9, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- peSameTypingCheckBox ----
 						peSameTypingCheckBox.setEnabled(false);
-						peSameTypingCheckBox.setText(bundle.getString("GUI.peSameTypingCheckBox.text"));
-						peSameTypingCheckBox.setToolTipText(bundle.getString("GUI.peSameTypingCheckBox.toolTipText"));
+						peSameTypingCheckBox.setText(bundle.getString("GUI.peEvosSameTypingCheckBox.text"));
+						peSameTypingCheckBox.setToolTipText(bundle.getString("GUI.peEvosSameTypingCheckBox.toolTipText"));
 						panel6.add(peSameTypingCheckBox, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- peLimitEvolutionsToThreeCheckBox ----
 						peLimitEvolutionsToThreeCheckBox.setEnabled(false);
-						peLimitEvolutionsToThreeCheckBox.setText(bundle.getString("GUI.peLimitEvolutionsToThreeCheckBox.text"));
-						peLimitEvolutionsToThreeCheckBox.setToolTipText(bundle.getString("GUI.peLimitEvolutionsToThreeCheckBox.toolTipText"));
+						peLimitEvolutionsToThreeCheckBox.setText(bundle.getString("GUI.peEvosMaxThreeStagesCheckBox.text"));
+						peLimitEvolutionsToThreeCheckBox.setToolTipText(bundle.getString("GUI.peEvosMaxThreeStagesCheckBox.toolTipText"));
 						panel6.add(peLimitEvolutionsToThreeCheckBox, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- peForceChangeCheckBox ----
 						peForceChangeCheckBox.setEnabled(false);
-						peForceChangeCheckBox.setText(bundle.getString("GUI.peForceChangeCheckBox.text"));
-						peForceChangeCheckBox.setToolTipText(bundle.getString("GUI.peForceChangeCheckBox.toolTipText"));
+						peForceChangeCheckBox.setText(bundle.getString("GUI.peEvosForceChangeCheckBox.text"));
+						peForceChangeCheckBox.setToolTipText(bundle.getString("GUI.peEvosForceChangeCheckBox.toolTipText"));
 						panel6.add(peForceChangeCheckBox, new GridBagConstraints(2, 4, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- peChangeImpossibleEvosCheckBox ----
 						peChangeImpossibleEvosCheckBox.setEnabled(false);
-						peChangeImpossibleEvosCheckBox.setText(bundle.getString("GUI.peChangeImpossibleEvosCheckBox.text"));
-						peChangeImpossibleEvosCheckBox.setToolTipText(bundle.getString("GUI.peChangeImpossibleEvosCheckBox.toolTipText"));
+						peChangeImpossibleEvosCheckBox.setText(bundle.getString("GUI.peChangeImpossibleEvolutionsCheckBox.text"));
+						peChangeImpossibleEvosCheckBox.setToolTipText(bundle.getString("GUI.peChangeImpossibleEvolutionsCheckBox.toolTipText"));
 						panel6.add(peChangeImpossibleEvosCheckBox, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4517,16 +4517,16 @@ public class NewRandomizerGUI {
 
 						//---- peAllowAltFormesCheckBox ----
 						peAllowAltFormesCheckBox.setEnabled(false);
-						peAllowAltFormesCheckBox.setText(bundle.getString("GUI.peAllowAltFormesCheckBox.text"));
-						peAllowAltFormesCheckBox.setToolTipText(bundle.getString("GUI.peAllowAltFormesCheckBox.toolTipText"));
+						peAllowAltFormesCheckBox.setText(bundle.getString("GUI.peEvosAllowAltFormesCheckBox.text"));
+						peAllowAltFormesCheckBox.setToolTipText(bundle.getString("GUI.peEvosAllowAltFormesCheckBox.toolTipText"));
 						panel6.add(peAllowAltFormesCheckBox, new GridBagConstraints(2, 5, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- peRemoveTimeBasedEvolutionsCheckBox ----
 						peRemoveTimeBasedEvolutionsCheckBox.setEnabled(false);
-						peRemoveTimeBasedEvolutionsCheckBox.setText(bundle.getString("GUI.peRemoveTimeBasedEvolutions.text"));
-						peRemoveTimeBasedEvolutionsCheckBox.setToolTipText(bundle.getString("GUI.peRemoveTimeBasedEvolutions.toolTipText"));
+						peRemoveTimeBasedEvolutionsCheckBox.setText(bundle.getString("GUI.peRemoveTimeBasedEvolutionsCheckBox.text"));
+						peRemoveTimeBasedEvolutionsCheckBox.setToolTipText(bundle.getString("GUI.peRemoveTimeBasedEvolutionsCheckBox.toolTipText"));
 						panel6.add(peRemoveTimeBasedEvolutionsCheckBox, new GridBagConstraints(3, 3, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4596,8 +4596,8 @@ public class NewRandomizerGUI {
 
 						//---- spRandomTwoEvosRadioButton ----
 						spRandomTwoEvosRadioButton.setEnabled(false);
-						spRandomTwoEvosRadioButton.setText(bundle.getString("GUI.spRandomTwoEvosRadioButton.text"));
-						spRandomTwoEvosRadioButton.setToolTipText(bundle.getString("GUI.spRandomTwoEvosRadioButton.toolTipText"));
+						spRandomTwoEvosRadioButton.setText(bundle.getString("GUI.spRandomTwoEvolutionsRadioButton.text"));
+						spRandomTwoEvosRadioButton.setToolTipText(bundle.getString("GUI.spRandomTwoEvolutionsRadioButton.toolTipText"));
 						panel8.add(spRandomTwoEvosRadioButton, new GridBagConstraints(1, 4, 4, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4631,24 +4631,24 @@ public class NewRandomizerGUI {
 
 						//---- spRandomizeStarterHeldItemsCheckBox ----
 						spRandomizeStarterHeldItemsCheckBox.setEnabled(false);
-						spRandomizeStarterHeldItemsCheckBox.setText(bundle.getString("GUI.spRandomizeStarterHeldItemsCheckBox.text"));
-						spRandomizeStarterHeldItemsCheckBox.setToolTipText(bundle.getString("GUI.spRandomizeStarterHeldItemsCheckBox.toolTipText"));
+						spRandomizeStarterHeldItemsCheckBox.setText(bundle.getString("GUI.spRandomizeStartersHeldItemsCheckBox.text"));
+						spRandomizeStarterHeldItemsCheckBox.setToolTipText(bundle.getString("GUI.spRandomizeStartersHeldItemsCheckBox.toolTipText"));
 						panel8.add(spRandomizeStarterHeldItemsCheckBox, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- spBanBadItemsCheckBox ----
 						spBanBadItemsCheckBox.setEnabled(false);
-						spBanBadItemsCheckBox.setText(bundle.getString("GUI.spBanBadItemsCheckBox.text"));
-						spBanBadItemsCheckBox.setToolTipText(bundle.getString("GUI.spBanBadItemsCheckBox.toolTipText"));
+						spBanBadItemsCheckBox.setText(bundle.getString("GUI.spBanBadRandomStarterHeldItemsCheckBox.text"));
+						spBanBadItemsCheckBox.setToolTipText(bundle.getString("GUI.spBanBadRandomStarterHeldItemsCheckBox.toolTipText"));
 						panel8.add(spBanBadItemsCheckBox, new GridBagConstraints(5, 3, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- spAllowAltFormesCheckBox ----
 						spAllowAltFormesCheckBox.setEnabled(false);
-						spAllowAltFormesCheckBox.setText(bundle.getString("GUI.spAllowAltFormesCheckBox.text"));
-						spAllowAltFormesCheckBox.setToolTipText(bundle.getString("GUI.spAllowAltFormesCheckBox.toolTipText"));
+						spAllowAltFormesCheckBox.setText(bundle.getString("GUI.spAllowStarterAltFormesCheckBox.text"));
+						spAllowAltFormesCheckBox.setToolTipText(bundle.getString("GUI.spAllowStarterAltFormesCheckBox.toolTipText"));
 						panel8.add(spAllowAltFormesCheckBox, new GridBagConstraints(5, 4, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4721,8 +4721,8 @@ public class NewRandomizerGUI {
 
 						//---- stpSwapMegaEvosCheckBox ----
 						stpSwapMegaEvosCheckBox.setEnabled(false);
-						stpSwapMegaEvosCheckBox.setText(bundle.getString("GUI.stpSwapMegaEvosCheckBox.text"));
-						stpSwapMegaEvosCheckBox.setToolTipText(bundle.getString("GUI.stpSwapMegaEvosCheckBox.toolTipText"));
+						stpSwapMegaEvosCheckBox.setText(bundle.getString("GUI.stpSwapStaticMegaEvosCheckBox.text"));
+						stpSwapMegaEvosCheckBox.setToolTipText(bundle.getString("GUI.stpSwapStaticMegaEvosCheckBox.toolTipText"));
 						panel9.add(stpSwapMegaEvosCheckBox, new GridBagConstraints(2, 4, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4759,8 +4759,8 @@ public class NewRandomizerGUI {
 
 						//---- stpAllowAltFormesCheckBox ----
 						stpAllowAltFormesCheckBox.setEnabled(false);
-						stpAllowAltFormesCheckBox.setText(bundle.getString("GUI.stpAllowAltFormesCheckBox.text"));
-						stpAllowAltFormesCheckBox.setToolTipText(bundle.getString("GUI.stpAllowAltFormesCheckBox.toolTipText"));
+						stpAllowAltFormesCheckBox.setText(bundle.getString("GUI.stpAllowStaticAltFormesCheckBox.text"));
+						stpAllowAltFormesCheckBox.setToolTipText(bundle.getString("GUI.stpAllowStaticAltFormesCheckBox.toolTipText"));
 						panel9.add(stpAllowAltFormesCheckBox, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4775,8 +4775,8 @@ public class NewRandomizerGUI {
 
 						//---- stpFixMusicCheckBox ----
 						stpFixMusicCheckBox.setEnabled(false);
-						stpFixMusicCheckBox.setText(bundle.getString("GUI.stpFixMusicAllCheckBox.text"));
-						stpFixMusicCheckBox.setToolTipText(bundle.getString("GUI.stpFixMusicAllCheckBox.toolTipText"));
+						stpFixMusicCheckBox.setText(bundle.getString("GUI.stpCorrectStaticMusicCheckBox.text"));
+						stpFixMusicCheckBox.setToolTipText(bundle.getString("GUI.stpCorrectStaticMusicCheckBox.toolTipText"));
 						panel9.add(stpFixMusicCheckBox, new GridBagConstraints(2, 5, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4829,32 +4829,32 @@ public class NewRandomizerGUI {
 
 						//---- igtRandomizeNicknamesCheckBox ----
 						igtRandomizeNicknamesCheckBox.setEnabled(false);
-						igtRandomizeNicknamesCheckBox.setText(bundle.getString("GUI.igtRandomizeNicknamesCheckBox.text"));
-						igtRandomizeNicknamesCheckBox.setToolTipText(bundle.getString("GUI.igtRandomizeNicknamesCheckBox.toolTipText"));
+						igtRandomizeNicknamesCheckBox.setText(bundle.getString("GUI.igtRandomizeInGameTradesNicknamesCheckBox.text"));
+						igtRandomizeNicknamesCheckBox.setToolTipText(bundle.getString("GUI.igtRandomizeInGameTradesNicknamesCheckBox.toolTipText"));
 						panel10.add(igtRandomizeNicknamesCheckBox, new GridBagConstraints(2, 1, 1, 1, 0.8, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- igtRandomizeOTsCheckBox ----
 						igtRandomizeOTsCheckBox.setEnabled(false);
-						igtRandomizeOTsCheckBox.setText(bundle.getString("GUI.igtRandomizeOTsCheckBox.text"));
-						igtRandomizeOTsCheckBox.setToolTipText(bundle.getString("GUI.igtRandomizeOTsCheckBox.toolTipText"));
+						igtRandomizeOTsCheckBox.setText(bundle.getString("GUI.igtRandomizeInGameTradesOTsCheckBox.text"));
+						igtRandomizeOTsCheckBox.setToolTipText(bundle.getString("GUI.igtRandomizeInGameTradesOTsCheckBox.toolTipText"));
 						panel10.add(igtRandomizeOTsCheckBox, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- igtRandomizeIVsCheckBox ----
 						igtRandomizeIVsCheckBox.setEnabled(false);
-						igtRandomizeIVsCheckBox.setText(bundle.getString("GUI.igtRandomizeIVsCheckBox.text"));
-						igtRandomizeIVsCheckBox.setToolTipText(bundle.getString("GUI.igtRandomizeIVsCheckBox.toolTipText"));
+						igtRandomizeIVsCheckBox.setText(bundle.getString("GUI.igtRandomizeInGameTradesIVsCheckBox.text"));
+						igtRandomizeIVsCheckBox.setToolTipText(bundle.getString("GUI.igtRandomizeInGameTradesIVsCheckBox.toolTipText"));
 						panel10.add(igtRandomizeIVsCheckBox, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- igtRandomizeItemsCheckBox ----
 						igtRandomizeItemsCheckBox.setEnabled(false);
-						igtRandomizeItemsCheckBox.setText(bundle.getString("GUI.igtRandomizeItemsCheckBox.text"));
-						igtRandomizeItemsCheckBox.setToolTipText(bundle.getString("GUI.igtRandomizeItemsCheckBox.toolTipText"));
+						igtRandomizeItemsCheckBox.setText(bundle.getString("GUI.igtRandomizeInGameTradesItemsCheckBox.text"));
+						igtRandomizeItemsCheckBox.setToolTipText(bundle.getString("GUI.igtRandomizeInGameTradesItemsCheckBox.toolTipText"));
 						panel10.add(igtRandomizeItemsCheckBox, new GridBagConstraints(2, 4, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4877,8 +4877,8 @@ public class NewRandomizerGUI {
 
 						//---- mdRandomizeMovePowerCheckBox ----
 						mdRandomizeMovePowerCheckBox.setEnabled(false);
-						mdRandomizeMovePowerCheckBox.setText(bundle.getString("GUI.mdRandomizeMovePowerCheckBox.text"));
-						mdRandomizeMovePowerCheckBox.setToolTipText(bundle.getString("GUI.mdRandomizeMovePowerCheckBox.toolTipText"));
+						mdRandomizeMovePowerCheckBox.setText(bundle.getString("GUI.mdRandomizeMovePowersCheckBox.text"));
+						mdRandomizeMovePowerCheckBox.setToolTipText(bundle.getString("GUI.mdRandomizeMovePowersCheckBox.toolTipText"));
 						panel12.add(mdRandomizeMovePowerCheckBox, new GridBagConstraints(1, 1, 1, 1, 0.1, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4897,16 +4897,16 @@ public class NewRandomizerGUI {
 
 						//---- mdRandomizeMoveAccuracyCheckBox ----
 						mdRandomizeMoveAccuracyCheckBox.setEnabled(false);
-						mdRandomizeMoveAccuracyCheckBox.setText(bundle.getString("GUI.mdRandomizeMoveAccuracyCheckBox.text"));
-						mdRandomizeMoveAccuracyCheckBox.setToolTipText(bundle.getString("GUI.mdRandomizeMoveAccuracyCheckBox.toolTipText"));
+						mdRandomizeMoveAccuracyCheckBox.setText(bundle.getString("GUI.mdRandomizeMoveAccuraciesCheckBox.text"));
+						mdRandomizeMoveAccuracyCheckBox.setToolTipText(bundle.getString("GUI.mdRandomizeMoveAccuraciesCheckBox.toolTipText"));
 						panel12.add(mdRandomizeMoveAccuracyCheckBox, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- mdRandomizeMovePPCheckBox ----
 						mdRandomizeMovePPCheckBox.setEnabled(false);
-						mdRandomizeMovePPCheckBox.setText(bundle.getString("GUI.mdRandomizeMovePPCheckBox.text"));
-						mdRandomizeMovePPCheckBox.setToolTipText(bundle.getString("GUI.mdRandomizeMovePPCheckBox.toolTipText"));
+						mdRandomizeMovePPCheckBox.setText(bundle.getString("GUI.mdRandomizeMovePPsCheckBox.text"));
+						mdRandomizeMovePPCheckBox.setToolTipText(bundle.getString("GUI.mdRandomizeMovePPsCheckBox.toolTipText"));
 						panel12.add(mdRandomizeMovePPCheckBox, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4988,8 +4988,8 @@ public class NewRandomizerGUI {
 
 						//---- pmsRandomPreferringSameTypeRadioButton ----
 						pmsRandomPreferringSameTypeRadioButton.setEnabled(false);
-						pmsRandomPreferringSameTypeRadioButton.setText(bundle.getString("GUI.pmsRandomPreferringSameTypeRadioButton.text"));
-						pmsRandomPreferringSameTypeRadioButton.setToolTipText(bundle.getString("GUI.pmsRandomPreferringSameTypeRadioButton.toolTipText"));
+						pmsRandomPreferringSameTypeRadioButton.setText(bundle.getString("GUI.pmsRandomPreferSameTypeRadioButton.text"));
+						pmsRandomPreferringSameTypeRadioButton.setToolTipText(bundle.getString("GUI.pmsRandomPreferSameTypeRadioButton.toolTipText"));
 						panel13.add(pmsRandomPreferringSameTypeRadioButton, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -5028,8 +5028,8 @@ public class NewRandomizerGUI {
 
 						//---- pmsNoGameBreakingMovesCheckBox ----
 						pmsNoGameBreakingMovesCheckBox.setEnabled(false);
-						pmsNoGameBreakingMovesCheckBox.setText(bundle.getString("GUI.pmsNoGameBreakingMovesCheckBox.text"));
-						pmsNoGameBreakingMovesCheckBox.setToolTipText(bundle.getString("GUI.pmsNoGameBreakingMovesCheckBox.toolTipText"));
+						pmsNoGameBreakingMovesCheckBox.setText(bundle.getString("GUI.pmsBlockBrokenMovesetMovesCheckBox.text"));
+						pmsNoGameBreakingMovesCheckBox.setToolTipText(bundle.getString("GUI.pmsBlockBrokenMovesetMovesCheckBox.toolTipText"));
 						panel13.add(pmsNoGameBreakingMovesCheckBox, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -5050,7 +5050,7 @@ public class NewRandomizerGUI {
 						pmsGuaranteedLevel1MovesSlider.setPaintLabels(true);
 						pmsGuaranteedLevel1MovesSlider.setPaintTicks(false);
 						pmsGuaranteedLevel1MovesSlider.setSnapToTicks(true);
-						pmsGuaranteedLevel1MovesSlider.setToolTipText(bundle.getString("GUI.pmsGuaranteedLevel1MovesSlider.toolTipText"));
+						pmsGuaranteedLevel1MovesSlider.setToolTipText(bundle.getString("GUI.pmsGuaranteedMoveCountSlider.toolTipText"));
 						pmsGuaranteedLevel1MovesSlider.setValue(2);
 						pmsGuaranteedLevel1MovesSlider.setValueIsAdjusting(false);
 						panel13.add(pmsGuaranteedLevel1MovesSlider, new GridBagConstraints(3, 1, 1, 2, 0.0, 0.0,
@@ -5064,7 +5064,7 @@ public class NewRandomizerGUI {
 						pmsForceGoodDamagingSlider.setPaintLabels(true);
 						pmsForceGoodDamagingSlider.setPaintTicks(true);
 						pmsForceGoodDamagingSlider.setSnapToTicks(true);
-						pmsForceGoodDamagingSlider.setToolTipText(bundle.getString("GUI.pmsForceGoodDamagingSlider.toolTipText"));
+						pmsForceGoodDamagingSlider.setToolTipText(bundle.getString("GUI.pmsMovesetsGoodDamagingPercentSlider.toolTipText"));
 						pmsForceGoodDamagingSlider.setValue(0);
 						panel13.add(pmsForceGoodDamagingSlider, new GridBagConstraints(2, 5, 2, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
@@ -5072,8 +5072,8 @@ public class NewRandomizerGUI {
 
 						//---- pmsEvolutionMovesCheckBox ----
 						pmsEvolutionMovesCheckBox.setEnabled(false);
-						pmsEvolutionMovesCheckBox.setText(bundle.getString("GUI.pmsEvolutionMovesCheckBox.text"));
-						pmsEvolutionMovesCheckBox.setToolTipText(bundle.getString("GUI.pmsEvolutionMovesCheckBox.toolTipText"));
+						pmsEvolutionMovesCheckBox.setText(bundle.getString("GUI.pmsEvolutionMovesForAllCheckBox.text"));
+						pmsEvolutionMovesCheckBox.setToolTipText(bundle.getString("GUI.pmsEvolutionMovesForAllCheckBox.toolTipText"));
 						panel13.add(pmsEvolutionMovesCheckBox, new GridBagConstraints(2, 6, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -5102,16 +5102,16 @@ public class NewRandomizerGUI {
 
 						//---- tpRivalCarriesStarterCheckBox ----
 						tpRivalCarriesStarterCheckBox.setEnabled(false);
-						tpRivalCarriesStarterCheckBox.setText(bundle.getString("GUI.tpRivalCarriesStarterCheckBox.text"));
-						tpRivalCarriesStarterCheckBox.setToolTipText(bundle.getString("GUI.tpRivalCarriesStarterCheckBox.toolTipText"));
+						tpRivalCarriesStarterCheckBox.setText(bundle.getString("GUI.tpRivalCarriesStarterThroughoutCheckBox.text"));
+						tpRivalCarriesStarterCheckBox.setToolTipText(bundle.getString("GUI.tpRivalCarriesStarterThroughoutCheckBox.toolTipText"));
 						panel15.add(tpRivalCarriesStarterCheckBox, new GridBagConstraints(5, 1, 1, 1, 0.1, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- tpSimilarStrengthCheckBox ----
 						tpSimilarStrengthCheckBox.setEnabled(false);
-						tpSimilarStrengthCheckBox.setText(bundle.getString("GUI.tpSimilarStrengthCheckBox.text"));
-						tpSimilarStrengthCheckBox.setToolTipText(bundle.getString("GUI.tpSimilarStrengthCheckBox.toolTipText"));
+						tpSimilarStrengthCheckBox.setText(bundle.getString("GUI.tpTrainersUsePokemonOfSimilarStrengthCheckBox.text"));
+						tpSimilarStrengthCheckBox.setToolTipText(bundle.getString("GUI.tpTrainersUsePokemonOfSimilarStrengthCheckBox.toolTipText"));
 						panel15.add(tpSimilarStrengthCheckBox, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -5149,7 +5149,7 @@ public class NewRandomizerGUI {
 						tpForceFullyEvolvedAtSlider.setPaintLabels(true);
 						tpForceFullyEvolvedAtSlider.setPaintTicks(true);
 						tpForceFullyEvolvedAtSlider.setSnapToTicks(true);
-						tpForceFullyEvolvedAtSlider.setToolTipText(bundle.getString("GUI.tpForceFullyEvolvedAtSlider.toolTipText"));
+						tpForceFullyEvolvedAtSlider.setToolTipText(bundle.getString("GUI.tpTrainersForceFullyEvolvedLevelSlider.toolTipText"));
 						tpForceFullyEvolvedAtSlider.setValue(30);
 						panel15.add(tpForceFullyEvolvedAtSlider, new GridBagConstraints(6, 5, 2, 2, 0.0, 0.0,
 							GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
@@ -5164,7 +5164,7 @@ public class NewRandomizerGUI {
 						tpPercentageLevelModifierSlider.setPaintLabels(true);
 						tpPercentageLevelModifierSlider.setPaintTicks(true);
 						tpPercentageLevelModifierSlider.setSnapToTicks(true);
-						tpPercentageLevelModifierSlider.setToolTipText(bundle.getString("GUI.tpPercentageLevelModifierSlider.toolTipText"));
+						tpPercentageLevelModifierSlider.setToolTipText(bundle.getString("GUI.tpTrainersLevelModifierSlider.toolTipText"));
 						tpPercentageLevelModifierSlider.setValue(0);
 						panel15.add(tpPercentageLevelModifierSlider, new GridBagConstraints(6, 8, 2, 2, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
@@ -5191,39 +5191,39 @@ public class NewRandomizerGUI {
 
 						//---- tpDontUseLegendariesCheckBox ----
 						tpDontUseLegendariesCheckBox.setEnabled(false);
-						tpDontUseLegendariesCheckBox.setText(bundle.getString("GUI.tpDontUseLegendariesCheckBox.text"));
+						tpDontUseLegendariesCheckBox.setText(bundle.getString("GUI.tpTrainersBlockLegendariesCheckBox.text"));
 						panel15.add(tpDontUseLegendariesCheckBox, new GridBagConstraints(5, 4, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- tpNoEarlyWonderGuardCheckBox ----
 						tpNoEarlyWonderGuardCheckBox.setEnabled(false);
-						tpNoEarlyWonderGuardCheckBox.setText(bundle.getString("GUI.tpNoEarlyWonderGuardCheckBox.text"));
-						tpNoEarlyWonderGuardCheckBox.setToolTipText(bundle.getString("GUI.tpNoEarlyWonderGuardCheckBox.toolTipText"));
+						tpNoEarlyWonderGuardCheckBox.setText(bundle.getString("GUI.tpTrainersBlockEarlyWonderGuardCheckBox.text"));
+						tpNoEarlyWonderGuardCheckBox.setToolTipText(bundle.getString("GUI.tpTrainersBlockEarlyWonderGuardCheckBox.toolTipText"));
 						panel15.add(tpNoEarlyWonderGuardCheckBox, new GridBagConstraints(5, 5, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- tpAllowAlternateFormesCheckBox ----
 						tpAllowAlternateFormesCheckBox.setEnabled(false);
-						tpAllowAlternateFormesCheckBox.setText(bundle.getString("GUI.tpAllowAlternateFormesCheckBox.text"));
-						tpAllowAlternateFormesCheckBox.setToolTipText(bundle.getString("GUI.tpAllowAlternateFormesCheckBox.toolTipText"));
+						tpAllowAlternateFormesCheckBox.setText(bundle.getString("GUI.tpAllowTrainerAlternateFormesCheckBox.text"));
+						tpAllowAlternateFormesCheckBox.setToolTipText(bundle.getString("GUI.tpAllowTrainerAlternateFormesCheckBox.toolTipText"));
 						panel15.add(tpAllowAlternateFormesCheckBox, new GridBagConstraints(5, 6, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- tpSwapMegaEvosCheckBox ----
 						tpSwapMegaEvosCheckBox.setEnabled(false);
-						tpSwapMegaEvosCheckBox.setText(bundle.getString("GUI.tpSwapMegaEvosCheckBox.text"));
-						tpSwapMegaEvosCheckBox.setToolTipText(bundle.getString("GUI.tpSwapMegaEvosCheckBox.toolTipText"));
+						tpSwapMegaEvosCheckBox.setText(bundle.getString("GUI.tpSwapTrainerMegaEvosCheckBox.text"));
+						tpSwapMegaEvosCheckBox.setToolTipText(bundle.getString("GUI.tpSwapTrainerMegaEvosCheckBox.toolTipText"));
 						panel15.add(tpSwapMegaEvosCheckBox, new GridBagConstraints(5, 7, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- tpRandomShinyTrainerPokemonCheckBox ----
 						tpRandomShinyTrainerPokemonCheckBox.setEnabled(false);
-						tpRandomShinyTrainerPokemonCheckBox.setText(bundle.getString("GUI.tpRandomShinyTrainerPokemonCheckBox.text"));
-						tpRandomShinyTrainerPokemonCheckBox.setToolTipText(bundle.getString("GUI.tpRandomShinyTrainerPokemonCheckBox.toolTipText"));
+						tpRandomShinyTrainerPokemonCheckBox.setText(bundle.getString("GUI.tpShinyChanceCheckBox.text"));
+						tpRandomShinyTrainerPokemonCheckBox.setToolTipText(bundle.getString("GUI.tpShinyChanceCheckBox.toolTipText"));
 						panel15.add(tpRandomShinyTrainerPokemonCheckBox, new GridBagConstraints(5, 8, 1, 1, 0.0, 0.0,
 							GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -5342,24 +5342,24 @@ public class NewRandomizerGUI {
 
 						//---- tpConsumableItemsOnlyCheckBox ----
 						tpConsumableItemsOnlyCheckBox.setEnabled(false);
-						tpConsumableItemsOnlyCheckBox.setText(bundle.getString("GUI.tpConsumableItemsOnlyCheckBox.text"));
-						tpConsumableItemsOnlyCheckBox.setToolTipText(bundle.getString("GUI.tpConsumableItemsOnlyCheckBox.tooltip"));
+						tpConsumableItemsOnlyCheckBox.setText(bundle.getString("GUI.tpConsumableItemsOnlyForTrainerPokemonCheckBox.text"));
+						tpConsumableItemsOnlyCheckBox.setToolTipText(bundle.getString("GUI.tpConsumableItemsOnlyForTrainerPokemonCheckBox.tooltip"));
 						panel15.add(tpConsumableItemsOnlyCheckBox, new GridBagConstraints(1, 10, 2, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- tpSensibleItemsCheckBox ----
 						tpSensibleItemsCheckBox.setEnabled(false);
-						tpSensibleItemsCheckBox.setText(bundle.getString("GUI.tpSensibleItemsCheckBox.text"));
-						tpSensibleItemsCheckBox.setToolTipText(bundle.getString("GUI.tpSensibleItemsCheckBox.tooltip"));
+						tpSensibleItemsCheckBox.setText(bundle.getString("GUI.tpSensibleItemsOnlyForTrainerPokemonCheckBox.text"));
+						tpSensibleItemsCheckBox.setToolTipText(bundle.getString("GUI.tpSensibleItemsOnlyForTrainerPokemonCheckBox.tooltip"));
 						panel15.add(tpSensibleItemsCheckBox, new GridBagConstraints(3, 10, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- tpHighestLevelGetsItemCheckBox ----
 						tpHighestLevelGetsItemCheckBox.setEnabled(false);
-						tpHighestLevelGetsItemCheckBox.setText(bundle.getString("GUI.tpHighestLevelGetsItemCheckBox.text"));
-						tpHighestLevelGetsItemCheckBox.setToolTipText(bundle.getString("GUI.tpHighestLevelGetsItemCheckBox.tooltip"));
+						tpHighestLevelGetsItemCheckBox.setText(bundle.getString("GUI.tpHighestLevelOnlyGetsItemsForTrainerPokemonCheckBox.text"));
+						tpHighestLevelGetsItemCheckBox.setToolTipText(bundle.getString("GUI.tpHighestLevelOnlyGetsItemsForTrainerPokemonCheckBox.tooltip"));
 						panel15.add(tpHighestLevelGetsItemCheckBox, new GridBagConstraints(4, 10, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -5504,16 +5504,16 @@ public class NewRandomizerGUI {
 
 						//---- totpRandomizeHeldItemsCheckBox ----
 						totpRandomizeHeldItemsCheckBox.setEnabled(false);
-						totpRandomizeHeldItemsCheckBox.setText(bundle.getString("GUI.totpRandomizeHeldItemsCheckBox.text"));
-						totpRandomizeHeldItemsCheckBox.setToolTipText(bundle.getString("GUI.totpRandomizeHeldItemsCheckBox.toolTipText"));
+						totpRandomizeHeldItemsCheckBox.setText(bundle.getString("GUI.totpRandomizeTotemHeldItemsCheckBox.text"));
+						totpRandomizeHeldItemsCheckBox.setToolTipText(bundle.getString("GUI.totpRandomizeTotemHeldItemsCheckBox.toolTipText"));
 						totpPanel.add(totpRandomizeHeldItemsCheckBox, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- totpAllowAltFormesCheckBox ----
 						totpAllowAltFormesCheckBox.setEnabled(false);
-						totpAllowAltFormesCheckBox.setText(bundle.getString("GUI.totpAllowAltFormesCheckBox.text"));
-						totpAllowAltFormesCheckBox.setToolTipText(bundle.getString("GUI.totpAllowAltFormesCheckBox.toolTipText"));
+						totpAllowAltFormesCheckBox.setText(bundle.getString("GUI.totpAllowTotemAltFormesCheckBox.text"));
+						totpAllowAltFormesCheckBox.setToolTipText(bundle.getString("GUI.totpAllowTotemAltFormesCheckBox.toolTipText"));
 						totpPanel.add(totpAllowAltFormesCheckBox, new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -5581,16 +5581,16 @@ public class NewRandomizerGUI {
 
 						//---- wpArea1To1RadioButton ----
 						wpArea1To1RadioButton.setEnabled(false);
-						wpArea1To1RadioButton.setText(bundle.getString("GUI.wpArea1To1RadioButton.text"));
-						wpArea1To1RadioButton.setToolTipText(bundle.getString("GUI.wpArea1To1RadioButton.toolTipText"));
+						wpArea1To1RadioButton.setText(bundle.getString("GUI.wpAreaMappingRadioButton.text"));
+						wpArea1To1RadioButton.setToolTipText(bundle.getString("GUI.wpAreaMappingRadioButton.toolTipText"));
 						panel17.add(wpArea1To1RadioButton, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- wpGlobal1To1RadioButton ----
 						wpGlobal1To1RadioButton.setEnabled(false);
-						wpGlobal1To1RadioButton.setText(bundle.getString("GUI.wpGlobal1To1RadioButton.text"));
-						wpGlobal1To1RadioButton.setToolTipText(bundle.getString("GUI.wpGlobal1To1RadioButton.toolTipText"));
+						wpGlobal1To1RadioButton.setText(bundle.getString("GUI.wpGlobalMappingRadioButton.text"));
+						wpGlobal1To1RadioButton.setToolTipText(bundle.getString("GUI.wpGlobalMappingRadioButton.toolTipText"));
 						panel17.add(wpGlobal1To1RadioButton, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -5602,8 +5602,8 @@ public class NewRandomizerGUI {
 
 							//---- wpARNoneRadioButton ----
 							wpARNoneRadioButton.setEnabled(false);
-							wpARNoneRadioButton.setText(bundle.getString("GUI.wpARNoneRadioButton.text"));
-							wpARNoneRadioButton.setToolTipText(bundle.getString("GUI.wpARNoneRadioButton.toolTipText"));
+							wpARNoneRadioButton.setText(bundle.getString("GUI.wpNoneRadioButton.text"));
+							wpARNoneRadioButton.setToolTipText(bundle.getString("GUI.wpNoneRadioButton.toolTipText"));
 							panel18.add(wpARNoneRadioButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 								GridBagConstraints.WEST, GridBagConstraints.NONE,
 								new Insets(0, 0, 0, 0), 0, 0));
@@ -5619,24 +5619,24 @@ public class NewRandomizerGUI {
 
 							//---- wpARSimilarStrengthRadioButton ----
 							wpARSimilarStrengthRadioButton.setEnabled(false);
-							wpARSimilarStrengthRadioButton.setText(bundle.getString("GUI.wpARSimilarStrengthRadioButton.text"));
-							wpARSimilarStrengthRadioButton.setToolTipText(bundle.getString("GUI.wpARSimilarStrengthRadioButton.toolTipText"));
+							wpARSimilarStrengthRadioButton.setText(bundle.getString("GUI.wpSimilarStrengthRadioButton.text"));
+							wpARSimilarStrengthRadioButton.setToolTipText(bundle.getString("GUI.wpSimilarStrengthRadioButton.toolTipText"));
 							panel18.add(wpARSimilarStrengthRadioButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 								GridBagConstraints.WEST, GridBagConstraints.NONE,
 								new Insets(0, 0, 0, 0), 0, 0));
 
 							//---- wpARCatchEmAllModeRadioButton ----
 							wpARCatchEmAllModeRadioButton.setEnabled(false);
-							wpARCatchEmAllModeRadioButton.setText(bundle.getString("GUI.wpARCatchEmAllModeRadioButton.text"));
-							wpARCatchEmAllModeRadioButton.setToolTipText(bundle.getString("GUI.wpARCatchEmAllModeRadioButton.toolTipText"));
+							wpARCatchEmAllModeRadioButton.setText(bundle.getString("GUI.wpCatchEmAllRadioButton.text"));
+							wpARCatchEmAllModeRadioButton.setToolTipText(bundle.getString("GUI.wpCatchEmAllRadioButton.toolTipText"));
 							panel18.add(wpARCatchEmAllModeRadioButton, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
 								GridBagConstraints.WEST, GridBagConstraints.NONE,
 								new Insets(0, 0, 0, 0), 0, 0));
 
 							//---- wpARTypeThemeAreasRadioButton ----
 							wpARTypeThemeAreasRadioButton.setEnabled(false);
-							wpARTypeThemeAreasRadioButton.setText(bundle.getString("GUI.wpARTypeThemeAreasRadioButton.text"));
-							wpARTypeThemeAreasRadioButton.setToolTipText(bundle.getString("GUI.wpARTypeThemeAreasRadioButton.toolTipText"));
+							wpARTypeThemeAreasRadioButton.setText(bundle.getString("GUI.wpTypeThemeAreasRadioButton.text"));
+							wpARTypeThemeAreasRadioButton.setToolTipText(bundle.getString("GUI.wpTypeThemeAreasRadioButton.toolTipText"));
 							panel18.add(wpARTypeThemeAreasRadioButton, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
 								GridBagConstraints.WEST, GridBagConstraints.NONE,
 								new Insets(0, 0, 0, 0), 0, 0));
@@ -5655,7 +5655,7 @@ public class NewRandomizerGUI {
 
 						//---- wpDontUseLegendariesCheckBox ----
 						wpDontUseLegendariesCheckBox.setEnabled(false);
-						wpDontUseLegendariesCheckBox.setText(bundle.getString("GUI.wpDontUseLegendariesCheckBox.text"));
+						wpDontUseLegendariesCheckBox.setText(bundle.getString("GUI.wpBlockWildLegendariesCheckBox.text"));
 						panel17.add(wpDontUseLegendariesCheckBox, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -5670,24 +5670,24 @@ public class NewRandomizerGUI {
 
 						//---- wpRandomizeHeldItemsCheckBox ----
 						wpRandomizeHeldItemsCheckBox.setEnabled(false);
-						wpRandomizeHeldItemsCheckBox.setText(bundle.getString("GUI.wpRandomizeHeldItemsCheckBox.text"));
-						wpRandomizeHeldItemsCheckBox.setToolTipText(bundle.getString("GUI.wpRandomizeHeldItemsCheckBox.toolTipText"));
+						wpRandomizeHeldItemsCheckBox.setText(bundle.getString("GUI.wpRandomizeWildPokemonHeldItemsCheckBox.text"));
+						wpRandomizeHeldItemsCheckBox.setToolTipText(bundle.getString("GUI.wpRandomizeWildPokemonHeldItemsCheckBox.toolTipText"));
 						panel17.add(wpRandomizeHeldItemsCheckBox, new GridBagConstraints(3, 4, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- wpBanBadItemsCheckBox ----
 						wpBanBadItemsCheckBox.setEnabled(false);
-						wpBanBadItemsCheckBox.setText(bundle.getString("GUI.wpBanBadItemsCheckBox.text"));
-						wpBanBadItemsCheckBox.setToolTipText(bundle.getString("GUI.wpBanBadItemsCheckBox.toolTipText"));
+						wpBanBadItemsCheckBox.setText(bundle.getString("GUI.wpBanBadRandomWildPokemonHeldItemsCheckBox.text"));
+						wpBanBadItemsCheckBox.setToolTipText(bundle.getString("GUI.wpBanBadRandomWildPokemonHeldItemsCheckBox.toolTipText"));
 						panel17.add(wpBanBadItemsCheckBox, new GridBagConstraints(3, 5, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- wpBalanceShakingGrassPokemonCheckBox ----
 						wpBalanceShakingGrassPokemonCheckBox.setEnabled(false);
-						wpBalanceShakingGrassPokemonCheckBox.setText(bundle.getString("GUI.wpBalanceShakingGrassPokemonCheckBox.text"));
-						wpBalanceShakingGrassPokemonCheckBox.setToolTipText(bundle.getString("GUI.wpBalanceShakingGrassPokemonCheckBox.toolTipText"));
+						wpBalanceShakingGrassPokemonCheckBox.setText(bundle.getString("GUI.wpBalanceShakingGrassCheckBox.text"));
+						wpBalanceShakingGrassPokemonCheckBox.setToolTipText(bundle.getString("GUI.wpBalanceShakingGrassCheckBox.toolTipText"));
 						panel17.add(wpBalanceShakingGrassPokemonCheckBox, new GridBagConstraints(3, 6, 2, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -5709,7 +5709,7 @@ public class NewRandomizerGUI {
 						wpPercentageLevelModifierSlider.setPaintLabels(true);
 						wpPercentageLevelModifierSlider.setPaintTicks(true);
 						wpPercentageLevelModifierSlider.setSnapToTicks(true);
-						wpPercentageLevelModifierSlider.setToolTipText(bundle.getString("GUI.wpPercentageLevelModifierSlider.toolTipText"));
+						wpPercentageLevelModifierSlider.setToolTipText(bundle.getString("GUI.wpWildLevelModifierSlider.toolTipText"));
 						wpPercentageLevelModifierSlider.setValue(0);
 						panel17.add(wpPercentageLevelModifierSlider, new GridBagConstraints(3, 8, 2, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
@@ -5722,7 +5722,7 @@ public class NewRandomizerGUI {
 						wpSetMinimumCatchRateSlider.setMinimum(1);
 						wpSetMinimumCatchRateSlider.setPaintLabels(true);
 						wpSetMinimumCatchRateSlider.setSnapToTicks(true);
-						wpSetMinimumCatchRateSlider.setToolTipText(bundle.getString("GUI.wpSetMinimumCatchRateSlider.toolTipText"));
+						wpSetMinimumCatchRateSlider.setToolTipText(bundle.getString("GUI.wpMinimumCatchRateLevelSlider.toolTipText"));
 						wpSetMinimumCatchRateSlider.setValue(1);
 						panel17.add(wpSetMinimumCatchRateSlider, new GridBagConstraints(4, 3, 1, 2, 0.0, 0.0,
 							GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
@@ -5730,8 +5730,8 @@ public class NewRandomizerGUI {
 
 						//---- wpAllowAltFormesCheckBox ----
 						wpAllowAltFormesCheckBox.setEnabled(false);
-						wpAllowAltFormesCheckBox.setText(bundle.getString("GUI.wpAllowAltFormesCheckBox.text"));
-						wpAllowAltFormesCheckBox.setToolTipText(bundle.getString("GUI.wpAllowAltFormesCheckBox.toolTipText"));
+						wpAllowAltFormesCheckBox.setText(bundle.getString("GUI.wpAllowWildAltFormesCheckBox.text"));
+						wpAllowAltFormesCheckBox.setToolTipText(bundle.getString("GUI.wpAllowWildAltFormesCheckBox.toolTipText"));
 						panel17.add(wpAllowAltFormesCheckBox, new GridBagConstraints(3, 9, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -5797,8 +5797,8 @@ public class NewRandomizerGUI {
 
 							//---- tmNoGameBreakingMovesCheckBox ----
 							tmNoGameBreakingMovesCheckBox.setEnabled(false);
-							tmNoGameBreakingMovesCheckBox.setText(bundle.getString("GUI.tmNoGameBreakingMovesCheckBox.text"));
-							tmNoGameBreakingMovesCheckBox.setToolTipText(bundle.getString("GUI.tmNoGameBreakingMovesCheckBox.toolTipText"));
+							tmNoGameBreakingMovesCheckBox.setText(bundle.getString("GUI.tmBlockBrokenTMMovesCheckBox.text"));
+							tmNoGameBreakingMovesCheckBox.setToolTipText(bundle.getString("GUI.tmBlockBrokenTMMovesCheckBox.toolTipText"));
 							panel21.add(tmNoGameBreakingMovesCheckBox, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
 								GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 								new Insets(0, 0, 0, 0), 0, 0));
@@ -5826,7 +5826,7 @@ public class NewRandomizerGUI {
 							tmForceGoodDamagingSlider.setPaintLabels(true);
 							tmForceGoodDamagingSlider.setPaintTicks(true);
 							tmForceGoodDamagingSlider.setSnapToTicks(true);
-							tmForceGoodDamagingSlider.setToolTipText(bundle.getString("GUI.tmForceGoodDamagingSlider.toolTipText"));
+							tmForceGoodDamagingSlider.setToolTipText(bundle.getString("GUI.tmTmsGoodDamagingPercentSlider.toolTipText"));
 							tmForceGoodDamagingSlider.setValue(0);
 							panel21.add(tmForceGoodDamagingSlider, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0,
 								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
@@ -5896,24 +5896,24 @@ public class NewRandomizerGUI {
 
 							//---- tmFollowEvolutionsCheckBox ----
 							tmFollowEvolutionsCheckBox.setEnabled(false);
-							tmFollowEvolutionsCheckBox.setText(bundle.getString("GUI.tmFollowEvolutionsCheckBox.text"));
-							tmFollowEvolutionsCheckBox.setToolTipText(bundle.getString("GUI.tmFollowEvolutionsCheckBox.toolTipText"));
+							tmFollowEvolutionsCheckBox.setText(bundle.getString("GUI.tmTmsFollowEvolutionsCheckBox.text"));
+							tmFollowEvolutionsCheckBox.setToolTipText(bundle.getString("GUI.tmTmsFollowEvolutionsCheckBox.toolTipText"));
 							panel22.add(tmFollowEvolutionsCheckBox, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
 								GridBagConstraints.WEST, GridBagConstraints.NONE,
 								new Insets(0, 0, 0, 0), 0, 0));
 
 							//---- tmLevelupMoveSanityCheckBox ----
 							tmLevelupMoveSanityCheckBox.setEnabled(false);
-							tmLevelupMoveSanityCheckBox.setText(bundle.getString("GUI.tmLevelupMoveSanityCheckBox.text"));
-							tmLevelupMoveSanityCheckBox.setToolTipText(bundle.getString("GUI.tmLevelupMoveSanityCheckBox.toolTipText"));
+							tmLevelupMoveSanityCheckBox.setText(bundle.getString("GUI.tmTmLevelUpMoveSanityCheckBox.text"));
+							tmLevelupMoveSanityCheckBox.setToolTipText(bundle.getString("GUI.tmTmLevelUpMoveSanityCheckBox.toolTipText"));
 							panel22.add(tmLevelupMoveSanityCheckBox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
 								GridBagConstraints.WEST, GridBagConstraints.NONE,
 								new Insets(0, 0, 0, 0), 0, 0));
 
 							//---- tmFullHMCompatibilityCheckBox ----
 							tmFullHMCompatibilityCheckBox.setEnabled(false);
-							tmFullHMCompatibilityCheckBox.setText(bundle.getString("GUI.tmFullHMCompatibilityCheckBox.text"));
-							tmFullHMCompatibilityCheckBox.setToolTipText(bundle.getString("GUI.tmFullHMCompatibilityCheckBox.toolTipText"));
+							tmFullHMCompatibilityCheckBox.setText(bundle.getString("GUI.tmFullHMCompatCheckBox.text"));
+							tmFullHMCompatibilityCheckBox.setToolTipText(bundle.getString("GUI.tmFullHMCompatCheckBox.toolTipText"));
 							panel22.add(tmFullHMCompatibilityCheckBox, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0,
 								GridBagConstraints.WEST, GridBagConstraints.NONE,
 								new Insets(0, 0, 0, 0), 0, 0));
@@ -5981,7 +5981,7 @@ public class NewRandomizerGUI {
 							mtForceGoodDamagingSlider.setPaintLabels(true);
 							mtForceGoodDamagingSlider.setPaintTicks(true);
 							mtForceGoodDamagingSlider.setSnapToTicks(true);
-							mtForceGoodDamagingSlider.setToolTipText(bundle.getString("GUI.mtForceGoodDamagingSlider.toolTipText"));
+							mtForceGoodDamagingSlider.setToolTipText(bundle.getString("GUI.mtTutorsGoodDamagingPercentSlider.toolTipText"));
 							mtForceGoodDamagingSlider.setValue(0);
 							mtMovesPanel.add(mtForceGoodDamagingSlider, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0,
 								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
@@ -5989,8 +5989,8 @@ public class NewRandomizerGUI {
 
 							//---- mtNoGameBreakingMovesCheckBox ----
 							mtNoGameBreakingMovesCheckBox.setEnabled(false);
-							mtNoGameBreakingMovesCheckBox.setText(bundle.getString("GUI.mtNoGameBreakingMovesCheckBox.text"));
-							mtNoGameBreakingMovesCheckBox.setToolTipText(bundle.getString("GUI.mtNoGameBreakingMovesCheckBox.toolTipText"));
+							mtNoGameBreakingMovesCheckBox.setText(bundle.getString("GUI.mtBlockBrokenTutorMovesCheckBox.text"));
+							mtNoGameBreakingMovesCheckBox.setToolTipText(bundle.getString("GUI.mtBlockBrokenTutorMovesCheckBox.toolTipText"));
 							mtMovesPanel.add(mtNoGameBreakingMovesCheckBox, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
 								GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 								new Insets(0, 0, 0, 0), 0, 0));
@@ -6075,16 +6075,16 @@ public class NewRandomizerGUI {
 
 							//---- mtFollowEvolutionsCheckBox ----
 							mtFollowEvolutionsCheckBox.setEnabled(false);
-							mtFollowEvolutionsCheckBox.setText(bundle.getString("GUI.mtFollowEvolutionsCheckBox.text"));
-							mtFollowEvolutionsCheckBox.setToolTipText(bundle.getString("GUI.mtFollowEvolutionsCheckBox.toolTipText"));
+							mtFollowEvolutionsCheckBox.setText(bundle.getString("GUI.mtTutorFollowEvolutionsCheckBox.text"));
+							mtFollowEvolutionsCheckBox.setToolTipText(bundle.getString("GUI.mtTutorFollowEvolutionsCheckBox.toolTipText"));
 							mtCompatPanel.add(mtFollowEvolutionsCheckBox, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
 								GridBagConstraints.WEST, GridBagConstraints.NONE,
 								new Insets(0, 0, 0, 0), 0, 0));
 
 							//---- mtLevelupMoveSanityCheckBox ----
 							mtLevelupMoveSanityCheckBox.setEnabled(false);
-							mtLevelupMoveSanityCheckBox.setText(bundle.getString("GUI.mtLevelupMoveSanityCheckBox.text"));
-							mtLevelupMoveSanityCheckBox.setToolTipText(bundle.getString("GUI.mtLevelupMoveSanityCheckBox.toolTipText"));
+							mtLevelupMoveSanityCheckBox.setText(bundle.getString("GUI.mtTutorLevelUpMoveSanityCheckBox.text"));
+							mtLevelupMoveSanityCheckBox.setToolTipText(bundle.getString("GUI.mtTutorLevelUpMoveSanityCheckBox.toolTipText"));
 							mtCompatPanel.add(mtLevelupMoveSanityCheckBox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
 								GridBagConstraints.WEST, GridBagConstraints.NONE,
 								new Insets(0, 0, 0, 0), 0, 0));
@@ -6163,8 +6163,8 @@ public class NewRandomizerGUI {
 
 						//---- fiBanBadItemsCheckBox ----
 						fiBanBadItemsCheckBox.setEnabled(false);
-						fiBanBadItemsCheckBox.setText(bundle.getString("GUI.fiBanBadItemsCheckBox.text"));
-						fiBanBadItemsCheckBox.setToolTipText(bundle.getString("GUI.fiBanBadItemsCheckBox.toolTipText"));
+						fiBanBadItemsCheckBox.setText(bundle.getString("GUI.fiBanBadRandomFieldItemsCheckBox.text"));
+						fiBanBadItemsCheckBox.setToolTipText(bundle.getString("GUI.fiBanBadRandomFieldItemsCheckBox.toolTipText"));
 						panel24.add(fiBanBadItemsCheckBox, new GridBagConstraints(2, 4, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -6229,16 +6229,16 @@ public class NewRandomizerGUI {
 
 						//---- shBanOverpoweredShopItemsCheckBox ----
 						shBanOverpoweredShopItemsCheckBox.setEnabled(false);
-						shBanOverpoweredShopItemsCheckBox.setText(bundle.getString("GUI.shBanOverpoweredShopItemsCheckBox.text"));
-						shBanOverpoweredShopItemsCheckBox.setToolTipText(bundle.getString("GUI.shBanOverpoweredShopItemsCheckBox.toolTipText"));
+						shBanOverpoweredShopItemsCheckBox.setText(bundle.getString("GUI.shBanOPShopItemsCheckBox.text"));
+						shBanOverpoweredShopItemsCheckBox.setToolTipText(bundle.getString("GUI.shBanOPShopItemsCheckBox.toolTipText"));
 						shopItemsPanel.add(shBanOverpoweredShopItemsCheckBox, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
 
 						//---- shBanBadItemsCheckBox ----
 						shBanBadItemsCheckBox.setEnabled(false);
-						shBanBadItemsCheckBox.setText(bundle.getString("GUI.shBanBadItemsCheckBox.text"));
-						shBanBadItemsCheckBox.setToolTipText(bundle.getString("GUI.shBanBadItemsCheckBox.toolTipText"));
+						shBanBadItemsCheckBox.setText(bundle.getString("GUI.shBanBadRandomShopItemsCheckBox.text"));
+						shBanBadItemsCheckBox.setToolTipText(bundle.getString("GUI.shBanBadRandomShopItemsCheckBox.toolTipText"));
 						shopItemsPanel.add(shBanBadItemsCheckBox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -6253,8 +6253,8 @@ public class NewRandomizerGUI {
 
 						//---- shBalanceShopItemPricesCheckBox ----
 						shBalanceShopItemPricesCheckBox.setEnabled(false);
-						shBalanceShopItemPricesCheckBox.setText(bundle.getString("GUI.shBalanceShopItemPricesCheckBox.text"));
-						shBalanceShopItemPricesCheckBox.setToolTipText(bundle.getString("GUI.shBalanceShopItemPricesCheckBox.toolTipText"));
+						shBalanceShopItemPricesCheckBox.setText(bundle.getString("GUI.shBalanceShopPricesCheckBox.text"));
+						shBalanceShopItemPricesCheckBox.setToolTipText(bundle.getString("GUI.shBalanceShopPricesCheckBox.toolTipText"));
 						shopItemsPanel.add(shBalanceShopItemPricesCheckBox, new GridBagConstraints(2, 4, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -6270,8 +6270,8 @@ public class NewRandomizerGUI {
 						//---- shGuaranteeXItemsCheckBox ----
 						shGuaranteeXItemsCheckBox.setEnabled(false);
 						shGuaranteeXItemsCheckBox.setSelected(false);
-						shGuaranteeXItemsCheckBox.setText(bundle.getString("GUI.shGuaranteeXItemsCheckbox.text"));
-						shGuaranteeXItemsCheckBox.setToolTipText(bundle.getString("GUI.shGuaranteeXItemsCheckbox.tooltipText"));
+						shGuaranteeXItemsCheckBox.setText(bundle.getString("GUI.shGuaranteeXItemsCheckBox.text"));
+						shGuaranteeXItemsCheckBox.setToolTipText(bundle.getString("GUI.shGuaranteeXItemsCheckBox.tooltipText"));
 						shopItemsPanel.add(shGuaranteeXItemsCheckBox, new GridBagConstraints(2, 6, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -6316,8 +6316,8 @@ public class NewRandomizerGUI {
 
 						//---- puBanBadItemsCheckBox ----
 						puBanBadItemsCheckBox.setEnabled(false);
-						puBanBadItemsCheckBox.setText(bundle.getString("GUI.puBanBadItemsCheckBox.text"));
-						puBanBadItemsCheckBox.setToolTipText(bundle.getString("GUI.puBanBadItemsCheckBox.toolTipText"));
+						puBanBadItemsCheckBox.setText(bundle.getString("GUI.puBanBadRandomPickupItemsCheckBox.text"));
+						puBanBadItemsCheckBox.setToolTipText(bundle.getString("GUI.puBanBadRandomPickupItemsCheckBox.toolTipText"));
 						pickupItemsPanel.add(puBanBadItemsCheckBox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));

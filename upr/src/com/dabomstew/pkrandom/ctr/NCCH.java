@@ -82,13 +82,9 @@ public class NCCH {
         }
 
         // TMP folder?
-        String rawFilename = new File(filename).getName();
-        String dataFolder = "tmp_" + rawFilename.substring(0, rawFilename.lastIndexOf('.'));
-        // remove nonsensical chars
-        dataFolder = dataFolder.replaceAll("[^A-Za-z0-9_]+", "");
-        File tmpFolder = new File(SysConstants.ROOT_PATH + dataFolder);
-        tmpFolder.mkdirs();
-        if (tmpFolder.canWrite()) {
+        String dataFolder = UUID.randomUUID().toString();
+        File tmpFolder = new File(SysConstants.ROOT_PATH, dataFolder);
+        if (tmpFolder.mkdir() && tmpFolder.canWrite()) {
             writingEnabled = true;
             this.tmpFolder = SysConstants.ROOT_PATH + dataFolder + File.separator;
             tmpFolder.deleteOnExit();

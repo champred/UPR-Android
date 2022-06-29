@@ -122,7 +122,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         private List<StaticPokemon> staticPokemonFakeBall = new ArrayList<>();
         private List<RoamingPokemon> roamingPokemon = new ArrayList<>();
         private List<TradeScript> tradeScripts = new ArrayList<>();
-        
+
 
         private int getInt(String key) {
             if (!numbers.containsKey(key)) {
@@ -426,7 +426,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     private long actualArm9CRC32;
     private Map<Integer, Long> actualOverlayCRC32s;
     private Map<String, Long> actualFileCRC32s;
-    
+
     private NARCArchive pokeNarc, moveNarc, stringsNarc, storyTextNarc, scriptNarc, shopNarc;
 
     @Override
@@ -491,7 +491,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         else if (romEntry.romType == Gen5Constants.Type_BW2) {
             shopNames = Gen5Constants.bw2ShopNames;
         }
-        
+
         loadedWildMapNames = false;
 
         allowedItems = Gen5Constants.allowedItems.copy();
@@ -3108,7 +3108,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
 
     @Override
     public void removeImpossibleEvolutions(Settings settings) {
-        boolean changeMoveEvos = !(settings.getMovesetsMod() == Settings.MovesetsMod.UNCHANGED);
+        boolean changeMoveEvos = !(settings.getMovesetsMod() == SettingsMod.MovesetsMod.UNCHANGED);
 
         Map<Integer, List<MoveLearnt>> movesets = this.getMovesLearnt();
         Set<Evolution> extraEvolutions = new HashSet<>();
@@ -3187,7 +3187,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
 
     @Override
     public void makeEvolutionsEasier(Settings settings) {
-        boolean wildsRandomized = !settings.getWildPokemonMod().equals(Settings.WildPokemonMod.UNCHANGED);
+        boolean wildsRandomized = !settings.getWildPokemonMod().equals(SettingsMod.WildPokemonMod.UNCHANGED);
 
         if (wildsRandomized) {
             for (Pokemon pkmn : pokes) {
@@ -3516,7 +3516,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     public String[] getItemNames() {
         return itemNames.toArray(new String[0]);
     }
-    
+
     @Override
     public String abilityName(int number) {
         return abilityNames.get(number);

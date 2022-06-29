@@ -46,6 +46,10 @@ public class SysConstants {
     public static final String nnamesFile = "nicknames.txt";
 
     private static String getRootPath() {
+        String customRoot = System.getProperty("pkrandom.root");
+        if (customRoot != null) {
+            return customRoot + File.separator;
+        }
         try {
             File fh = Utils.getExecutionLocation().getParentFile();
             return fh.getAbsolutePath() + File.separator;
