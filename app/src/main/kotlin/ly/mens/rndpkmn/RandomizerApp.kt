@@ -43,7 +43,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dabomstew.pkrandom.MiscTweak
 import com.dabomstew.pkrandom.RandomSource.pickSeed
-import com.dabomstew.pkrandom.SettingsMod.StartersMod
+import com.dabomstew.pkrandom.Settings.StartersMod
 import com.dabomstew.pkrandom.SysConstants.customNamesFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

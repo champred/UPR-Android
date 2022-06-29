@@ -28,4 +28,4 @@
 -dontwarn java.awt.**
 -dontwarn com.dabomstew.pkrandom.gui.**
 -dontobfuscate
--keep enum com.dabomstew.pkrandom.SettingsMod$* {*;}
+-keep enum com.dabomstew.pkrandom.Settings$* {*;}

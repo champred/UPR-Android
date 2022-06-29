@@ -112,7 +112,7 @@ object RandomizerSettings : Settings() {
 					for (pre in SettingsPrefix.values()) {
 						if (pre.search(fld, suffix)) break
 					}
-				} else if (type.enclosingClass == SettingsMod::class.java) {
+				} else if (type.enclosingClass == Settings::class.java) {
 					val prefix = type.getField("PREFIX").get(null) as String
 					type.enumConstants.forEach {
 						for (pre in SettingsPrefix.values()) {
