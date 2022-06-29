@@ -4423,8 +4423,8 @@ public class NewRandomizerGUI {
 
 						//---- paEnsureTwoAbilitiesCheckbox ----
 						paEnsureTwoAbilitiesCheckbox.setEnabled(false);
-						paEnsureTwoAbilitiesCheckbox.setText(bundle.getString("GUI.paEnsureTwoAbilitiesCheckbox.text"));
-						paEnsureTwoAbilitiesCheckbox.setToolTipText(bundle.getString("GUI.paEnsureTwoAbilitiesCheckbox.toolTipText"));
+						paEnsureTwoAbilitiesCheckbox.setText(bundle.getString("GUI.paEnsureTwoAbilitiesCheckBox.text"));
+						paEnsureTwoAbilitiesCheckbox.setToolTipText(bundle.getString("GUI.paEnsureTwoAbilitiesCheckBox.toolTipText"));
 						pokemonAbilitiesPanel.add(paEnsureTwoAbilitiesCheckbox, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -5366,8 +5366,8 @@ public class NewRandomizerGUI {
 
 						//---- tpBetterMovesetsCheckBox ----
 						tpBetterMovesetsCheckBox.setEnabled(false);
-						tpBetterMovesetsCheckBox.setText(bundle.getString("GUI.tpBetterMovesetsCheckBox.text"));
-						tpBetterMovesetsCheckBox.setToolTipText(bundle.getString("GUI.tpBetterMovesetsCheckBox.toolTipText"));
+						tpBetterMovesetsCheckBox.setText(bundle.getString("GUI.tpBetterTrainerMovesetsCheckBox.text"));
+						tpBetterMovesetsCheckBox.setToolTipText(bundle.getString("GUI.tpBetterTrainerMovesetsCheckBox.toolTipText"));
 						panel15.add(tpBetterMovesetsCheckBox, new GridBagConstraints(1, 3, 2, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
