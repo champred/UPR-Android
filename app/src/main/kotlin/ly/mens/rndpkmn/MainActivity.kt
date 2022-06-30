@@ -27,4 +27,15 @@ class MainActivity : ComponentActivity() {
         setContent { RandomizerApp() }
     }
 
+    override fun onDestroy() {
+        if (isFinishing) {
+            filesDir.listFiles()?.forEach {
+                if (it.isDirectory) {
+                    it.deleteRecursively()
+                }
+            }
+        }
+        super.onDestroy()
+    }
+
 }

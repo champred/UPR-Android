@@ -34,6 +34,10 @@ A: Officially, only Android 10+ is supported, however it can work on earlier ver
 
 A: 3DS games will not work due to the large size of the ROM not being feasible to load into the limited amount of RAM Android gives to apps.
 
+**Q: Why does it take up so much storage?**
+
+A: The app has to copy every ROM that is opened to its internal storage. This copy is only made once for each unique filename, so after you open a ROM once, it will load faster each subsequent time that same ROM is opened. All copies are kept permanently, so to delete them, you need to manually clear the app storage. You can do this by long pressing on the app icon and choosing `App info>Storage & cache>Clear storage`. Keep in mind that clearing the app storage will also delete any custom names you have made. Alternatively, you can force the app to delete temporary directories by using the back button to close the app (not by closing it on the recents screen). This may free some storage space if you use the batch randomize feature for DS games. 
+
 **Q: How to make multiple ROMs at once?**
 
 A: If you press the "Batch Randomize" button, it will open a dialog that allows you to choose a prefix, starting number, and ending number. This will generate a ROM for each number between the starting and ending numbers. The file name will simply be the prefix with the current number (0 padded so they sort correctly). The files will be saved to a folder using the "Choose Directory" button.
