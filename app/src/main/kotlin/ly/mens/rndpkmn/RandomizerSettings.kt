@@ -38,7 +38,7 @@ object RandomizerSettings : Settings() {
 	val romLimit: Int get() {
 		val rt = Runtime.getRuntime()
 		val mem = rt.maxMemory() - (rt.totalMemory() - rt.freeMemory())
-		return (mem / inputFile.length() / 3).toInt()
+		return (mem / inputFile.length() / 3L).toInt().coerceAtLeast(1)
 	}
 	val currentGen: Int get() = if (this::romHandler.isInitialized) romHandler.generationOfPokemon() else 1
 	var currentStarters: Triple<Pokemon?, Pokemon?, Pokemon?> = Triple(null, null, null)

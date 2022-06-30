@@ -261,7 +261,7 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 		val dir = DocumentFile.fromTreeUri(ctx, uri)!!
 		//determine how many ROMs we can make at a time
 		val len = end - start + 1; val count = AtomicInteger(start)
-		val numHandlers = Math.min(len, RandomizerSettings.romLimit)
+		val numHandlers = len.coerceAtMost(RandomizerSettings.romLimit)
 		val romsPerHandler = len / numHandlers; val remainingRoms = len % numHandlers
 		val lock = Semaphore(start); var last = 0
 

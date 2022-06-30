@@ -18,8 +18,8 @@ android {
         applicationId "ly.mens.rndpkmn"
         minSdkVersion 29
         targetSdkVersion 30
-        versionCode 8
-        versionName "0.1.0"
+        versionCode 9
+        versionName "0.1.0a"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         importStrings.forEach { rawKey, value ->
