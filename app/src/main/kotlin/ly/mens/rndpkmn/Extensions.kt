@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.core.text.parseAsHtml
 import com.dabomstew.pkrandom.RandomSource
 import com.dabomstew.pkrandom.Utils
 import java.io.File
@@ -29,9 +30,9 @@ val File.isRomFile: Boolean get() {
 val random get() = RandomSource.instance()
 
 fun Context.toast(@StringRes resId: Int, vararg formatArgs: Any) =
-        Toast.makeText(this, getString(resId, *formatArgs), Toast.LENGTH_SHORT)
-fun Context.longToast(@StringRes resId: Int, vararg formatArgs: Any) =
-        Toast.makeText(this, getString(resId, *formatArgs), Toast.LENGTH_LONG)
+        Toast.makeText(this, getString(resId, *formatArgs).parseAsHtml(), Toast.LENGTH_SHORT).show()
+fun Context.toast(text: String) =
+        Toast.makeText(this, text.parseAsHtml(), Toast.LENGTH_LONG).show()
 
 fun Context.loadFromUri(uri: Uri, file: File) {
     //copy selected file to app directory if it doesn't exist

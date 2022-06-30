@@ -527,6 +527,7 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 
 @Composable
 fun TweaksList() {
+	val ctx = LocalContext.current
 	LazyColumn {
 		item {
 			Text(stringResource(R.string.title_misc), style = MaterialTheme.typography.h6)
@@ -538,7 +539,9 @@ fun TweaksList() {
 					checked = it
 					RandomizerSettings.currentMiscTweaks = RandomizerSettings.currentMiscTweaks xor tweak.value
 				})
-				Text(tweak.tweakName)
+				Text(tweak.tweakName, Modifier.clickable {
+					ctx.toast(tweak.tooltipText)
+				})
 			}
 		}
 	}
@@ -546,6 +549,7 @@ fun TweaksList() {
 
 @Composable
 fun SettingsList(category: SettingsCategory) {
+	val ctx = LocalContext.current
 	LazyColumn {
 		category.prefixes.forEach { prefix ->
 			item {
@@ -558,7 +562,12 @@ fun SettingsList(category: SettingsCategory) {
 				Divider()
 			}
 			items(prefix.props.toList()) { (label, field) ->
-				field.SettingsComponent(prefix.strings[label]!!)
+				field.SettingsComponent(prefix.strings[label]!!) {
+					val id = ctx.resources.getIdentifier(label.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
+					if (id != 0) {
+						ctx.toast(id)
+					}
+				}
 			}
 		}
 	}
@@ -573,15 +582,21 @@ fun SettingsGroup(prefix: SettingsPrefix, subtitle: String, group: MutableMap<St
 		val groupField = group.values.first()
 		val groupEnum = groupField.get(RandomizerSettings) as Enum<*>
 		val selectedIndex = rememberSaveable { mutableStateOf(groupEnum.ordinal) }
+		val ctx = LocalContext.current
 		group.keys.forEachIndexed { index, label ->
-			groupField.SettingsComponent(prefix.strings[label]!!, index, selectedIndex)
+			groupField.SettingsComponent(prefix.strings[label]!!, index, selectedIndex) {
+				val id = ctx.resources.getIdentifier(label.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
+				if (id != 0) {
+					ctx.toast(id)
+				}
+			}
 		}
 	}
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
-fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: MutableState<Int>? = null) {
+fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: MutableState<Int>? = null, onClick: () -> Unit) {
 	if (type.isPrimitive) {
 		when (type.name) {
 			"boolean" -> {
@@ -591,7 +606,7 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 						checked = it
 						setBoolean(RandomizerSettings, it)
 					})
-					Text(label, Modifier.weight(1f))
+					Text(label, Modifier.weight(1f).clickable(onClick = onClick))
 					if (this@SettingsComponent in RandomizerSettings.selections && checked) {
 						val toggle = RandomizerSettings.toggles[this@SettingsComponent]
 						val options = RandomizerSettings.selections[this@SettingsComponent] ?: emptyList()
@@ -625,7 +640,7 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 						checked = it
 						toggle?.setBoolean(RandomizerSettings, it)
 					})
-					Text(String.format(label, position.toInt()))
+					Text(String.format(label, position.toInt()), Modifier.clickable(onClick = onClick))
 					if (length > 10) {
 						val numPattern = Regex("^-?\\d+$")
 						var input by rememberSaveable { mutableStateOf(position.toString().substringBefore('.')) }
@@ -653,7 +668,7 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 				selectedIndex.value = index
 				set(RandomizerSettings, type.enumConstants[index])
 			})
-			Text(label)
+			Text(label, Modifier.clickable(onClick = onClick))
 		}
 		if (get(RandomizerSettings) === StartersMod.CUSTOM && index == StartersMod.CUSTOM.ordinal) {
 			var (first, second, third) = RandomizerSettings.currentStarters
