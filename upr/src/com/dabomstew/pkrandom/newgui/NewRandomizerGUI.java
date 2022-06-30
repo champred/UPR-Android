@@ -4226,7 +4226,7 @@ public class NewRandomizerGUI {
 						//---- pbsAssignEvoStatsRandomlyCheckBox ----
 						pbsAssignEvoStatsRandomlyCheckBox.setEnabled(false);
 						pbsAssignEvoStatsRandomlyCheckBox.setText(bundle.getString("GUI.pbsAssignEvoStatsRandomlyCheckBox.text"));
-						pbsAssignEvoStatsRandomlyCheckBox.setToolTipText(bundle.getString("GUI.pbsAssignEvoStatsRandomlyCheckBox.tooltipText"));
+						pbsAssignEvoStatsRandomlyCheckBox.setToolTipText(bundle.getString("GUI.pbsAssignEvoStatsRandomlyCheckBox.toolTipText"));
 						panel4.add(pbsAssignEvoStatsRandomlyCheckBox, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -4730,7 +4730,7 @@ public class NewRandomizerGUI {
 						//---- stpPercentageLevelModifierCheckBox ----
 						stpPercentageLevelModifierCheckBox.setEnabled(false);
 						stpPercentageLevelModifierCheckBox.setText(bundle.getString("GUI.stpPercentageLevelModifierCheckBox.text"));
-						stpPercentageLevelModifierCheckBox.setToolTipText(bundle.getString("GUI.stpPercentageLevelModifierCheckBox.tooltipText"));
+						stpPercentageLevelModifierCheckBox.setToolTipText(bundle.getString("GUI.stpPercentageLevelModifierCheckBox.toolTipText"));
 						panel9.add(stpPercentageLevelModifierCheckBox, new GridBagConstraints(4, 1, 1, 1, 6.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -6271,7 +6271,7 @@ public class NewRandomizerGUI {
 						shGuaranteeXItemsCheckBox.setEnabled(false);
 						shGuaranteeXItemsCheckBox.setSelected(false);
 						shGuaranteeXItemsCheckBox.setText(bundle.getString("GUI.shGuaranteeXItemsCheckBox.text"));
-						shGuaranteeXItemsCheckBox.setToolTipText(bundle.getString("GUI.shGuaranteeXItemsCheckBox.tooltipText"));
+						shGuaranteeXItemsCheckBox.setToolTipText(bundle.getString("GUI.shGuaranteeXItemsCheckBox.toolTipText"));
 						shopItemsPanel.add(shGuaranteeXItemsCheckBox, new GridBagConstraints(2, 6, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
