@@ -460,6 +460,27 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		this.defaultKeyboardAction(ImeAction.Done)
 	}), singleLine = true)
 
+	var preset by rememberSaveable { mutableStateOf(SettingsPreset.NONE) }
+	val updatePreset: (SettingsPreset)->Unit = { pre ->
+		preset = pre
+		if (pre != SettingsPreset.NONE) {
+			settingsText = pre.getPreset() ?: run {
+				scope.launch {
+					scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_no_preset))
+				}
+				settingsText
+			}
+			updateSettings()
+		}
+	}
+	Text(stringResource(R.string.choose_preset))
+	Row(Modifier.horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically) {
+		SettingsPreset.values().forEach {
+			RadioButton(preset == it, { updatePreset(it) })
+			Text(it.name)
+		}
+	}
+
 	var validSeed by remember { mutableStateOf(true) }
 	var seedText by remember { mutableStateOf(RandomizerSettings.currentSeed.toString(16)) }
 	var seedBase by remember { mutableStateOf(16) }

@@ -7,6 +7,7 @@ importStrings.load(new FileInputStream(file(
 def trimPrefix = ~/^GUI_/
 def trimSuffix = ~/_?text$/
 def prefixMapType = "java.util.HashMap<String, java.util.Map<String, String>>"
+//group properties by prefix
 Properties groupStrings = importStrings.groupBy {
     ((it.key.replaceAll("\\.", "_") - trimPrefix) - trimSuffix).split("[A-Z]", 2)[0]
 }
@@ -18,15 +19,42 @@ android {
         applicationId "ly.mens.rndpkmn"
         minSdkVersion 29
         targetSdkVersion 30
-        versionCode 10
-        versionName "0.1.1"
+        versionCode 11
+        versionName "0.1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        //add properties to resources
         importStrings.forEach { rawKey, value ->
             String key = (rawKey.replaceAll("\\.", "_") - trimPrefix) - trimSuffix
             resValue "string", key, "\"$value\""
         }
+        //add properties to build config
         buildConfigField prefixMapType, "PREFIX_MAP", mapToString(groupStrings, prefixMapType)
+        //add presets to build config
+        buildConfigField "String", "FRLG_STANDARD", '"319WQIEEjIBAAQABwCRAAKeBnsECQEACQACCQAuEgAAAAAABRi45ATkAYAICTIGBAIyAAUAEEZpcmUgUmVkIChVKSAxLjHHK9Hc48M4ig=="'
+        buildConfigField "String", "FRLG_ULTIMATE", '"319WRIEEjIBAAQABwCRAAKeBnsECQEACQACCQAuEgAAAAAABRi45ATkAYAICTIGBAIyAAUAEEZpcmUgUmVkIChVKSAxLjF+CLkR48M4ig=="'
+        buildConfigField "String", "FRLG_KAIZO", '"319WRIEEjIBAAQABwCRAAKeBnsECQEAFAACCQAuEgAAAAAABRi45ATkAYYICTIGBAIyAAUAEEZpcmUgUmVkIChVKSAxLjGwV2lQ48M4ig=="'
+        buildConfigField "String", "FRLG_SURVIVAL", '"319WRIEEjIBAAQABwCRAAKeBnsEiAEAFAACCQAuEgAAAAAABRi45ATkAYYICTIGBAIyEwUAEEZpcmUgUmVkIChVKSAxLjHRHQLn48M4ig=="'
+        buildConfigField "String", "RSE_STANDARD", '"319WQIEEjL8AP8AAgGRAAKeBnsECQEACQACCQAuEgAAAAAABBi45ATkAYAICTIGBAIyAAUAC0VtZXJhbGQgKFUp4Nb6s+PDOIo="'
+        buildConfigField "String", "RSE_ULTIMATE", '"319WRIEEjL8AP8AAgGRAAKeBnsECQEACQACCQAuEgAAAAAABBi45ATkAYAICTIGBAIyAAUAC0VtZXJhbGQgKFUpWrfcfOPDOIo="'
+        buildConfigField "String", "RSE_KAIZO", '"319WRIEEjL8AP8AAgGRAAKeBnsECQEAFAACCQAuEgAAAAAABBi45ATkAYYICTIGBAIyAAUAC0VtZXJhbGQgKFUp5ZxuSuPDOIo="'
+        buildConfigField "String", "RSE_SURVIVAL", '"319WRIEEjL8AP8AAgGRAAKeBnsEiAEAFAACCQAuEgAAAAAABBi45ATkAYYICTIGBAIyEwUAC0VtZXJhbGQgKFUpBgGvAePDOIo="'
+        buildConfigField "String", "HGSS_STANDARD", '"319WQIEEgKYAJsAngCRAAKeBnsECQEACQACCQAuEgAAAAAADBCI5ATkQYAICTIGBQIyAAUAFlBva2Vtb24gU291bFNpbHZlciAoVSm1y3vA48M4ig=="'
+        buildConfigField "String", "HGSS_ULTIMATE", '"319WRIEEgKYAJsAngCRAAKeBnsECQEACQACCQAuEgAAAAAADBCI5ATkQYAICTIGBQIyAAUAFlBva2Vtb24gU291bFNpbHZlciAoVSnJ949p48M4ig=="'
+        buildConfigField "String", "HGSS_KAIZO", '"319WRIEEgKYAJsAngCRAAKeBnsECQEAFAACCQAuEgAAAAAADBCI5ATkQYYICTIGBQIyAAUAFlBva2Vtb24gU291bFNpbHZlciAoVSmMWY1H48M4ig=="'
+        buildConfigField "String", "HGSS_SURVIVAL", '"319WRIEEgKYAJsAngCRAAKeBnsEiAEAFAACCQAuEgAAAAAADBCI5ATkQYYICTIGBQIyEwUAFlBva2Vtb24gU291bFNpbHZlciAoVSnYyPGY48M4ig=="'
+        buildConfigField "String", "DPPT_STANDARD", '"319WQIEEgLDAXQA+ACRAAKeBnsECQEACQACCQAuEgAAAAAADBCI5ATkQYAICTIGBQIyAAUAGlBva2Vtb24gUGxhdGludW0gKFUgUmV2IDEp7+VvbePDOIo="'
+        buildConfigField "String", "DPPT_ULTIMATE", '"319WRIEEgLDAXQA+ACRAAKeBnsECQEACQACCQAuEgAAAAAADBCI5ATkQYAICTIGBQIyAAUAGlBva2Vtb24gUGxhdGludW0gKFUgUmV2IDEpRwumBuPDOIo="'
+        buildConfigField "String", "DPPT_KAIZO", '"319WRIEEgLDAXQA+ACRAAKeBnsECQEAFAACCQAuEgAAAAAADBCI5ATkQYYICTIGBQIyAAUAGlBva2Vtb24gUGxhdGludW0gKFUgUmV2IDEpMlCOHePDOIo="'
+        buildConfigField "String", "DPPT_SURVIVAL", '"319WRIEEgLDAXQA+ACRAAKeBnsEiAEAFAACCQAuEgAAAAAADBCI5ATkQYYICTIGBQIyEwUAGlBva2Vtb24gUGxhdGludW0gKFUgUmV2IDEpFdCYUOPDOIo="'
+        buildConfigField "String", "BW_STANDARD", '"319WQIEEgLvAfIB9QGRAAKeJHsECQEAFAACCQAuEgAAAAAABHCI5ATkwYAICTIGBgIyAAUAEVBva2Vtb24gQmxhY2sgKFUpjCSWi+PDOIo="'
+        buildConfigField "String", "BW_ULTIMATE", '"319WRIEEgLvAfIB9QGRAAKeJHsECQEAFAACCQAuEgAAAAAABHCI5ATkwYAICTIGBgIyAAUAEVBva2Vtb24gQmxhY2sgKFUpaUgL7uPDOIo="'
+        buildConfigField "String", "BW_KAIZO", '"319WRIEEgLvAfIB9QGRAAKeJHsECQEAFAACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyAAUAEVBva2Vtb24gQmxhY2sgKFUp+Cnbd+PDOIo="'
+        buildConfigField "String", "BW_SURVIVAL", '"319WRIEEgLvAfIB9QGRAAKeJHsEiAEAFAACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyEwUAEVBva2Vtb24gQmxhY2sgKFUprU23M+PDOIo="'
+        buildConfigField "String", "B2W2_STANDARD", '"319WQIEEgLvAfIB9QGRAAKeBnsECQEACQACCSAuEgAAAAAABHCI5ATkwYAICTIGBgAyAAUAE1Bva2Vtb24gQmxhY2sgMiAoVSnDIzZ848M4ig=="'
+        buildConfigField "String", "B2W2_ULTIMATE", '"319WRIEEgLvAfIB9QGRAAKeBnsECQEACQACCSAuEgAAAAAABHCI5ATkwYAICTIGBgIyAAUAE1Bva2Vtb24gQmxhY2sgMiAoVSnFcYVW48M4ig=="'
+        buildConfigField "String", "B2W2_KAIZO", '"319WRIEEgLvAfIB9QGRAAKeBnsECQEACQACCSAuEgAAAAAABHCI5ATkwYYICTIGBgIyAAUAE1Bva2Vtb24gQmxhY2sgMiAoVSnjIfew48M4ig=="'
+        buildConfigField "String", "B2W2_SURVIVAL", '"319WRIEEgLvAfIB9QGRAAKeBnsEiAEACQACCSAuEgAAAAAABHCI5ATkwYYICTIGBgIyEwUAE1Bva2Vtb24gQmxhY2sgMiAoVSkzMAWm48M4ig=="'
     }
     buildTypes {
         release {

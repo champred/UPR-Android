@@ -34,6 +34,14 @@ A: Officially, only Android 10+ is supported, however it can work on earlier ver
 
 A: 3DS games will not work due to the large size of the ROM not being feasible to load into the limited amount of RAM Android gives to apps.
 
+**Q: Why does the randomizer fail?**
+
+A: Most likely this is due to the source ROM being invalid (patched ROMs, ROM hacks, and ROMs that are not clean are all invalid). It can also happen if you select a setting not supported by the generation of game you have. This should not happen if you are using a valid settings string for that generation.
+
+**Q: What games are presets available for?**
+
+A: Currently, only FRLG, RSE, HGSS, DPPt, and BW/B2W2 have built-in presets. You can choose from any of the 4 main ironMON challenges (Standard, Ultimate, Kaizo, and Survival). Other generations of games can still be used, but you need to manually put in a settings string.
+
 **Q: Why does it take up so much storage?**
 
 A: The app has to copy every ROM that is opened to its internal storage. This copy is only made once for each unique filename, so after you open a ROM once, it will load faster each subsequent time that same ROM is opened. All copies are kept permanently, so to delete them, you need to manually clear the app storage. You can do this by long pressing on the app icon and choosing `App info>Storage & cache>Clear storage`. Keep in mind that clearing the app storage will also delete any custom names you have made. Alternatively, you can force the app to delete temporary directories by using the back button to close the app (not by closing it on the recents screen). This may free some storage space if you use the batch randomize feature for DS games. 
