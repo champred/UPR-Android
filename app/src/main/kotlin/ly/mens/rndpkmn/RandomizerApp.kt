@@ -165,6 +165,9 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			if (RandomizerSettings.loadRom(file)) {
 				romFileName.value = RandomizerSettings.romFileName
 				romSaved = false
+				if (!RandomizerSettings.isValid) {
+					scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_not_clean))
+				}
 			} else {
 				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_invalid_rom, file.name))
 			}

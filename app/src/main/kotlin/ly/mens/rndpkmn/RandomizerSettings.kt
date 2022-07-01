@@ -41,6 +41,7 @@ object RandomizerSettings : Settings() {
 		return (mem / inputFile.length() / 3L).toInt().coerceAtLeast(1)
 	}
 	val currentGen: Int get() = if (this::romHandler.isInitialized) romHandler.generationOfPokemon() else 1
+	val isValid: Boolean get() = if (this::romHandler.isInitialized) romHandler.isRomValid else false
 	var currentStarters: Triple<Pokemon?, Pokemon?, Pokemon?> = Triple(null, null, null)
 		set(value) {
 			val (first, second, third) = value
