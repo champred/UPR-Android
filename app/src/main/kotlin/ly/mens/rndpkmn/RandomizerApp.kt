@@ -105,7 +105,9 @@ fun RandomizerAppBar(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavCon
 @Composable
 fun RandomizerDrawer(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavController) {
 	RandomizerDrawerItem(stringResource(R.string.title_general)) {
-		nav.navigate(START_ROUTE) { launchSingleTop = true }
+		if (nav.currentDestination?.route != START_ROUTE) {
+			nav.popBackStack()
+		}
 		scope.launch { scaffold.drawerState.close() }
 	}
 	SettingsCategory.values().forEach { category ->

@@ -211,12 +211,12 @@ object RandomizerSettings : Settings() {
 	}
 
 	private fun createRomHandler(): RomHandler {
-		val romHandler = romHandlerFactory.create(random)
-		romHandler.loadRom(inputFile.absolutePath)
-		if (!romHandler.isRomValid) {
-			Log.i(TAG, "The loaded ROM is not valid.")
+		return romHandlerFactory.create(random).apply {
+			loadRom(inputFile.absolutePath)
+			if (!isRomValid) {
+				Log.i(TAG, "The loaded ROM is not valid.")
+			}
 		}
-		return romHandler
 	}
 
 	fun reloadRomHandler() {
