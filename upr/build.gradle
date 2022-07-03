@@ -1,8 +1,8 @@
 apply plugin: 'java'
 
 java {
-    targetCompatibility = '1.8'
-    sourceCompatibility = '1.8'
+    targetCompatibility = '11'
+    sourceCompatibility = '11'
 }
 
 jar {

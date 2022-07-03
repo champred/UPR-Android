@@ -10,7 +10,7 @@ The goal for this project is to build a complete UI using Jetpack Compose that s
 
 **Note: the app is in early stages of development, you may experience bugs!**
 
-1. Download the APK from the "Releases" page to the right and expanding the "Assets" dropdown on the latest release.
+1. Download the APK from the [Releases](https://github.com/champred/UPR-Android/releases) page.
 2. Open the downloaded APK from your web browser or file manager. You may need to allow your web browser or file manager to install apps by going to `Android Settings>Apps & Notifications>Advanced>Special app access>Install unknown apps`.
 3. Once the app is installed, you should see this after opening it:
 <img src="https://user-images.githubusercontent.com/46391895/173204207-f182c85c-ded6-42fd-9faa-7cbbfefbb8e3.png" height="440">
@@ -28,7 +28,7 @@ The goal for this project is to build a complete UI using Jetpack Compose that s
 
 **Q: What versions of Android are supported?**
 
-A: Officially, only Android 10+ is supported, however it can work on earlier versions of Android if you request so by messaging me on Discord (champred#6443).
+A: Officially, only Android 10+ is supported, however there is a compatibility APK built for Android 8+ that may work on older devices. To use it, download the APK that has `android8` in the filename.
 
 **Q: Are 3DS games supported?**
 
