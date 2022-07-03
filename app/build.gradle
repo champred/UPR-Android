@@ -17,7 +17,7 @@ android {
     buildToolsVersion "30.0.3"
     defaultConfig {
         applicationId "ly.mens.rndpkmn"
-        minSdkVersion 29
+        minSdkVersion 26
         targetSdkVersion 30
         versionCode 12
         versionName "0.1.2a"

@@ -61,9 +61,7 @@ const val CHANNEL_ID = 69_420
 
 @Composable
 fun RandomizerApp() {
-	MaterialTheme(
-			colors = if (isSystemInDarkTheme()) darkColors() else lightColors()
-	) {
+	MaterialTheme {
 		val nav = rememberNavController()
 		val scaffold = rememberScaffoldState()
 		val scope = rememberCoroutineScope()

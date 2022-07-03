@@ -2,9 +2,13 @@ package ly.mens.rndpkmn
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.dabomstew.pkrandom.Utils.testForRequiredConfigs
 
 class MainActivity : ComponentActivity() {
@@ -25,6 +29,15 @@ class MainActivity : ComponentActivity() {
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
         setContent { RandomizerApp() }
+        checkPermission()
+    }
+
+    private fun checkPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
+            // TODO: UX flow
+        }
     }
 
     override fun onDestroy() {
