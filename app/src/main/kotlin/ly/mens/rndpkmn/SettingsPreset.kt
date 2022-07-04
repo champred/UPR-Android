@@ -31,6 +31,10 @@ enum class SettingsPreset {
 			}
 			else -> return null
 		}
-		return BuildConfig::class.java.getField("${prefix}_${this.name}").get(null) as? String
+		return try {
+			BuildConfig::class.java.getField("${prefix}_${this.name}").get(null) as? String
+		} catch (e: NoSuchFieldException) {
+			null
+		}
 	}
 }

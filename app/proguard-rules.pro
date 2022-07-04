@@ -29,3 +29,4 @@
 -dontwarn com.dabomstew.pkrandom.gui.**
 -dontobfuscate
 -keep enum com.dabomstew.pkrandom.Settings$* {*;}
+-keep class ly.mens.rndpkmn.BuildConfig {*;}
