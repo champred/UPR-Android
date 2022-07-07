@@ -10,6 +10,7 @@ import com.dabomstew.pkrandom.romhandlers.*
 import java.io.*
 import java.lang.NumberFormatException
 import java.lang.reflect.Field
+import java.util.Random
 import java.util.ResourceBundle.getBundle
 import kotlin.properties.Delegates
 import kotlin.reflect.full.memberProperties
@@ -33,6 +34,10 @@ object RandomizerSettings : Settings() {
 		override fun write(b: Int) {
 			return
 		}
+	}
+	private val random = object : ThreadLocal<Random>() {
+		override fun initialValue() = Random()
+		fun seed(seed: Long) = get()!!.apply { setSeed(seed) }
 	}
 	//limit the number of ROMs based on amount of available memory
 	val romLimit: Int get() {
@@ -143,7 +148,7 @@ object RandomizerSettings : Settings() {
 		romFileName = Triple(file.nameWithoutExtension.substringAfter(':'), currentSeed.toString(16), file.extension).fileName
 		try {
 			romHandlerFactory = romHandlerFactories.first { it.isLoadable(file.absolutePath) }
-			romHandler = createRomHandler()
+			romHandler = createRomHandler(RandomSource.instance())
 			romName = romHandler.romName
 		} catch (e: Exception) {
 			Log.e(TAG, "${file.name} cannot be loaded.", e)
@@ -190,7 +195,7 @@ object RandomizerSettings : Settings() {
 
 	fun saveRom(file: File, seed: Long, log: OutputStream? = null): Boolean {
 		val handler = try {
-			createRomHandler()
+			createRomHandler(random.seed(seed))
 		} catch (e: Exception) {
 			Log.e(TAG, "Failed to create ROM handler.", e)
 			return false
@@ -211,7 +216,7 @@ object RandomizerSettings : Settings() {
 		}
 	}
 
-	private fun createRomHandler(): RomHandler {
+	private fun createRomHandler(random: Random): RomHandler {
 		return romHandlerFactory.create(random).apply {
 			loadRom(inputFile.absolutePath)
 			if (!isRomValid) {
@@ -222,7 +227,7 @@ object RandomizerSettings : Settings() {
 
 	fun reloadRomHandler() {
 		romHandler = try {
-			createRomHandler()
+			createRomHandler(RandomSource.instance())
 		} catch (e: Exception) {
 			Log.e(TAG, "Failed to create new ROM handler.", e)
 			romHandler

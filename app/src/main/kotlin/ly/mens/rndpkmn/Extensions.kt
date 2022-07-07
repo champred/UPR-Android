@@ -5,7 +5,6 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.text.parseAsHtml
-import com.dabomstew.pkrandom.RandomSource
 import com.dabomstew.pkrandom.Utils
 import java.io.File
 import java.lang.reflect.Field
@@ -18,16 +17,13 @@ val Triple<Any, Any, Any>.fileName get() = "$first-$second.$third"
 
 val File.isRomFile: Boolean get() {
     if (!isFile) { return false }
-    try {
+    return try {
         Utils.validateRomFile(this)
-        return true
-    }
-    catch (e: Utils.InvalidROMException) {
-        return false
+        true
+    } catch (e: Utils.InvalidROMException) {
+        false
     }
 }
-
-val random get() = RandomSource.instance()
 
 fun Context.toast(@StringRes resId: Int, vararg formatArgs: Any) =
         Toast.makeText(this, getString(resId, *formatArgs).parseAsHtml(), Toast.LENGTH_SHORT).show()
