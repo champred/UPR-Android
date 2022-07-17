@@ -373,6 +373,8 @@ public class Gen5Constants {
     public static final String pickupTableLocator = "19005C00DD00";
     public static final int numberOfPickupItems = 29;
 
+    public static final String friendshipValueForEvoLocator = "DC282FD3";
+
     public static final List<Integer> consumableHeldItems = setupAllConsumableItems();
 
     private static List<Integer> setupAllConsumableItems() {

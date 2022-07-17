@@ -4362,6 +4362,23 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     public void makeEvolutionsEasier(Settings settings) {
         boolean wildsRandomized = !settings.getWildPokemonMod().equals(Settings.WildPokemonMod.UNCHANGED);
 
+        // Reduce the amount of happiness required to evolve.
+        int offset = find(arm9, Gen4Constants.friendshipValueForEvoLocator);
+        if (offset > 0) {
+            // Amount of required happiness for HAPPINESS evolutions.
+            if (arm9[offset] == (byte)220) {
+                arm9[offset] = (byte)160;
+            }
+            // Amount of required happiness for HAPPINESS_DAY evolutions.
+            if (arm9[offset + 22] == (byte)220) {
+                arm9[offset + 22] = (byte)160;
+            }
+            // Amount of required happiness for HAPPINESS_NIGHT evolutions.
+            if (arm9[offset + 44] == (byte)220) {
+                arm9[offset + 44] = (byte)160;
+            }
+        }
+
         if (wildsRandomized) {
             for (Pokemon pkmn : pokes) {
                 if (pkmn != null) {

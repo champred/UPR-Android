@@ -1780,6 +1780,24 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         return "Complete";
     }
 
+    private static int find(byte[] haystack, String hexString) {
+        if (hexString.length() % 2 != 0) {
+            return -3; // error
+        }
+        byte[] searchFor = new byte[hexString.length() / 2];
+        for (int i = 0; i < searchFor.length; i++) {
+            searchFor[i] = (byte) Integer.parseInt(hexString.substring(i * 2, i * 2 + 2), 16);
+        }
+        List<Integer> found = RomFunctions.search(haystack, searchFor);
+        if (found.size() == 0) {
+            return -1; // not found
+        } else if (found.size() > 1) {
+            return -2; // not unique
+        } else {
+            return found.get(0);
+        }
+    }
+
     @Override
     public boolean hasTimeBasedEncounters() {
         return true; // All GSC do
@@ -1888,7 +1906,18 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
 
     @Override
     public void makeEvolutionsEasier(Settings settings) {
-        // No such thing
+        // Reduce the amount of happiness required to evolve.
+        int offset = find(rom, Gen2Constants.friendshipValueForEvoLocator);
+        if (offset > 0) {
+            // The thing we're looking at is actually one byte before what we
+            // want to change; this makes it work in both G/S and Crystal.
+            offset++;
+
+            // Amount of required happiness for all happiness evolutions.
+            if (rom[offset] == (byte)220) {
+                rom[offset] = (byte)160;
+            }
+        }
     }
 
     @Override

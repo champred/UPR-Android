@@ -28,6 +28,7 @@ package com.dabomstew.pkrandom.newgui;
 import com.dabomstew.pkrandom.*;
 import com.dabomstew.pkrandom.cli.CliRandomizer;
 import com.dabomstew.pkrandom.constants.GlobalConstants;
+import com.dabomstew.pkrandom.exceptions.CannotWriteToLocationException;
 import com.dabomstew.pkrandom.exceptions.EncryptedROMException;
 import com.dabomstew.pkrandom.exceptions.InvalidSupplementFilesException;
 import com.dabomstew.pkrandom.exceptions.RandomizationException;
@@ -704,6 +705,11 @@ public class NewRandomizerGUI {
                 } catch (RandomizationException ex) {
                     attemptToLogException(ex, "GUI.saveFailedMessage",
                             "GUI.saveFailedMessageNoLog", true, settings.toString(), Long.toString(seed));
+                    if (verboseLog != null) {
+                        verboseLog.close();
+                    }
+                } catch (CannotWriteToLocationException ex) {
+                    JOptionPane.showMessageDialog(mainPanel, String.format(bundle.getString("GUI.cannotWriteToLocation"), filename));
                     if (verboseLog != null) {
                         verboseLog.close();
                     }
@@ -3071,7 +3077,7 @@ public class NewRandomizerGUI {
             tpHighestLevelGetsItemCheckBox.setEnabled(false);
         }
 
-        if (!spUnchangedRadioButton.isSelected() || !isTrainerSetting(TRAINER_UNCHANGED)) {
+        if (!peRandomEveryLevelRadioButton.isSelected() && (!spUnchangedRadioButton.isSelected() || !isTrainerSetting(TRAINER_UNCHANGED))) {
             tpRivalCarriesStarterCheckBox.setEnabled(true);
         } else {
             tpRivalCarriesStarterCheckBox.setEnabled(false);

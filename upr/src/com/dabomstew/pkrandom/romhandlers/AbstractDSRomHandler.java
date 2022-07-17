@@ -33,6 +33,7 @@ import java.util.Random;
 
 import com.dabomstew.pkrandom.FileFunctions;
 import com.dabomstew.pkrandom.RomFunctions;
+import com.dabomstew.pkrandom.exceptions.CannotWriteToLocationException;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
 import com.dabomstew.pkrandom.newnds.NARCArchive;
 import com.dabomstew.pkrandom.newnds.NDSRom;
@@ -90,7 +91,11 @@ public abstract class AbstractDSRomHandler extends AbstractRomHandler {
         try {
             baseRom.saveTo(filename);
         } catch (IOException e) {
-            throw new RandomizerIOException(e);
+            if (e.getMessage().contains("Access is denied")) {
+                throw new CannotWriteToLocationException("The randomizer cannot write to this location: " + filename);
+            } else {
+                throw new RandomizerIOException(e);
+            }
         }
         return true;
     }

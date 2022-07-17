@@ -162,6 +162,8 @@ public class Gen3Constants {
 
     public static final String eNatDexScriptPart2 = "3229610825F00129E40825F30116CD40010003";
 
+    public static final String friendshipValueForEvoLocator = "DB2900D8";
+
     public static final int unhackedMaxPokedex = 411, unhackedRealPokedex = 386, hoennPokesStart = 252;
 
     public static final int evolutionMethodCount = 15;

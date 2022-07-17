@@ -64,7 +64,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     public AbstractRomHandler(Random random, PrintStream logStream) {
         this.random = random;
         this.cosmeticRandom = RandomSource.cosmeticInstance();
-        this.fullyEvolvedRandomSeed = random.nextInt(GlobalConstants.LARGEST_NUMBER_OF_SPLIT_EVOS);
+        this.fullyEvolvedRandomSeed = -1;
         this.logStream = logStream;
     }
 
@@ -6698,6 +6698,11 @@ public abstract class AbstractRomHandler implements RomHandler {
     }
 
     private Pokemon fullyEvolve(Pokemon pokemon, int trainerIndex) {
+        // If the fullyEvolvedRandomSeed hasn't been set yet, set it here.
+        if (this.fullyEvolvedRandomSeed == -1) {
+            this.fullyEvolvedRandomSeed = random.nextInt(GlobalConstants.LARGEST_NUMBER_OF_SPLIT_EVOS);
+        }
+
         Set<Pokemon> seenMons = new HashSet<>();
         seenMons.add(pokemon);
 

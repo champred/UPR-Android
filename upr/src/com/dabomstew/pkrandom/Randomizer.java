@@ -245,6 +245,9 @@ public class Randomizer {
 
         if (settings.isMakeEvolutionsEasier()) {
             log.println("--Making Evolutions Easier--");
+            if (!(romHandler instanceof Gen1RomHandler)) {
+                log.println("Friendship evolutions now take 160 happiness (was 220).");
+            }
             logUpdatedEvolutions(log, romHandler.getEasierEvoUpdates(), null);
         }
 
@@ -759,14 +762,25 @@ public class Randomizer {
 
             StringBuilder sb = new StringBuilder();
 
-            sb.append(String.format("%03d %s", i, pkmn.fullName()))
-                    .append(evoStr).append(System.getProperty("line.separator"))
-                    .append(String.format("HP  %-3d", pkmn.hp)).append(System.getProperty("line.separator"))
-                    .append(String.format("ATK %-3d", pkmn.attack)).append(System.getProperty("line.separator"))
-                    .append(String.format("DEF %-3d", pkmn.defense)).append(System.getProperty("line.separator"))
-                    .append(String.format("SPA %-3d", pkmn.spatk)).append(System.getProperty("line.separator"))
-                    .append(String.format("SPD %-3d", pkmn.spdef)).append(System.getProperty("line.separator"))
-                    .append(String.format("SPE %-3d", pkmn.speed)).append(System.getProperty("line.separator"));
+            if (romHandler instanceof Gen1RomHandler) {
+                sb.append(String.format("%03d %s", i, pkmn.fullName()))
+                        .append(evoStr).append(System.getProperty("line.separator"))
+                        .append(String.format("HP   %-3d", pkmn.hp)).append(System.getProperty("line.separator"))
+                        .append(String.format("ATK  %-3d", pkmn.attack)).append(System.getProperty("line.separator"))
+                        .append(String.format("DEF  %-3d", pkmn.defense)).append(System.getProperty("line.separator"))
+                        .append(String.format("SPEC %-3d", pkmn.special)).append(System.getProperty("line.separator"))
+                        .append(String.format("SPE  %-3d", pkmn.speed)).append(System.getProperty("line.separator"));
+            } else {
+                sb.append(String.format("%03d %s", i, pkmn.fullName()))
+                        .append(evoStr).append(System.getProperty("line.separator"))
+                        .append(String.format("HP  %-3d", pkmn.hp)).append(System.getProperty("line.separator"))
+                        .append(String.format("ATK %-3d", pkmn.attack)).append(System.getProperty("line.separator"))
+                        .append(String.format("DEF %-3d", pkmn.defense)).append(System.getProperty("line.separator"))
+                        .append(String.format("SPA %-3d", pkmn.spatk)).append(System.getProperty("line.separator"))
+                        .append(String.format("SPD %-3d", pkmn.spdef)).append(System.getProperty("line.separator"))
+                        .append(String.format("SPE %-3d", pkmn.speed)).append(System.getProperty("line.separator"));
+            }
+
             i++;
 
             List<MoveLearnt> data = moveData.get(pkmn.number);

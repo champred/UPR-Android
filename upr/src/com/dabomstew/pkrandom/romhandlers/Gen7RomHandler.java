@@ -2752,6 +2752,23 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     public void makeEvolutionsEasier(Settings settings) {
         boolean wildsRandomized = !settings.getWildPokemonMod().equals(Settings.WildPokemonMod.UNCHANGED);
 
+        // Reduce the amount of happiness required to evolve.
+        int offset = find(code, Gen7Constants.friendshipValueForEvoLocator);
+        if (offset > 0) {
+            // Amount of required happiness for HAPPINESS evolutions.
+            if (code[offset] == (byte)220) {
+                code[offset] = (byte)160;
+            }
+            // Amount of required happiness for HAPPINESS_DAY evolutions.
+            if (code[offset + 12] == (byte)220) {
+                code[offset + 12] = (byte)160;
+            }
+            // Amount of required happiness for HAPPINESS_NIGHT evolutions.
+            if (code[offset + 36] == (byte)220) {
+                code[offset + 36] = (byte)160;
+            }
+        }
+
         for (Pokemon pkmn : pokes) {
             if (pkmn != null) {
                 Evolution extraEntry = null;

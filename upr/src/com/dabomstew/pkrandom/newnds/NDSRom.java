@@ -9,6 +9,7 @@ import com.dabomstew.pkrandom.SysConstants;
 import com.dabomstew.pkrandom.FileFunctions;
 import com.dabomstew.pkrandom.RomFunctions;
 
+import com.dabomstew.pkrandom.exceptions.CannotWriteToLocationException;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
 import cuecompressors.BLZCoder;
 
@@ -64,15 +65,15 @@ public class NDSRom {
         this.baseRom = new RandomAccessFile(filename, "r");
         this.romOpen = true;
         // TMP folder?
-        String dataFolder = UUID.randomUUID().toString();
-        File tmpFolder = new File(SysConstants.ROOT_PATH, dataFolder);
-        if (tmpFolder.mkdir() && tmpFolder.canWrite()) {
-            writingEnabled = true;
-            this.tmpFolder = SysConstants.ROOT_PATH + dataFolder + File.separator;
-            tmpFolder.deleteOnExit();
-        } else {
+//        String dataFolder = UUID.randomUUID().toString();
+//        File tmpFolder = new File(SysConstants.ROOT_PATH, dataFolder);
+//        if (tmpFolder.mkdir() && tmpFolder.canWrite()) {
+//            writingEnabled = true;
+//            this.tmpFolder = SysConstants.ROOT_PATH + dataFolder + File.separator;
+//            tmpFolder.deleteOnExit();
+//        } else {
             writingEnabled = false;
-        }
+//        }
         readFileSystem();
         arm9_open = false;
         arm9_changed = false;
@@ -225,7 +226,7 @@ public class NDSRom {
     public void saveTo(String filename) throws IOException {
         this.reopenROM();
 
-        // Initialise new ROM
+        // Initialize new ROM
         RandomAccessFile fNew = new RandomAccessFile(filename, "rw");
 
         int headersize = readFromFile(this.baseRom, 0x84, 4);

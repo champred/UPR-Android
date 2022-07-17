@@ -768,6 +768,8 @@ public class Gen4Constants {
     public static final String pickupTableLocator = "110012001A000300", rarePickupTableLocator = "19005C00DD00";
     public static final int numberOfCommonPickupItems = 18, numberOfRarePickupItems = 11;
 
+    public static final String friendshipValueForEvoLocator = "DC286AD3";
+
     public static final int[] dpptOverworldDexMaps = new int[] {
             1,  2,  3,  4,  5, -1, -1,  6, -1,  7, // 0-9 (cities, pkmn league, wind/ironworks)
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 10-19 (all mt coronet)

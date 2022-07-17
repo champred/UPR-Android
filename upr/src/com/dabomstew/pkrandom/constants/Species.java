@@ -692,7 +692,7 @@ public class Species {
     public static final int vivillon = 666;
     public static final int litleo = 667;
     public static final int pyroar = 668;
-    public static final int flabebe = 669;
+    public static final int flabébé = 669;
     public static final int floette = 670;
     public static final int florges = 671;
     public static final int skiddo = 672;

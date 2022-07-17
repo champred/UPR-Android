@@ -27,6 +27,7 @@ package com.dabomstew.pkrandom.romhandlers;
 import com.dabomstew.pkrandom.FileFunctions;
 import com.dabomstew.pkrandom.ctr.GARCArchive;
 import com.dabomstew.pkrandom.ctr.NCCH;
+import com.dabomstew.pkrandom.exceptions.CannotWriteToLocationException;
 import com.dabomstew.pkrandom.exceptions.EncryptedROMException;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
 import com.dabomstew.pkrandom.pokemon.Type;
@@ -88,7 +89,11 @@ public abstract class Abstract3DSRomHandler extends AbstractRomHandler {
             savingROM();
             baseRom.saveAsNCCH(filename, getGameAcronym(), seed);
         } catch (IOException | NoSuchAlgorithmException e) {
-            throw new RandomizerIOException(e);
+            if (e.getMessage().contains("Access is denied")) {
+                throw new CannotWriteToLocationException("The randomizer cannot write to this location: " + filename);
+            } else {
+                throw new RandomizerIOException(e);
+            }
         }
         return true;
     }

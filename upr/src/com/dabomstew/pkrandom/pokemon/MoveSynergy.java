@@ -947,8 +947,6 @@ public class MoveSynergy {
                 synergisticMoves.add(Moves.swallow);
                 break;
             case Moves.spitUp:
-                synergisticMoves.add(Moves.stockpile);
-                break;
             case Moves.swallow:
                 synergisticMoves.add(Moves.stockpile);
                 break;
@@ -979,6 +977,8 @@ public class MoveSynergy {
                         .collect(Collectors.toList()));
                 break;
             case Moves.focusPunch:
+            case Moves.dreamEater:
+            case Moves.nightmare:
                 synergisticMoves.addAll(moveList
                         .stream()
                         .filter(mv -> mv.statusMoveType == StatusMoveType.NO_DAMAGE &&
@@ -1000,15 +1000,6 @@ public class MoveSynergy {
                         .map(mv -> mv.number)
                         .collect(Collectors.toList()));
                 synergisticMoves.add(Moves.banefulBunker);
-                break;
-            case Moves.dreamEater:
-            case Moves.nightmare:
-                synergisticMoves.addAll(moveList
-                        .stream()
-                        .filter(mv -> mv.statusMoveType == StatusMoveType.NO_DAMAGE &&
-                                mv.statusType == StatusType.SLEEP)
-                        .map(mv -> mv.number)
-                        .collect(Collectors.toList()));
                 break;
             case Moves.storedPower:
                 synergisticMoves.addAll(moveList
@@ -1125,6 +1116,13 @@ public class MoveSynergy {
                 break;
             case Moves.frustration:
                 antiSynergisticMoves.add(Moves.returnTheMoveNotTheKeyword);
+                break;
+            case Moves.leechSeed:
+            case Moves.perishSong:
+                antiSynergisticMoves.add(Moves.whirlwind);
+                antiSynergisticMoves.add(Moves.roar);
+                antiSynergisticMoves.add(Moves.circleThrow);
+                antiSynergisticMoves.add(Moves.dragonTail);
                 break;
         }
 

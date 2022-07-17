@@ -14,3 +14,6 @@ assignees: ''
 **What problem would your contribution solve? Please describe:** 
 
 **Additional context:**
+
+<!-- Your issue will be closed unless you check this box (by putting an X between the brackets) below! -->
+**I understand that I am expected to implement this change myself in the randomizer's codebase: [ ]**

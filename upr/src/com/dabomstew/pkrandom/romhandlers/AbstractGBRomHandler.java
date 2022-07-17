@@ -35,6 +35,7 @@ import java.nio.file.Paths;
 import java.util.Random;
 
 import com.dabomstew.pkrandom.FileFunctions;
+import com.dabomstew.pkrandom.exceptions.CannotWriteToLocationException;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
 
 public abstract class AbstractGBRomHandler extends AbstractRomHandler {
@@ -75,6 +76,9 @@ public abstract class AbstractGBRomHandler extends AbstractRomHandler {
             fos.close();
             return true;
         } catch (IOException ex) {
+            if (ex.getMessage().contains("Access is denied")) {
+                throw new CannotWriteToLocationException("The randomizer cannot write to this location: " + filename);
+            }
             return false;
         }
     }
