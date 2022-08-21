@@ -104,6 +104,7 @@ fun RandomizerAppBar(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavCon
 
 @Composable
 fun RandomizerDrawer(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavController) {
+	val ctx = LocalContext.current
 	RandomizerDrawerItem(stringResource(R.string.title_general)) {
 		if (nav.currentDestination?.route != START_ROUTE) {
 			nav.popBackStack()
@@ -112,19 +113,33 @@ fun RandomizerDrawer(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavCon
 	}
 	SettingsCategory.values().forEach { category ->
 		RandomizerDrawerItem(stringResource(category.title)) {
-			nav.navigate(category.name) {
+			if (RandomizerSettings.handler != null) {
+				nav.navigate(category.name) {
+					popUpTo(START_ROUTE)
+					launchSingleTop = true
+				}
+				scope.launch { scaffold.drawerState.close() }
+			} else {
+				scope.launch {
+					scaffold.drawerState.close()
+					scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.rom_not_loaded))
+				}
+			}
+		}
+	}
+	RandomizerDrawerItem(stringResource(R.string.title_misc)) {
+		if (RandomizerSettings.handler != null) {
+			nav.navigate(MISC_ROUTE) {
 				popUpTo(START_ROUTE)
 				launchSingleTop = true
 			}
 			scope.launch { scaffold.drawerState.close() }
+		} else {
+			scope.launch {
+				scaffold.drawerState.close()
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.rom_not_loaded))
+			}
 		}
-	}
-	RandomizerDrawerItem(stringResource(R.string.title_misc)) {
-		nav.navigate(MISC_ROUTE) {
-			popUpTo(START_ROUTE)
-			launchSingleTop = true
-		}
-		scope.launch { scaffold.drawerState.close() }
 	}
 }
 
@@ -589,7 +604,10 @@ fun TweaksList() {
 		item {
 			Text(stringResource(R.string.title_misc), style = MaterialTheme.typography.h6)
 		}
-		items(MiscTweak.allTweaks) { tweak ->
+		items(MiscTweak.allTweaks.filter {
+			val available = RandomizerSettings.handler?.miscTweaksAvailable()
+			available != null && available and it.value != 0
+		}) { tweak ->
 			var checked by rememberSaveable { mutableStateOf(RandomizerSettings.currentMiscTweaks and tweak.value == tweak.value) }
 			Row(verticalAlignment = Alignment.CenterVertically) {
 				Checkbox(checked, {
@@ -608,7 +626,9 @@ fun TweaksList() {
 fun SettingsList(category: SettingsCategory) {
 	val ctx = LocalContext.current
 	LazyColumn {
-		category.prefixes.forEach { prefix ->
+		category.prefixes.filter { p ->
+			RandomizerSettings.handler?.let { p.isSupported(it) } ?: false
+		}.forEach { prefix ->
 			item {
 				Text(stringResource(prefix.title), style = MaterialTheme.typography.h6)
 			}
@@ -619,10 +639,12 @@ fun SettingsList(category: SettingsCategory) {
 				Divider()
 			}
 			items(prefix.props.toList()) { (label, field) ->
-				field.SettingsComponent(prefix.strings[label] ?: label) {
-					val id = ctx.resources.getIdentifier(label.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
-					if (id != 0) {
-						ctx.toast(id)
+				if (RandomizerSettings.currentGen in (RandomizerSettings.generations[field] ?: 1..7)) {
+					field.SettingsComponent(prefix.strings[label] ?: label) {
+						val id = ctx.resources.getIdentifier(label.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
+						if (id != 0) {
+							ctx.toast(id)
+						}
 					}
 				}
 			}

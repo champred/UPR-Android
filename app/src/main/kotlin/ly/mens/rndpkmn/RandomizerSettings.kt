@@ -27,6 +27,7 @@ object RandomizerSettings : Settings() {
 	)
 	private lateinit var romHandlerFactory: RomHandler.Factory
 	private lateinit var romHandler: RomHandler
+	val handler: RomHandler? get() = if (::romHandler.isInitialized) romHandler else null
 	private lateinit var inputFile: File
 	//allocate enough space to accommodate large logs
 	val outputLog = ByteArrayOutputStream(1024 * 1024)
@@ -45,8 +46,8 @@ object RandomizerSettings : Settings() {
 		val mem = rt.maxMemory() - (rt.totalMemory() - rt.freeMemory())
 		return (mem / inputFile.length() / 3L).toInt().coerceAtLeast(1)
 	}
-	val currentGen: Int get() = if (this::romHandler.isInitialized) romHandler.generationOfPokemon() else 1
-	val isValid: Boolean get() = if (this::romHandler.isInitialized) romHandler.isRomValid else false
+	val currentGen: Int get() = if (::romHandler.isInitialized) romHandler.generationOfPokemon() else 1
+	val isValid: Boolean get() = if (::romHandler.isInitialized) romHandler.isRomValid else false
 	var currentStarters: Triple<Pokemon?, Pokemon?, Pokemon?> = Triple(null, null, null)
 		set(value) {
 			val (first, second, third) = value
@@ -61,48 +62,15 @@ object RandomizerSettings : Settings() {
 	var currentSeed by Delegates.notNull<Long>()
 	lateinit var romFileName: String
 	val versionString: String get() = "$VERSION$this"
-	val limits: Map<Field?, ClosedFloatingPointRange<Float>> = mapOf(
-			this::staticLevelModifier.javaField to -50f..50f,
-			this::guaranteedMoveCount.javaField to 2f..4f,
-			this::movesetsGoodDamagingPercent.javaField to 0f..100f,
-			this::trainersForceFullyEvolvedLevel.javaField to 30f..65f,
-			this::trainersLevelModifier.javaField to -50f..50f,
-			this::totemLevelModifier.javaField to -50f..50f,
-			this::minimumCatchRateLevel.javaField to 1f..4f,
-			this::wildLevelModifier.javaField to -50f..50f,
-			this::tmsGoodDamagingPercent.javaField to 0f..100f,
-			this::tutorsGoodDamagingPercent.javaField to 0f..100f,
-			this::additionalBossTrainerPokemon.javaField to 0f..5f,
-			this::additionalImportantTrainerPokemon.javaField to 0f..5f,
-			this::additionalRegularTrainerPokemon.javaField to 0f..5f,
-			this::eliteFourUniquePokemonNumber.javaField to 0f..2f,
-	)
-	val toggles: Map<Field?, Field?> = mapOf(
-			this::staticLevelModifier.javaField to this::staticLevelModified.javaField,
-			this::guaranteedMoveCount.javaField to this::startWithGuaranteedMoves.javaField,
-			this::movesetsGoodDamagingPercent.javaField to this::movesetsForceGoodDamaging.javaField,
-			this::trainersForceFullyEvolvedLevel.javaField to this::trainersForceFullyEvolved.javaField,
-			this::trainersLevelModifier.javaField to this::trainersLevelModified.javaField,
-			this::totemLevelModifier.javaField to this::totemLevelsModified.javaField,
-			this::minimumCatchRateLevel.javaField to this::useMinimumCatchRate.javaField,
-			this::wildLevelModifier.javaField to this::wildLevelsModified.javaField,
-			this::tmsGoodDamagingPercent.javaField to this::tmsForceGoodDamaging.javaField,
-			this::tutorsGoodDamagingPercent.javaField to this::tutorsForceGoodDamaging.javaField,
-			this::additionalBossTrainerPokemon.javaField to null,
-			this::additionalImportantTrainerPokemon.javaField to null,
-			this::additionalRegularTrainerPokemon.javaField to null,
-			this::eliteFourUniquePokemonNumber.javaField to null,
-			this::updateBaseStats.javaField to this::updateBaseStatsToGeneration.javaField,
-			this::standardizeEXPCurves.javaField to this::selectedEXPCurve.javaField,
-			this::updateMoves.javaField to this::updateMovesToGeneration.javaField,
-	)
 	val selections: MutableMap<Field?, List<Any>> = mutableMapOf()
 	val nameLists: List<Pair<String, MutableList<String>>>
 
 	private const val TAG = "Settings"
 
 	init {
-		this::class.memberProperties.forEach { prop ->
+		this::class.memberProperties.filterNot {
+			"MegaEvo" in it.name || "AltForme" in it.name
+		}.forEach { prop ->
 			val fld = prop.javaField
 			if (fld != null) {
 				val type = fld.type
@@ -168,7 +136,7 @@ object RandomizerSettings : Settings() {
 		for (i in baseStatGenerationNumbers.indices) {
 			baseStatGenerationNumbers[i] = j++
 		}
-		selections[this::updateBaseStats.javaField] = baseStatGenerationNumbers.filterNotNull()
+		selections[::updateBaseStats.javaField] = baseStatGenerationNumbers.filterNotNull()
 
 		val moveGenerationNumbers = arrayOfNulls<Int>(GlobalConstants.HIGHEST_POKEMON_GEN - currentGen)
 		j = currentGen + 1
@@ -176,14 +144,14 @@ object RandomizerSettings : Settings() {
 		for (i in moveGenerationNumbers.indices) {
 			moveGenerationNumbers[i] = j++
 		}
-		selections[this::updateMoves.javaField] = moveGenerationNumbers.filterNotNull()
+		selections[::updateMoves.javaField] = moveGenerationNumbers.filterNotNull()
 
 		val expCurves = if (currentGen < 3) {
 			arrayOf(ExpCurve.MEDIUM_FAST, ExpCurve.MEDIUM_SLOW, ExpCurve.FAST, ExpCurve.SLOW)
 		} else {
 			arrayOf(ExpCurve.MEDIUM_FAST, ExpCurve.MEDIUM_SLOW, ExpCurve.FAST, ExpCurve.SLOW, ExpCurve.ERRATIC, ExpCurve.FLUCTUATING)
 		}
-		selections[this::standardizeEXPCurves.javaField] = expCurves.toList()
+		selections[::standardizeEXPCurves.javaField] = expCurves.toList()
 
 		return true
 	}
@@ -279,4 +247,67 @@ object RandomizerSettings : Settings() {
 			false
 		}
 	}
+
+	val limits: Map<Field?, ClosedFloatingPointRange<Float>> = mapOf(
+			::staticLevelModifier.javaField to -50f..50f,
+			::guaranteedMoveCount.javaField to 2f..4f,
+			::movesetsGoodDamagingPercent.javaField to 0f..100f,
+			::trainersForceFullyEvolvedLevel.javaField to 30f..65f,
+			::trainersLevelModifier.javaField to -50f..50f,
+			::totemLevelModifier.javaField to -50f..50f,
+			::minimumCatchRateLevel.javaField to 1f..4f,
+			::wildLevelModifier.javaField to -50f..50f,
+			::tmsGoodDamagingPercent.javaField to 0f..100f,
+			::tutorsGoodDamagingPercent.javaField to 0f..100f,
+			::additionalBossTrainerPokemon.javaField to 0f..5f,
+			::additionalImportantTrainerPokemon.javaField to 0f..5f,
+			::additionalRegularTrainerPokemon.javaField to 0f..5f,
+			::eliteFourUniquePokemonNumber.javaField to 0f..2f,
+	)
+	val toggles: Map<Field?, Field?> = mapOf(
+			::staticLevelModifier.javaField to ::staticLevelModified.javaField,
+			::guaranteedMoveCount.javaField to ::startWithGuaranteedMoves.javaField,
+			::movesetsGoodDamagingPercent.javaField to ::movesetsForceGoodDamaging.javaField,
+			::trainersForceFullyEvolvedLevel.javaField to ::trainersForceFullyEvolved.javaField,
+			::trainersLevelModifier.javaField to ::trainersLevelModified.javaField,
+			::totemLevelModifier.javaField to ::totemLevelsModified.javaField,
+			::minimumCatchRateLevel.javaField to ::useMinimumCatchRate.javaField,
+			::wildLevelModifier.javaField to ::wildLevelsModified.javaField,
+			::tmsGoodDamagingPercent.javaField to ::tmsForceGoodDamaging.javaField,
+			::tutorsGoodDamagingPercent.javaField to ::tutorsForceGoodDamaging.javaField,
+			::additionalBossTrainerPokemon.javaField to null,
+			::additionalImportantTrainerPokemon.javaField to null,
+			::additionalRegularTrainerPokemon.javaField to null,
+			::eliteFourUniquePokemonNumber.javaField to null,
+			::updateBaseStats.javaField to ::updateBaseStatsToGeneration.javaField,
+			::standardizeEXPCurves.javaField to ::selectedEXPCurve.javaField,
+			::updateMoves.javaField to ::updateMovesToGeneration.javaField,
+	)
+	val generations: Map<Field?, IntRange> = mapOf(
+			::randomizeStartersHeldItems.javaField to 2..3,
+			::banBadRandomStarterHeldItems.javaField to 2..3,
+			::randomizeInGameTradesOTs.javaField to 2..7,
+			::randomizeInGameTradesIVs.javaField to 2..7,
+			::randomizeInGameTradesItems.javaField to 2..7,
+			::evolutionMovesForAll.javaField to 7..7,
+			::doubleBattleMode.javaField to 3..7,
+			::additionalRegularTrainerPokemon.javaField to 3..7,
+			::additionalImportantTrainerPokemon.javaField to 3..7,
+			::additionalBossTrainerPokemon.javaField to 3..7,
+			::randomizeHeldItemsForRegularTrainerPokemon.javaField to 3..7,
+			::randomizeHeldItemsForImportantTrainerPokemon.javaField to 3..7,
+			::randomizeHeldItemsForBossTrainerPokemon.javaField to 3..7,
+			::consumableItemsOnlyForTrainerPokemon.javaField to 3..7,
+			::sensibleItemsOnlyForTrainerPokemon.javaField to 3..7,
+			::highestLevelOnlyGetsItemsForTrainerPokemon.javaField to 3..7,
+			::eliteFourUniquePokemonNumber.javaField to 3..7,
+			::trainersBlockEarlyWonderGuard.javaField to 3..7,
+			::shinyChance.javaField to 7..7,
+			::betterTrainerMovesets.javaField to 3..7,
+			::randomizeWildPokemonHeldItems.javaField to 2..7,
+			::banBadRandomWildPokemonHeldItems.javaField to 2..7,
+			::balanceShakingGrass.javaField to 5..5,
+			::fullHMCompat.javaField to 1..6,
+			::randomizeMoveCategory.javaField to 4..7,
+	)
 }
