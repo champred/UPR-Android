@@ -9,6 +9,7 @@
     <string name="action_random_seed">Random Seed</string>
     <string name="action_batch_random">Batch Randomize</string>
     <string name="action_choose_dir">Choose Directory</string>
+    <string name="action_choose_state">Choose Savestate</string>
 
     <string name="rom_loaded">ROM Loaded</string>
     <string name="rom_not_loaded">ROM Not Loaded</string>

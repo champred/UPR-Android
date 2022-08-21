@@ -16,8 +16,7 @@ val Enum<*>.id get() = name.split("_").joinToString("") {
 val Triple<Any, Any, Any>.fileName get() = "$first-$second.$third"
 
 val File.isRomFile: Boolean get() {
-    if (!isFile) { return false }
-    return try {
+    return isFile && try {
         Utils.validateRomFile(this)
         true
     } catch (e: Utils.InvalidROMException) {
@@ -31,8 +30,8 @@ fun Context.toast(text: String) =
         Toast.makeText(this, text.parseAsHtml(), Toast.LENGTH_LONG).show()
 
 fun Context.loadFromUri(uri: Uri, file: File) {
-    //copy selected file to app directory if it doesn't exist
-    if (!file.isRomFile) {
+    //copy selected file to app directory
+    if (!file.exists()) {
         openFileOutput(file.name, Context.MODE_PRIVATE).use {
             val source = contentResolver.openInputStream(uri)
             if (source != null) {
@@ -51,7 +50,5 @@ fun Context.saveToUri(uri: Uri, file: File) {
             source.copyTo(it)
         }
         source.close()
-        //clean up temporary file
-        deleteFile(file.name)
     }
 }

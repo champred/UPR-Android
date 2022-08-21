@@ -162,7 +162,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		scope.launch(Dispatchers.IO) {
 			showProgress = true
 			ctx.loadFromUri(uri, file)
-			if (RandomizerSettings.loadRom(file)) {
+			if (file.isRomFile && RandomizerSettings.loadRom(file)) {
 				romFileName.value = RandomizerSettings.romFileName
 				romSaved = false
 				if (!RandomizerSettings.isValid) {
@@ -187,6 +187,8 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 				return@launch
 			}
 			ctx.saveToUri(uri, file)
+			//clean up temporary file
+			ctx.deleteFile(file.name)
 			RandomizerSettings.reloadRomHandler()
 			romSaved = true
 			showProgress = false
@@ -247,6 +249,7 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 	var start by rememberSaveable { mutableStateOf(1) }
 	var end by rememberSaveable { mutableStateOf(10) }
 	var saveLog by rememberSaveable { mutableStateOf(false) }
+	var stateName by rememberSaveable { mutableStateOf<String?>(null) }
 
 	val keyCon = LocalSoftwareKeyboardController.current
 	val (first, second) = remember { FocusRequester.createRefs() }
@@ -264,6 +267,19 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 		openDialog.value = false
 		if (start >= end || uri == null) return@rememberLauncherForActivityResult
 		val dir = DocumentFile.fromTreeUri(ctx, uri)!!
+
+		//copy the savestate if selected
+		if (stateName != null) {
+			scope.launch(Dispatchers.IO) {
+				val stateFile = File(ctx.filesDir, stateName!!)
+				for (i in start..end) {
+					val copyName = Triple(prefix, i.toString().padStart(4, '0'), stateName!!.substringAfter('.')).fileName
+					val copyUri = dir.createFile("application/octet-stream", copyName)?.uri ?: return@launch
+					ctx.saveToUri(copyUri, stateFile)
+				}
+			}
+		}
+
 		//determine how many ROMs we can make at a time
 		val len = end - start + 1; val count = AtomicInteger(start)
 		val numHandlers = len.coerceAtMost(RandomizerSettings.romLimit)
@@ -287,6 +303,8 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 			val logUri = log?.let { dir.createFile("text/plain", "${file.name}.log.txt")?.uri }
 			if (!RandomizerSettings.saveRom(file, pickSeed(), log)) return
 			ctx.saveToUri(fileUri, file)
+			//clean up temporary file
+			ctx.deleteFile(file.name)
 			if (logUri != null) {
 				ctx.contentResolver.openOutputStream(logUri).use {
 					if (it != null) {
@@ -318,6 +336,15 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 			//once the last ROM has been saved we will have one more permit than the ending ROM number
 			lock.acquireUninterruptibly(end + 1)
 			manager.cancel(CHANNEL_ID)
+		}
+	}
+	val stateLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+		keyCon?.hide()
+		if (uri == null) return@rememberLauncherForActivityResult
+		stateName = DocumentFile.fromSingleUri(ctx, uri)!!.name ?: uri.lastPathSegment!!
+		val file = File(ctx.filesDir, stateName)
+		scope.launch(Dispatchers.IO) {
+			ctx.loadFromUri(uri, file)
 		}
 	}
 
@@ -354,6 +381,10 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 			Row(verticalAlignment = Alignment.CenterVertically) {
 				Checkbox(saveLog, { saveLog = it })
 				Text(stringResource(R.string.action_save_log))
+			}
+			Row(verticalAlignment = Alignment.CenterVertically) {
+				Button({ stateLauncher.launch("*/*") }) { Text(stringResource(R.string.action_choose_state)) }
+				stateName?.let { Text(it) }
 			}
 			Button({ batchLauncher.launch(null) }) { Text(stringResource(R.string.action_choose_dir) )}
 		}
