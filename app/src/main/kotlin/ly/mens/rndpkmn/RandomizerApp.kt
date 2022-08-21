@@ -619,7 +619,7 @@ fun SettingsList(category: SettingsCategory) {
 				Divider()
 			}
 			items(prefix.props.toList()) { (label, field) ->
-				field.SettingsComponent(prefix.strings[label]!!) {
+				field.SettingsComponent(prefix.strings[label] ?: label) {
 					val id = ctx.resources.getIdentifier(label.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
 					if (id != 0) {
 						ctx.toast(id)
@@ -641,7 +641,7 @@ fun SettingsGroup(prefix: SettingsPrefix, subtitle: String, group: MutableMap<St
 		val selectedIndex = rememberSaveable { mutableStateOf(groupEnum.ordinal) }
 		val ctx = LocalContext.current
 		group.keys.forEachIndexed { index, label ->
-			groupField.SettingsComponent(prefix.strings[label]!!, index, selectedIndex) {
+			groupField.SettingsComponent(prefix.strings[label] ?: label, index, selectedIndex) {
 				val id = ctx.resources.getIdentifier(label.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
 				if (id != 0) {
 					ctx.toast(id)

@@ -24,10 +24,17 @@ val File.isRomFile: Boolean get() {
     }
 }
 
-fun Context.toast(@StringRes resId: Int, vararg formatArgs: Any) =
-        Toast.makeText(this, getString(resId, *formatArgs).parseAsHtml(), Toast.LENGTH_SHORT).show()
-fun Context.toast(text: String) =
-        Toast.makeText(this, text.parseAsHtml(), Toast.LENGTH_LONG).show()
+fun Context.toast(@StringRes resId: Int, vararg formatArgs: Any, length: Int = Toast.LENGTH_LONG) {
+    val text = if (formatArgs.isNotEmpty()) {
+        getString(resId, *formatArgs)
+    } else {
+        getString(resId)
+    }
+    toast(text, length)
+}
+fun Context.toast(text: String, length: Int = Toast.LENGTH_LONG) {
+    Toast.makeText(this, text.parseAsHtml(), length).show()
+}
 
 fun Context.loadFromUri(uri: Uri, file: File) {
     //copy selected file to app directory
