@@ -283,12 +283,16 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 		if (start >= end || uri == null) return@rememberLauncherForActivityResult
 		val dir = DocumentFile.fromTreeUri(ctx, uri)!!
 
-		//copy the savestate if selected
+		//copy the save state if selected
 		if (stateName != null) {
 			scope.launch(Dispatchers.IO) {
 				val stateFile = File(ctx.filesDir, stateName!!)
 				for (i in start..end) {
-					val copyName = Triple(prefix, i.toString().padStart(4, '0'), stateName!!.substringAfter('.')).fileName
+					val copyName = Triple(
+							prefix,
+							i.toString().padStart(4, '0'),
+							stateName!!.substringAfter('.')
+					).fileName
 					val copyUri = dir.createFile("application/octet-stream", copyName)?.uri ?: return@launch
 					ctx.saveToUri(copyUri, stateFile)
 				}
@@ -312,7 +316,11 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 				last = current
 				lock.release(current)
 			}
-			val file = File(ctx.filesDir, Triple(prefix, count.getAndIncrement().toString().padStart(4, '0'), name.substringAfterLast('.')).fileName)
+			val file = File(ctx.filesDir, Triple(
+					prefix,
+					count.getAndIncrement().toString().padStart(4, '0'),
+					name.substringAfterLast('.')
+			).fileName)
 			val fileUri = dir.createFile("application/octet-stream", file.name)?.uri ?: return
 			val log = if (saveLog) ByteArrayOutputStream(1024 * 1024) else null
 			val logUri = log?.let { dir.createFile("text/plain", "${file.name}.log.txt")?.uri }
@@ -357,9 +365,9 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 		keyCon?.hide()
 		if (uri == null) return@rememberLauncherForActivityResult
 		stateName = DocumentFile.fromSingleUri(ctx, uri)!!.name ?: uri.lastPathSegment!!
-		val file = File(ctx.filesDir, stateName)
+		val stateFile = File(ctx.filesDir, stateName!!)
 		scope.launch(Dispatchers.IO) {
-			ctx.loadFromUri(uri, file)
+			ctx.loadFromUri(uri, stateFile)
 		}
 	}
 
@@ -531,7 +539,13 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	var seedText by remember { mutableStateOf(RandomizerSettings.currentSeed.toString(16)) }
 	var seedBase by remember { mutableStateOf(16) }
 	val updateName: ()->Unit = {
-		val name = RandomizerSettings.romFileName.let { Triple(it.substringBeforeLast('-'), seedText, it.substringAfterLast('.')).fileName }
+		val name = RandomizerSettings.romFileName.let {
+			Triple(
+					it.substringBeforeLast('-'),
+					seedText,
+					it.substringAfterLast('.')
+			).fileName
+		}
 		RandomizerSettings.romFileName = name
 		romFileName.value = name
 	}

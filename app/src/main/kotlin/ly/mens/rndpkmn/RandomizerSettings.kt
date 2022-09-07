@@ -113,7 +113,11 @@ object RandomizerSettings : Settings() {
 	fun loadRom(file: File): Boolean {
 		inputFile = file
 		currentSeed = RandomSource.pickSeed()
-		romFileName = Triple(file.nameWithoutExtension.substringAfter(':'), currentSeed.toString(16), file.extension).fileName
+		romFileName = Triple(
+				file.nameWithoutExtension.substringAfter(':'),
+				currentSeed.toString(16),
+				file.extension
+		).fileName
 		try {
 			romHandlerFactory = romHandlerFactories.first { it.isLoadable(file.absolutePath) }
 			romHandler = createRomHandler(RandomSource.instance())
