@@ -1,4 +1,6 @@
-package ly.mens.rndpkmn
+package ly.mens.rndpkmn.settings
+
+import ly.mens.rndpkmn.BuildConfig
 
 enum class SettingsPreset {
 	NONE {

@@ -6,6 +6,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.dabomstew.pkrandom.Utils.testForRequiredConfigs
+import ly.mens.rndpkmn.ui.CHANNEL_ID
+import ly.mens.rndpkmn.ui.RandomizerApp
 
 class MainActivity : ComponentActivity() {
 

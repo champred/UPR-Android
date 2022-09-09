@@ -1,19 +1,22 @@
-package ly.mens.rndpkmn
+package ly.mens.rndpkmn.ui
 
 import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -27,131 +30,26 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.documentfile.provider.DocumentFile
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.dabomstew.pkrandom.MiscTweak
-import com.dabomstew.pkrandom.RandomSource.pickSeed
-import com.dabomstew.pkrandom.Settings.StartersMod
-import com.dabomstew.pkrandom.SysConstants.customNamesFile
-import kotlinx.coroutines.CoroutineScope
+import com.dabomstew.pkrandom.RandomSource
+import com.dabomstew.pkrandom.SysConstants
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import ly.mens.rndpkmn.*
+import ly.mens.rndpkmn.R
+import ly.mens.rndpkmn.settings.RandomizerSettings
+import ly.mens.rndpkmn.settings.SettingsPreset
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.lang.reflect.Field
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicInteger
-
-const val START_ROUTE = "GENERAL"
-const val MISC_ROUTE = "MISC"
-const val CHANNEL_ID = 69_420
-
-@Composable
-fun RandomizerApp() {
-	MaterialTheme(
-			colors = if (isSystemInDarkTheme()) darkColors() else lightColors()
-	) {
-		val nav = rememberNavController()
-		val scaffold = rememberScaffoldState()
-		val scope = rememberCoroutineScope()
-		Scaffold(scaffoldState = scaffold, topBar = { RandomizerAppBar(scope, scaffold, nav) }, drawerContent = { RandomizerDrawer(scope, scaffold, nav) }) {
-			NavHost(nav, START_ROUTE, Modifier.padding(horizontal = 8.dp)) {
-				composable(START_ROUTE) { RandomizerHome(scaffold) }
-				SettingsCategory.values().forEach { category ->
-					composable(category.name) { SettingsList(category) }
-				}
-				composable(MISC_ROUTE) { TweaksList() }
-			}
-		}
-	}
-}
-
-@Composable
-fun RandomizerAppBar(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavController) {
-	TopAppBar({
-		var title by rememberSaveable { mutableStateOf(R.string.app_name) }
-		LaunchedEffect(nav) {
-			nav.currentBackStackEntryFlow.collect {
-				val currentRoute = it.destination.route ?: START_ROUTE
-				title = try {
-					SettingsCategory.valueOf(currentRoute).title
-				} catch (e: IllegalArgumentException) {
-					R.string.app_name
-				}
-			}
-		}
-		Text(stringResource(title))
-	},
-	navigationIcon = {
-		IconButton({
-			scope.launch { scaffold.drawerState.open() }
-		}) { Icon(Icons.Filled.Menu, null) }
-	})
-}
-
-@Composable
-fun RandomizerDrawer(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavController) {
-	val ctx = LocalContext.current
-	RandomizerDrawerItem(stringResource(R.string.title_general)) {
-		if (nav.currentDestination?.route != START_ROUTE) {
-			nav.popBackStack()
-		}
-		scope.launch { scaffold.drawerState.close() }
-	}
-	SettingsCategory.values().forEach { category ->
-		RandomizerDrawerItem(stringResource(category.title)) {
-			if (RandomizerSettings.handler != null) {
-				nav.navigate(category.name) {
-					popUpTo(START_ROUTE)
-					launchSingleTop = true
-				}
-				scope.launch { scaffold.drawerState.close() }
-			} else {
-				scope.launch {
-					scaffold.drawerState.close()
-					scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.rom_not_loaded))
-				}
-			}
-		}
-	}
-	RandomizerDrawerItem(stringResource(R.string.title_misc)) {
-		if (RandomizerSettings.handler != null) {
-			nav.navigate(MISC_ROUTE) {
-				popUpTo(START_ROUTE)
-				launchSingleTop = true
-			}
-			scope.launch { scaffold.drawerState.close() }
-		} else {
-			scope.launch {
-				scaffold.drawerState.close()
-				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.rom_not_loaded))
-			}
-		}
-	}
-}
-
-@Composable
-fun RandomizerDrawerItem(text: String, onClick: ()->Unit) {
-	Text(text, Modifier
-			.fillMaxWidth()
-			.clickable(onClick = onClick)
-			.padding(8.dp),
-			style = MaterialTheme.typography.h5
-	)
-}
 
 @Composable
 fun RandomizerHome(scaffold: ScaffoldState) {
@@ -293,19 +191,23 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 							i.toString().padStart(4, '0'),
 							stateName!!.substringAfter('.')
 					).fileName
-					val copyUri = dir.createFile("application/octet-stream", copyName)?.uri ?: return@launch
+					val copyUri = dir.createFile("application/octet-stream", copyName)?.uri
+							?: return@launch
 					ctx.saveToUri(copyUri, stateFile)
 				}
 			}
 		}
 
 		//determine how many ROMs we can make at a time
-		val len = end - start + 1; val count = AtomicInteger(start)
+		val len = end - start + 1;
+		val count = AtomicInteger(start)
 		val numHandlers = len.coerceAtMost(RandomizerSettings.romLimit)
-		val romsPerHandler = len / numHandlers; val remainingRoms = len % numHandlers
-		val lock = Semaphore(start); var last = 0
+		val romsPerHandler = len / numHandlers;
+		val remainingRoms = len % numHandlers
+		val lock = Semaphore(start);
+		var last = 0
 
-		val saveRom = fun (_: Int) {
+		val saveRom = fun(_: Int) {
 			//update the progress notification
 			//only allow one thread to update it at a time
 			//make sure the progress is greater than the last update
@@ -324,7 +226,7 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 			val fileUri = dir.createFile("application/octet-stream", file.name)?.uri ?: return
 			val log = if (saveLog) ByteArrayOutputStream(1024 * 1024) else null
 			val logUri = log?.let { dir.createFile("text/plain", "${file.name}.log.txt")?.uri }
-			if (!RandomizerSettings.saveRom(file, pickSeed(), log)) return
+			if (!RandomizerSettings.saveRom(file, RandomSource.pickSeed(), log)) return
 			ctx.saveToUri(fileUri, file)
 			//clean up temporary file
 			ctx.deleteFile(file.name)
@@ -383,22 +285,22 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 			Row(Modifier.padding(top = 8.dp)) {
 				val notNumPattern = Regex("\\D")
 				TextField(start.toString(), {
-						val tmp = it.replace(notNumPattern, "").trimStart('0')
-						start = if (tmp.isNotEmpty()) tmp.toInt() else 0
-					},
-					Modifier.weight(1f).focusRequester(first).padding(end = 2.dp),
-					label = { Text(stringResource(R.string.name_start)) },
-					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-					keyboardActions = KeyboardActions { second.requestFocus() }
+					val tmp = it.replace(notNumPattern, "").trimStart('0')
+					start = if (tmp.isNotEmpty()) tmp.toInt() else 0
+				},
+						Modifier.weight(1f).focusRequester(first).padding(end = 2.dp),
+						label = { Text(stringResource(R.string.name_start)) },
+						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+						keyboardActions = KeyboardActions { second.requestFocus() }
 				)
 				TextField(end.toString(), {
-						val tmp = it.replace(notNumPattern, "").trimStart('0')
-						end = if (tmp.isNotEmpty()) tmp.toInt() else 0
-					},
-					Modifier.weight(1f).focusRequester(second).padding(start = 2.dp),
-					label = { Text(stringResource(R.string.name_end)) },
-					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-					keyboardActions = KeyboardActions { batchLauncher.launch(null) }
+					val tmp = it.replace(notNumPattern, "").trimStart('0')
+					end = if (tmp.isNotEmpty()) tmp.toInt() else 0
+				},
+						Modifier.weight(1f).focusRequester(second).padding(start = 2.dp),
+						label = { Text(stringResource(R.string.name_end)) },
+						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+						keyboardActions = KeyboardActions { batchLauncher.launch(null) }
 				)
 			}
 			Row(verticalAlignment = Alignment.CenterVertically) {
@@ -409,7 +311,7 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 				Button({ stateLauncher.launch("*/*") }) { Text(stringResource(R.string.action_choose_state)) }
 				stateName?.let { Text(it) }
 			}
-			Button({ batchLauncher.launch(null) }) { Text(stringResource(R.string.action_choose_dir) )}
+			Button({ batchLauncher.launch(null) }) { Text(stringResource(R.string.action_choose_dir)) }
 		}
 	}
 }
@@ -426,7 +328,7 @@ fun NamesDialog(openDialog: MutableState<Boolean>, label: String, names: Mutable
 				names.clear()
 				names.addAll(text.split("\n"))
 				scope.launch(Dispatchers.IO) {
-					ctx.openFileOutput(customNamesFile, Context.MODE_PRIVATE).use {
+					ctx.openFileOutput(SysConstants.customNamesFile, Context.MODE_PRIVATE).use {
 						it.write(RandomizerSettings.customNames.bytes)
 					}
 				}
@@ -494,10 +396,10 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		settingsText = it
 		validSettings = false
 	}, Modifier.fillMaxWidth(),
-	textStyle = TextStyle(fontFamily = FontFamily.Monospace),
-	label = {
-		Text(stringResource(R.string.current_settings))
-	}, trailingIcon = {
+			textStyle = TextStyle(fontFamily = FontFamily.Monospace),
+			label = {
+				Text(stringResource(R.string.current_settings))
+			}, trailingIcon = {
 		IconButton(updateSettings) { Icon(Icons.Filled.Done, null) }
 	}, leadingIcon = {
 		IconButton({
@@ -508,11 +410,11 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			})
 		}) { Icon(Icons.Filled.Share, null) }
 	}, isError = !validSettings,
-	keyboardOptions = KeyboardOptions(KeyboardCapitalization.None, false, KeyboardType.Ascii, ImeAction.Done),
-	keyboardActions = KeyboardActions(onDone = {
-		updateSettings()
-		this.defaultKeyboardAction(ImeAction.Done)
-	}), singleLine = true)
+			keyboardOptions = KeyboardOptions(KeyboardCapitalization.None, false, KeyboardType.Ascii, ImeAction.Done),
+			keyboardActions = KeyboardActions(onDone = {
+				updateSettings()
+				this.defaultKeyboardAction(ImeAction.Done)
+			}), singleLine = true)
 
 	var preset by rememberSaveable { mutableStateOf(SettingsPreset.NONE) }
 	val updatePreset: (SettingsPreset)->Unit = { pre ->
@@ -583,10 +485,10 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		seedText = it
 		validSeed = false
 	}, Modifier.fillMaxWidth(),
-	textStyle = TextStyle(fontFamily = FontFamily.Monospace),
-	label = {
-		Text(stringResource(R.string.current_seed))
-	}, trailingIcon = {
+			textStyle = TextStyle(fontFamily = FontFamily.Monospace),
+			label = {
+				Text(stringResource(R.string.current_seed))
+			}, trailingIcon = {
 		IconButton(updateSeed) { Icon(Icons.Filled.Done, null) }
 	}, leadingIcon = {
 		IconButton({
@@ -597,213 +499,16 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			})
 		}) { Icon(Icons.Filled.Share, null) }
 	}, isError = !validSeed,
-	keyboardOptions = KeyboardOptions(KeyboardCapitalization.None, false, KeyboardType.Ascii, ImeAction.Done),
-	keyboardActions = KeyboardActions(onDone = {
-		updateSeed()
-		this.defaultKeyboardAction(ImeAction.Done)
-	}), singleLine = true)
+			keyboardOptions = KeyboardOptions(KeyboardCapitalization.None, false, KeyboardType.Ascii, ImeAction.Done),
+			keyboardActions = KeyboardActions(onDone = {
+				updateSeed()
+				this.defaultKeyboardAction(ImeAction.Done)
+			}), singleLine = true)
 	Button({
-		val seed = pickSeed()
+		val seed = RandomSource.pickSeed()
 		RandomizerSettings.currentSeed = seed
 		seedText = seed.toString(seedBase)
 		validSeed = true
 		updateName()
 	}) { Text(stringResource(R.string.action_random_seed)) }
-}
-
-@Composable
-fun TweaksList() {
-	val ctx = LocalContext.current
-	LazyColumn {
-		item {
-			Text(stringResource(R.string.title_misc), style = MaterialTheme.typography.h6)
-		}
-		items(MiscTweak.allTweaks.filter {
-			val available = RandomizerSettings.handler?.miscTweaksAvailable()
-			available != null && available and it.value != 0
-		}) { tweak ->
-			var checked by rememberSaveable { mutableStateOf(RandomizerSettings.currentMiscTweaks and tweak.value == tweak.value) }
-			Row(verticalAlignment = Alignment.CenterVertically) {
-				Checkbox(checked, {
-					checked = it
-					RandomizerSettings.currentMiscTweaks = RandomizerSettings.currentMiscTweaks xor tweak.value
-				})
-				Text(tweak.tweakName, Modifier.clickable {
-					ctx.toast(tweak.tooltipText)
-				})
-			}
-		}
-	}
-}
-
-@Composable
-fun SettingsList(category: SettingsCategory) {
-	val ctx = LocalContext.current
-	LazyColumn {
-		category.prefixes.filter { p ->
-			RandomizerSettings.handler?.let { p.isSupported(it) } ?: false
-		}.forEach { prefix ->
-			item {
-				Text(stringResource(prefix.title), style = MaterialTheme.typography.h6)
-			}
-			items(prefix.groups.toList()) { (subtitle, group) ->
-				SettingsGroup(prefix, subtitle, group)
-			}
-			item {
-				Divider()
-			}
-			items(prefix.props.toList()) { (label, field) ->
-				if (RandomizerSettings.currentGen in (RandomizerSettings.generations[field] ?: 1..7)) {
-					field.SettingsComponent(prefix.strings[label] ?: label) {
-						val id = ctx.resources.getIdentifier(label.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
-						if (id != 0) {
-							ctx.toast(id)
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-@Composable
-fun SettingsGroup(prefix: SettingsPrefix, subtitle: String, group: MutableMap<String, Field>) {
-	Column {
-		if (subtitle.isNotEmpty()) {
-			Text(prefix.strings[subtitle]!!, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-		}
-		val groupField = group.values.first()
-		val groupEnum = groupField.get(RandomizerSettings) as Enum<*>
-		val selectedIndex = rememberSaveable { mutableStateOf(groupEnum.ordinal) }
-		val ctx = LocalContext.current
-		group.keys.forEachIndexed { index, label ->
-			groupField.SettingsComponent(prefix.strings[label] ?: label, index, selectedIndex) {
-				val id = ctx.resources.getIdentifier(label.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
-				if (id != 0) {
-					ctx.toast(id)
-				}
-			}
-		}
-	}
-}
-
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
-@Composable
-fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: MutableState<Int>? = null, onClick: () -> Unit) {
-	if (type.isPrimitive) {
-		when (type.name) {
-			"boolean" -> {
-				var checked by rememberSaveable { mutableStateOf(getBoolean(RandomizerSettings)) }
-				Row(Modifier.padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-					Checkbox(checked, {
-						checked = it
-						setBoolean(RandomizerSettings, it)
-					})
-					Text(label, Modifier.weight(1f).clickable(onClick = onClick))
-					if (this@SettingsComponent in RandomizerSettings.selections && checked) {
-						val toggle = RandomizerSettings.toggles[this@SettingsComponent]
-						val options = RandomizerSettings.selections[this@SettingsComponent] ?: emptyList()
-						var selected by rememberSaveable { mutableStateOf(toggle?.get(RandomizerSettings).toString()) }
-						var expanded by remember { mutableStateOf(false) }
-						val width = (options.maxOf { it.toString().length } * MaterialTheme.typography.body2.fontSize.value).coerceAtLeast(48f)
-						ExposedDropdownMenuBox(expanded, { expanded = !expanded }) {
-							TextField(selected, {}, Modifier.width(width.dp).offset(x = 2.dp), readOnly = true)
-							ExposedDropdownMenu(expanded, { expanded = false }) {
-								options.forEach { option ->
-									DropdownMenuItem({
-										selected = option.toString()
-										toggle?.set(RandomizerSettings, option)
-										expanded = false
-									}) { Text(option.toString()) }
-								}
-							}
-						}
-					}
-				}
-			}
-			"int" -> {
-				val limit = RandomizerSettings.limits[this] ?: 0f..1f
-				val length = (limit.endInclusive - limit.start).toInt()
-				val toggle = RandomizerSettings.toggles[this]
-				//toggle?.isAccessible = true
-				var position by rememberSaveable { mutableStateOf(getInt(RandomizerSettings).toFloat()) }
-				var checked by rememberSaveable { mutableStateOf(toggle?.getBoolean(RandomizerSettings) ?: (position > 0f)) }
-				Row(Modifier.padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-					Checkbox(checked, {
-						checked = it
-						toggle?.setBoolean(RandomizerSettings, it)
-					})
-					Text(String.format(label, position.toInt()), Modifier.clickable(onClick = onClick))
-					if (length > 10) {
-						val numPattern = Regex("^-?\\d+$")
-						var input by rememberSaveable { mutableStateOf(position.toString().substringBefore('.')) }
-						val keyCon = LocalSoftwareKeyboardController.current
-						TextField(input, {
-							input = it
-							position = numPattern.matchEntire(it)?.run {
-								val num = value.toFloat().coerceIn(limit)
-								setInt(RandomizerSettings, num.toInt())
-								num
-							} ?: position
-						}, Modifier.width(64.dp).offset(x = 2.dp), checked,
-						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-						keyboardActions = KeyboardActions { keyCon?.hide() })
-					}
-				}
-				if (length <= 10) {
-					Slider(position, { position = it }, Modifier.fillMaxWidth(), checked, limit, length - 1, { setInt(RandomizerSettings, position.toInt()) })
-				}
-			}
-		}
-	} else if (type.isEnum) {
-		Row(verticalAlignment = Alignment.CenterVertically) {
-			RadioButton(index == selectedIndex!!.value, {
-				selectedIndex.value = index
-				set(RandomizerSettings, type.enumConstants[index])
-			})
-			Text(label, Modifier.clickable(onClick = onClick))
-		}
-		if (get(RandomizerSettings) === StartersMod.CUSTOM && index == StartersMod.CUSTOM.ordinal) {
-			var (first, second, third) = RandomizerSettings.currentStarters
-			val firstName = rememberSaveable { mutableStateOf(first?.name ?: "") }; SearchField(firstName)
-			val secondName = rememberSaveable { mutableStateOf(second?.name ?: "") }; SearchField(secondName)
-			val thirdName = rememberSaveable { mutableStateOf(third?.name ?: "") }; SearchField(thirdName)
-			Button({
-				first = RandomizerSettings.getPokemon(firstName.value)
-				second = RandomizerSettings.getPokemon(secondName.value)
-				third = RandomizerSettings.getPokemon(thirdName.value)
-				RandomizerSettings.currentStarters = Triple(first, second, third)
-			}) { Text(stringResource(R.string.action_save_starters)) }
-		}
-	}
-}
-
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
-@Composable
-fun SearchField(search: MutableState<String>) {
-	var expanded by remember { mutableStateOf(false) }
-	var useRandom by rememberSaveable { mutableStateOf(search.value.isBlank()) }
-	val options = RandomizerSettings.pokeTrie[search.value.uppercase()]?.children() ?: emptyList()
-	val keyCon = LocalSoftwareKeyboardController.current
-	Row(verticalAlignment = Alignment.CenterVertically) {
-		ExposedDropdownMenuBox(expanded, { expanded = !expanded }, Modifier.weight(1f)) {
-			TextField(search.value, { search.value = it }, Modifier.padding(vertical = 2.dp), !useRandom, singleLine = true)
-			ExposedDropdownMenu(expanded && !useRandom, { expanded = false }) {
-				options.forEach { option ->
-					DropdownMenuItem({
-						expanded = false
-						search.value = option
-						keyCon?.hide()
-						//TODO update cursor position
-					}) { Text(option) }
-				}
-			}
-		}
-		Checkbox(useRandom, {
-			useRandom = it
-			keyCon?.hide()
-			search.value = ""
-		})
-		Text(stringResource(R.string.random_starter), Modifier.weight(1f))
-	}
 }

@@ -1,7 +1,10 @@
-package ly.mens.rndpkmn
+package ly.mens.rndpkmn.settings
 
 import androidx.annotation.StringRes
 import com.dabomstew.pkrandom.romhandlers.RomHandler
+import ly.mens.rndpkmn.BuildConfig
+import ly.mens.rndpkmn.R
+import ly.mens.rndpkmn.id
 import java.lang.reflect.Field
 
 enum class SettingsPrefix(val prefix: String, @StringRes val title: Int) {

@@ -1,8 +1,9 @@
-package ly.mens.rndpkmn
+package ly.mens.rndpkmn.settings
 
 import androidx.annotation.StringRes
+import ly.mens.rndpkmn.R
 
-import ly.mens.rndpkmn.SettingsPrefix.*
+import ly.mens.rndpkmn.settings.SettingsPrefix.*
 
 enum class SettingsCategory(@StringRes val title: Int) {
 	TRAITS(R.string.pokemonTraitsPanel_title) {

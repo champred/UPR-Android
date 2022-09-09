@@ -1,4 +1,4 @@
-package ly.mens.rndpkmn
+package ly.mens.rndpkmn.settings
 
 import android.util.Log
 import com.dabomstew.pkrandom.*
@@ -7,6 +7,8 @@ import com.dabomstew.pkrandom.pokemon.ExpCurve
 import com.dabomstew.pkrandom.pokemon.GenRestrictions
 import com.dabomstew.pkrandom.pokemon.Pokemon
 import com.dabomstew.pkrandom.romhandlers.*
+import ly.mens.rndpkmn.Trie
+import ly.mens.rndpkmn.fileName
 import java.io.*
 import java.lang.NumberFormatException
 import java.lang.reflect.Field
@@ -27,7 +29,7 @@ object RandomizerSettings : Settings() {
 	)
 	private lateinit var romHandlerFactory: RomHandler.Factory
 	private lateinit var romHandler: RomHandler
-	val handler: RomHandler? get() = if (::romHandler.isInitialized) romHandler else null
+	val handler: RomHandler? get() = if (RandomizerSettings::romHandler.isInitialized) romHandler else null
 	private lateinit var inputFile: File
 	//allocate enough space to accommodate large logs
 	val outputLog = ByteArrayOutputStream(1024 * 1024)
@@ -46,8 +48,8 @@ object RandomizerSettings : Settings() {
 		val mem = rt.maxMemory() - (rt.totalMemory() - rt.freeMemory())
 		return (mem / inputFile.length() / 3L).toInt().coerceAtLeast(1)
 	}
-	val currentGen: Int get() = if (::romHandler.isInitialized) romHandler.generationOfPokemon() else 1
-	val isValid: Boolean get() = if (::romHandler.isInitialized) romHandler.isRomValid else false
+	val currentGen: Int get() = if (RandomizerSettings::romHandler.isInitialized) romHandler.generationOfPokemon() else 1
+	val isValid: Boolean get() = if (RandomizerSettings::romHandler.isInitialized) romHandler.isRomValid else false
 	var currentStarters: Triple<Pokemon?, Pokemon?, Pokemon?> = Triple(null, null, null)
 		set(value) {
 			val (first, second, third) = value
