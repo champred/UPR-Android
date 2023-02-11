@@ -136,8 +136,18 @@ object RandomizerSettings : Settings() {
 			pokeTrie.insert(romHandler.pokemon[i].name)
 		}
 
-		val baseStatGenerationNumbers = arrayOfNulls<Int>(Math.min(3, GlobalConstants.HIGHEST_POKEMON_GEN - currentGen))
-		var j = Math.max(6, currentGen + 1)
+		with (SettingsPrefix.STARTERS.props) {
+			if (!romHandler.supportsStarterHeldItems()) {
+				remove("GUI.spRandomizeStartersHeldItemsCheckBox.text")
+				remove("GUI.spBanBadRandomStarterHeldItemsCheckBox.text")
+			} else {
+				put("GUI.spRandomizeStartersHeldItemsCheckBox.text", RandomizerSettings::randomizeStartersHeldItems.javaField!!)
+				put("GUI.spBanBadRandomStarterHeldItemsCheckBox.text", RandomizerSettings::banBadRandomStarterHeldItems.javaField!!)
+			}
+		}
+
+		val baseStatGenerationNumbers = arrayOfNulls<Int>(4.coerceAtMost(GlobalConstants.HIGHEST_POKEMON_GEN - currentGen))
+		var j = 6.coerceAtLeast(currentGen + 1)
 		updateBaseStatsToGeneration = j
 		for (i in baseStatGenerationNumbers.indices) {
 			baseStatGenerationNumbers[i] = j++
@@ -261,7 +271,7 @@ object RandomizerSettings : Settings() {
 			::trainersForceFullyEvolvedLevel.javaField to 30f..65f,
 			::trainersLevelModifier.javaField to -50f..50f,
 			::totemLevelModifier.javaField to -50f..50f,
-			::minimumCatchRateLevel.javaField to 1f..4f,
+			::minimumCatchRateLevel.javaField to 1f..5f,
 			::wildLevelModifier.javaField to -50f..50f,
 			::tmsGoodDamagingPercent.javaField to 0f..100f,
 			::tutorsGoodDamagingPercent.javaField to 0f..100f,
@@ -290,8 +300,6 @@ object RandomizerSettings : Settings() {
 			::updateMoves.javaField to ::updateMovesToGeneration.javaField,
 	)
 	val generations: Map<Field?, IntRange> = mapOf(
-			::randomizeStartersHeldItems.javaField to 2..3,
-			::banBadRandomStarterHeldItems.javaField to 2..3,
 			::randomizeInGameTradesOTs.javaField to 2..7,
 			::randomizeInGameTradesIVs.javaField to 2..7,
 			::randomizeInGameTradesItems.javaField to 2..7,
