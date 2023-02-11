@@ -1071,11 +1071,6 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 se.pkmn = pokemon;
                 se.forme = forme;
                 se.level = staticCRO[offset+i*size + 5];
-                int heldItem = FileFunctions.readFullInt(staticCRO,offset+i*size + 12);
-                if (heldItem < 0) {
-                    heldItem = 0;
-                }
-                se.heldItem = heldItem;
                 starters.add(se);
             }
         } catch (IOException e) {
@@ -1123,11 +1118,6 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 writeWord(staticCRO,offset+i*size,newStatic.pkmn.number);
                 staticCRO[offset+i*size + 4] = (byte)newStatic.forme;
 //                staticCRO[offset+i*size + 5] = (byte)newStatic.level;
-                if (newStatic.heldItem == 0) {
-                    writeWord(staticCRO,offset+i*size + 12,-1);
-                } else {
-                    writeWord(staticCRO,offset+i*size + 12,newStatic.heldItem);
-                }
                 writeWord(displayCRO,displayOffset+displayIndex*0x54,newStatic.pkmn.number);
                 displayCRO[displayOffset+displayIndex*0x54+2] = (byte)newStatic.forme;
                 if (displayIndex < 3) {
@@ -1160,24 +1150,76 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         Map<Integer, StatChange> map = GlobalConstants.getStatChanges(generation);
         switch(generation) {
             case 7:
-                map.put(781,new StatChange(Stat.SPDEF.val,105));
+                map.put(Species.Gen6Formes.alakazamMega, new StatChange(Stat.SPDEF.val, 105));
                 break;
             case 8:
-                map.put(776,new StatChange(Stat.ATK.val | Stat.SPATK.val,140,140));
+                map.put(Species.Gen6Formes.aegislashB, new StatChange(Stat.ATK.val | Stat.SPATK.val, 140, 140));
                 break;
         }
         return map;
     }
 
     @Override
+    public boolean supportsStarterHeldItems() {
+        return true;
+    }
+
+    @Override
     public List<Integer> getStarterHeldItems() {
-        // do nothing
-        return new ArrayList<>();
+        List<Integer> starterHeldItems = new ArrayList<>();
+        try {
+            byte[] staticCRO = readFile(romEntry.getFile("StaticPokemon"));
+
+            List<Integer> starterIndices =
+                    Arrays.stream(romEntry.arrayEntries.get("StarterIndices")).boxed().collect(Collectors.toList());
+
+            // Gift Pokemon
+            int count = Gen6Constants.getGiftPokemonCount(romEntry.romType);
+            int size = Gen6Constants.getGiftPokemonSize(romEntry.romType);
+            int offset = romEntry.getInt("GiftPokemonOffset");
+            for (int i = 0; i < count; i++) {
+                if (!starterIndices.contains(i)) continue;
+                int heldItem = FileFunctions.readFullInt(staticCRO,offset+i*size + 12);
+                if (heldItem < 0) {
+                    heldItem = 0;
+                }
+                starterHeldItems.add(heldItem);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+
+        return starterHeldItems;
     }
 
     @Override
     public void setStarterHeldItems(List<Integer> items) {
-        // do nothing
+        try {
+            byte[] staticCRO = readFile(romEntry.getFile("StaticPokemon"));
+
+            List<Integer> starterIndices =
+                    Arrays.stream(romEntry.arrayEntries.get("StarterIndices")).boxed().collect(Collectors.toList());
+
+            // Gift Pokemon
+            int count = Gen6Constants.getGiftPokemonCount(romEntry.romType);
+            int size = Gen6Constants.getGiftPokemonSize(romEntry.romType);
+            int offset = romEntry.getInt("GiftPokemonOffset");
+
+            Iterator<Integer> itemsIter = items.iterator();
+
+            for (int i = 0; i < count; i++) {
+                if (!starterIndices.contains(i)) continue;
+                int item = itemsIter.next();
+                if (item == 0) {
+                    FileFunctions.writeFullInt(staticCRO,offset+i*size + 12,-1);
+                } else {
+                    FileFunctions.writeFullInt(staticCRO,offset+i*size + 12,item);
+                }
+            }
+            writeFile(romEntry.getFile("StaticPokemon"),staticCRO);
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
     }
 
     @Override
@@ -2341,9 +2383,9 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 staticCRO[offset+i*size + 4] = (byte)se.forme;
                 staticCRO[offset+i*size + 5] = (byte)se.level;
                 if (se.heldItem == 0) {
-                    writeWord(staticCRO,offset+i*size + 12,-1);
+                    FileFunctions.writeFullInt(staticCRO,offset+i*size + 12,-1);
                 } else {
-                    writeWord(staticCRO,offset+i*size + 12,se.heldItem);
+                    FileFunctions.writeFullInt(staticCRO,offset+i*size + 12,se.heldItem);
                 }
             }
             writeFile(romEntry.getFile("StaticPokemon"),staticCRO);
@@ -2686,6 +2728,30 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 // wrote above.
                 FileFunctions.writeFullIntBigEndian(code, offset + 208, 0xD2FFFFEA);
             }
+        }
+    }
+
+    @Override
+    public void enableGuaranteedPokemonCatching() {
+        try {
+            byte[] battleCRO = readFile(romEntry.getFile("Battle"));
+            int offset = find(battleCRO, Gen6Constants.perfectOddsBranchLocator);
+            if (offset > 0) {
+                // The game checks to see if your odds are greater then or equal to 255 using the following
+                // code. Note that they compare to 0xFF000 instead of 0xFF; it looks like all catching code
+                // probabilities are shifted like this?
+                // cmp r6, #0xFF000
+                // blt oddsLessThanOrEqualTo254
+                // The below code just nops the branch out so it always acts like our odds are 255, and
+                // Pokemon are automatically caught no matter what.
+                battleCRO[offset] = 0x00;
+                battleCRO[offset + 1] = 0x00;
+                battleCRO[offset + 2] = 0x00;
+                battleCRO[offset + 3] = 0x00;
+                writeFile(romEntry.getFile("Battle"), battleCRO);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
         }
     }
 
@@ -4050,6 +4116,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             long expectedCRC32 = romEntry.files.get(fileKey).expectedCRC32s[index];
             long actualCRC32 = actualFileCRC32s.get(fileKey);
             if (expectedCRC32 != actualCRC32) {
+                System.out.println(actualCRC32);
                 return false;
             }
         }

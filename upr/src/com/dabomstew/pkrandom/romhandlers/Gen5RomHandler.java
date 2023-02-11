@@ -67,32 +67,6 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         super(random, logStream);
     }
 
-    @Override
-    public void changeCatchRates(Settings settings) {
-        int minimumCatchRateLevel = settings.getMinimumCatchRateLevel();
-
-        int normalMin, legendaryMin;
-        switch (minimumCatchRateLevel) {
-            case 1:
-            default:
-                normalMin = 50;
-                legendaryMin = 25;
-                break;
-            case 2:
-                normalMin = 100;
-                legendaryMin = 45;
-                break;
-            case 3:
-                normalMin = 180;
-                legendaryMin = 75;
-                break;
-            case 4:
-                normalMin = legendaryMin = 255;
-                break;
-        }
-        minimumCatchRate(normalMin, legendaryMin);
-    }
-
     private static class OffsetWithinEntry {
         private int entry;
         private int offset;
@@ -503,6 +477,13 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             computeCRC32sForRom();
         } catch (IOException e) {
             throw new RandomizerIOException(e);
+        }
+
+        // If there are tweaks for expanding the ARM9, do it here to keep it simple.
+        boolean shouldExtendARM9 = romEntry.tweakFiles.containsKey("ShedinjaEvolutionTweak") || romEntry.tweakFiles.containsKey("NewIndexToMusicTweak");
+        if (shouldExtendARM9) {
+            int extendBy = romEntry.getInt("Arm9ExtensionSize");
+            arm9 = extendARM9(arm9, extendBy, romEntry.getString("TCMCopyingPrefix"), Gen5Constants.arm9Offset);
         }
     }
 
@@ -1003,6 +984,11 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     @Override
     public Map<Integer, StatChange> getUpdatedPokemonStats(int generation) {
         return GlobalConstants.getStatChanges(generation);
+    }
+
+    @Override
+    public boolean supportsStarterHeldItems() {
+        return false;
     }
 
     @Override
@@ -1998,8 +1984,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             e.printStackTrace();
         }
 
-        int extendBy = romEntry.getInt("NewIndexToMusicSize");
-        arm9 = extendARM9(arm9, extendBy, romEntry.getString("TCMCopyingPrefix"), Gen5Constants.arm9Offset);
+        // Relies on arm9 already being extended, which it *should* have been in loadedROM
         genericIPSPatch(arm9, "NewIndexToMusicTweak");
 
         String newIndexToMusicPrefix = romEntry.getString("NewIndexToMusicPrefix");
@@ -2421,6 +2406,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         if (romEntry.romType == Gen5Constants.Type_BW2) {
             available |= MiscTweak.FORCE_CHALLENGE_MODE.getValue();
         }
+        available |= MiscTweak.DISABLE_LOW_HP_MUSIC.getValue();
         return available;
     }
 
@@ -2456,6 +2442,8 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             updateTypeEffectiveness();
         } else if (tweak == MiscTweak.FORCE_CHALLENGE_MODE) {
             forceChallengeMode();
+        } else if (tweak == MiscTweak.DISABLE_LOW_HP_MUSIC) {
+            disableLowHpMusic();
         }
     }
 
@@ -2528,13 +2516,12 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             // set on the save file. If it isn't, the code branches to a separate code path
             // where the function returns 0. The below code simply nops this branch so that
             // this function always returns 1, regardless of the status of flag 2403.
-            int fieldOverlayNumber = Gen5Constants.getFieldOverlayNumber(romEntry.romType);
-            byte[] fieldOverlay = readOverlay(fieldOverlayNumber);
+            byte[] fieldOverlay = readOverlay(romEntry.getInt("FieldOvlNumber"));
             String prefix = Gen5Constants.runningShoesPrefix;
             int offset = find(fieldOverlay, prefix);
             if (offset != 0) {
                 writeWord(fieldOverlay, offset, 0);
-                writeOverlay(fieldOverlayNumber, fieldOverlay);
+                writeOverlay(romEntry.getInt("FieldOvlNumber"), fieldOverlay);
             }
         } catch (IOException e) {
             throw new RandomizerIOException(e);
@@ -2631,6 +2618,50 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             arm9[offset + 1] = 0x20;
             arm9[offset + 2] = 0x70;
             arm9[offset + 3] = 0x47;
+        }
+    }
+
+    private void disableLowHpMusic() {
+        try {
+            byte[] lowHealthMusicOverlay = readOverlay(romEntry.getInt("LowHealthMusicOvlNumber"));
+            int offset = find(lowHealthMusicOverlay, Gen5Constants.lowHealthMusicLocator);
+            if (offset > 0) {
+                // The game calls a function that returns 2 if the Pokemon has low HP. The ASM looks like this:
+                // bl funcThatReturns2IfThePokemonHasLowHp
+                // cmp r0, #0x2
+                // bne pokemonDoesNotHaveLowHp
+                // mov r7, #0x1
+                // The offset variable is currently pointing at the bne instruction. If we change that bne to an unconditional
+                // branch, the game will never think the player's Pokemon has low HP (for the purposes of changing the music).
+                lowHealthMusicOverlay[offset + 1] = (byte)0xE0;
+                writeOverlay(romEntry.getInt("LowHealthMusicOvlNumber"), lowHealthMusicOverlay);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+    }
+
+    @Override
+    public void enableGuaranteedPokemonCatching() {
+        try {
+            byte[] battleOverlay = readOverlay(romEntry.getInt("BattleOvlNumber"));
+            int offset = find(battleOverlay, Gen5Constants.perfectOddsBranchLocator);
+            if (offset > 0) {
+                // The game checks to see if your odds are greater then or equal to 255 using the following
+                // code. Note that they compare to 0xFF000 instead of 0xFF; it looks like all catching code
+                // probabilities are shifted like this?
+                // mov r0, #0xFF
+                // lsl r0, r0, #0xC
+                // cmp r7, r0
+                // blt oddsLessThanOrEqualTo254
+                // The below code just nops the branch out so it always acts like our odds are 255, and
+                // Pokemon are automatically caught no matter what.
+                battleOverlay[offset] = 0x00;
+                battleOverlay[offset + 1] = 0x00;
+                writeOverlay(romEntry.getInt("BattleOvlNumber"), battleOverlay);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
         }
     }
 
@@ -3025,7 +3056,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             for (int i = 1; i <= Gen5Constants.pokemonCount; i++) {
                 byte[] evoEntry = evoNARC.files.get(i);
                 Pokemon pk = pokes[i];
-                if (pk.number == Species.nincada) {
+                if (pk.number == Species.nincada && romEntry.tweakFiles.containsKey("ShedinjaEvolutionTweak")) {
                     writeShedinjaEvolution();
                 }
                 int evosWritten = 0;
@@ -3061,48 +3092,22 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         if (nincada.evolutionsFrom.size() < 2) {
             return;
         }
+
         Pokemon extraEvolution = nincada.evolutionsFrom.get(1).to;
 
-        // In all the Gen 5 games, the evolution overlay is hardcoded to generate
-        // a Shedinja by loading its species ID using the following instructions:
-        // mov r1, #0x49
-        // lsl r1, r1, #2
-        // Since Gen 5 has more than 510 species, we cannot use 8-bit addition to
-        // load any Pokemon; instead, we nop out a useless load of a string, then
-        // use the space that used to store the address of that string to instead
-        // store Nincada's new extra evolution's species ID.
+        // Update the evolution overlay to point towards our custom code in the expanded arm9.
         byte[] evolutionOverlay = readOverlay(romEntry.getInt("EvolutionOvlNumber"));
-        int functionOffset = find(evolutionOverlay, Gen5Constants.shedinjaFunctionLocator);
-        if (functionOffset > 0) {
-            int[] patchOffsets = romEntry.arrayEntries.get("ShedinjaCodePatchOffsets");
+        genericIPSPatch(evolutionOverlay, "ShedinjaEvolutionOvlTweak");
+        writeOverlay(romEntry.getInt("EvolutionOvlNumber"), evolutionOverlay);
 
-            // First, nop the instruction that loads a pointer to the string
-            // "shinka_demo.c" into a register; this has seemingly no effect on
-            // the game and was probably used strictly for debugging.
-            evolutionOverlay[functionOffset + patchOffsets[0]] = 0x00;
-            evolutionOverlay[functionOffset + patchOffsets[0] + 1] = 0x00;
+        // Relies on arm9 already being extended, which it *should* have been in loadedROM
+        genericIPSPatch(arm9, "ShedinjaEvolutionTweak");
 
-            // In the space that used to hold the address of the "shinka_demo.c" string,
-            // we're going to instead store a species ID. We need to write a pc-relative
-            // load to that space. However, the original Shedinja instructions are
-            // misaligned to do a load; there's an "add r0, r4, #0x0" between the move
-            // and the shift that is correctly-aligned. So we first move this add up one
-            // instruction, then we write out the load ("ldr r1, [pc #pcRelativeOffset]")
-            // in the correctly-aligned space, then we nop out the shift.
-            int pcRelativeOffset = patchOffsets[2] - patchOffsets[1] - 6;
-            evolutionOverlay[functionOffset + patchOffsets[1]] = 0x20;
-            evolutionOverlay[functionOffset + patchOffsets[1] + 1] = 0x1c;
-            evolutionOverlay[functionOffset + patchOffsets[1] + 2] = (byte) (pcRelativeOffset / 4);
-            evolutionOverlay[functionOffset + patchOffsets[1] + 3] = 0x49;
-            evolutionOverlay[functionOffset + patchOffsets[1] + 4] = 0x00;
-            evolutionOverlay[functionOffset + patchOffsets[1] + 5] = 0x00;
-
-            // Finally, we replace what used to store the address of "shinka_demo.c"
-            // with the species ID of Nincada's new extra evolution.
-            int newSpeciesIDOffset = functionOffset + patchOffsets[2];
-            FileFunctions.writeFullInt(evolutionOverlay, newSpeciesIDOffset, extraEvolution.number);
-
-            writeOverlay(romEntry.getInt("EvolutionOvlNumber"), evolutionOverlay);
+        // After applying the tweak, Shedinja's ID is simply pc-relative loaded, so just
+        // update the constant
+        int offset = romEntry.getInt("ShedinjaSpeciesOffset");
+        if (offset > 0) {
+            FileFunctions.writeFullInt(arm9, offset, extraEvolution.number);
         }
     }
 

@@ -770,6 +770,8 @@ public class Gen4Constants {
 
     public static final String friendshipValueForEvoLocator = "DC286AD3";
 
+    public static final String perfectOddsBranchLocator = "FF2901D30425";
+
     public static final int[] dpptOverworldDexMaps = new int[] {
             1,  2,  3,  4,  5, -1, -1,  6, -1,  7, // 0-9 (cities, pkmn league, wind/ironworks)
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 10-19 (all mt coronet)

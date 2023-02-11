@@ -26,32 +26,23 @@ package com.dabomstew.pkrandom.newgui;
 /*--  along with this program. If not, see <http://www.gnu.org/licenses/>.  --*/
 /*----------------------------------------------------------------------------*/
 
+import java.awt.*;
+import java.util.*;
 import com.dabomstew.pkrandom.pokemon.GenRestrictions;
 
 import javax.swing.*;
 
 public class NewGenerationLimitDialog extends javax.swing.JDialog {
-    private JCheckBox gen1CheckBox;
-    private JCheckBox gen2CheckBox;
-    private JCheckBox gen3CheckBox;
-    private JCheckBox gen4CheckBox;
-    private JCheckBox gen5CheckBox;
-    private JCheckBox gen6CheckBox;
-    private JCheckBox gen7CheckBox;
-    private JButton okButton;
-    private JButton cancelButton;
-    private JPanel mainPanel;
-    private JLabel xyWarningLabel;
-    private JCheckBox allowEvolutionaryRelativesCheckBox;
 
     private boolean pressedOk;
     private boolean isXY;
 
     public NewGenerationLimitDialog(JFrame parent, GenRestrictions current, int generation, boolean isXY) {
-        super(parent, true);
+		super(parent, true);
+		initComponents();
         add(mainPanel);
         this.isXY = isXY;
-        initComponents();
+        initComponents2();
         initialState(generation);
         if (current != null) {
             current.limitToGen(generation);
@@ -166,4 +157,136 @@ public class NewGenerationLimitDialog extends javax.swing.JDialog {
         pressedOk = false;
         setVisible(false);
     }
+
+	private void initComponents2() {
+		ResourceBundle bundle = ResourceBundle.getBundle("com.dabomstew.pkrandom.newgui.Bundle");
+		mainPanel = new JPanel();
+		JPanel panel1 = new JPanel();
+		JPanel hSpacer1 = new JPanel(null);
+		cancelButton = new JButton();
+		okButton = new JButton();
+		gen1CheckBox = new JCheckBox();
+		gen2CheckBox = new JCheckBox();
+		gen3CheckBox = new JCheckBox();
+		gen4CheckBox = new JCheckBox();
+		gen5CheckBox = new JCheckBox();
+		gen6CheckBox = new JCheckBox();
+		gen7CheckBox = new JCheckBox();
+		xyWarningLabel = new JLabel();
+		JPanel hSpacer2 = new JPanel(null);
+		JPanel hSpacer3 = new JPanel(null);
+		JPanel vSpacer1 = new JPanel(null);
+		JLabel label1 = new JLabel();
+		allowEvolutionaryRelativesCheckBox = new JCheckBox();
+
+		//======== mainPanel ========
+		{
+			mainPanel.setLayout(new GridBagLayout());
+
+			//======== panel1 ========
+			{
+				panel1.setLayout(new GridBagLayout());
+				panel1.add(hSpacer1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+					new Insets(0, 0, 0, 0), 0, 0));
+
+				//---- cancelButton ----
+				cancelButton.setText("Cancel");
+				panel1.add(cancelButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+					new Insets(0, 0, 0, 0), 0, 0));
+
+				//---- okButton ----
+				okButton.setText("OK");
+				panel1.add(okButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+					new Insets(0, 0, 0, 0), 0, 0));
+			}
+			mainPanel.add(panel1, new GridBagConstraints(3, 9, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
+
+			//---- gen1CheckBox ----
+			gen1CheckBox.setText("Generation 1");
+			mainPanel.add(gen1CheckBox, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(0, 0, 0, 0), 0, 0));
+
+			//---- gen2CheckBox ----
+			gen2CheckBox.setText("Generation 2");
+			mainPanel.add(gen2CheckBox, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(0, 0, 0, 0), 0, 0));
+
+			//---- gen3CheckBox ----
+			gen3CheckBox.setText("Generation 3");
+			mainPanel.add(gen3CheckBox, new GridBagConstraints(3, 3, 1, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(0, 0, 0, 0), 0, 0));
+
+			//---- gen4CheckBox ----
+			gen4CheckBox.setText("Generation 4");
+			mainPanel.add(gen4CheckBox, new GridBagConstraints(3, 4, 1, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(0, 0, 0, 0), 0, 0));
+
+			//---- gen5CheckBox ----
+			gen5CheckBox.setText("Generation 5");
+			mainPanel.add(gen5CheckBox, new GridBagConstraints(3, 5, 1, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(0, 0, 0, 0), 0, 0));
+
+			//---- gen6CheckBox ----
+			gen6CheckBox.setText("Generation 6");
+			mainPanel.add(gen6CheckBox, new GridBagConstraints(3, 6, 1, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(0, 0, 0, 0), 0, 0));
+
+			//---- gen7CheckBox ----
+			gen7CheckBox.setText("Generation 7");
+			mainPanel.add(gen7CheckBox, new GridBagConstraints(3, 7, 1, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(0, 0, 0, 0), 0, 0));
+
+			//---- xyWarningLabel ----
+			xyWarningLabel.setText(bundle.getString("GenerationLimitDialog.warningXYLabel.text"));
+			mainPanel.add(xyWarningLabel, new GridBagConstraints(3, 11, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.NONE,
+				new Insets(0, 0, 0, 0), 0, 0));
+			mainPanel.add(hSpacer2, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+				new Insets(0, 0, 0, 0), 0, 0));
+			mainPanel.add(hSpacer3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+				new Insets(0, 0, 0, 0), 0, 0));
+			mainPanel.add(vSpacer1, new GridBagConstraints(3, 10, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 0, 0), 0, 0));
+
+			//---- label1 ----
+			label1.setText("Include Pokemon from:");
+			mainPanel.add(label1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(0, 0, 0, 0), 0, 0));
+
+			//---- allowEvolutionaryRelativesCheckBox ----
+			allowEvolutionaryRelativesCheckBox.setText("Allow Evolutionary Relatives");
+			mainPanel.add(allowEvolutionaryRelativesCheckBox, new GridBagConstraints(3, 8, 1, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(0, 0, 0, 0), 0, 0));
+		}
+	}
+
+	private JPanel mainPanel;
+	private JButton cancelButton;
+	private JButton okButton;
+	private JCheckBox gen1CheckBox;
+	private JCheckBox gen2CheckBox;
+	private JCheckBox gen3CheckBox;
+	private JCheckBox gen4CheckBox;
+	private JCheckBox gen5CheckBox;
+	private JCheckBox gen6CheckBox;
+	private JCheckBox gen7CheckBox;
+	private JLabel xyWarningLabel;
+	private JCheckBox allowEvolutionaryRelativesCheckBox;
 }

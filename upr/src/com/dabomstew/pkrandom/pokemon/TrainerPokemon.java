@@ -88,6 +88,15 @@ public class TrainerPokemon {
         tpk.moves[2] = moves[2];
         tpk.moves[3] = moves[3];
 
+        tpk.forcedGenderFlag = forcedGenderFlag;
+        tpk.nature = nature;
+        tpk.IVs = IVs;
+        tpk.hpEVs = hpEVs;
+        tpk.atkEVs = atkEVs;
+        tpk.defEVs = defEVs;
+        tpk.spatkEVs = spatkEVs;
+        tpk.spdefEVs = spdefEVs;
+        tpk.speedEVs = speedEVs;
         tpk.strength = strength;
         tpk.heldItem = heldItem;
         tpk.abilitySlot = abilitySlot;

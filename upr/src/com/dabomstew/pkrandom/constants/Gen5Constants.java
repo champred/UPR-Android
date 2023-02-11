@@ -359,9 +359,8 @@ public class Gen5Constants {
             Moves.cut, Moves.fly, Moves.surf, Moves.strength, Moves.flash, Moves.dig, Moves.teleport,
             Moves.waterfall, Moves.sweetScent, Moves.dive);
 
-    public static final String shedinjaFunctionLocator = "F8B582B0061C30680F1C";
+    public static final String shedinjaSpeciesLocator = "24010000";
 
-    private static final int bw1FieldOverlayNumber = 21, bw2FieldOverlayNumber = 36;
     public static final String runningShoesPrefix = "01D0012008BD002008BD63";
 
     public static final String introGraphicPrefix = "5A0000010000001700000001000000", bw1IntroCryPrefix = "0021009101910291", bw2IntroCryLocator = "3D020000F8B51C1C";
@@ -374,6 +373,10 @@ public class Gen5Constants {
     public static final int numberOfPickupItems = 29;
 
     public static final String friendshipValueForEvoLocator = "DC282FD3";
+
+    public static final String perfectOddsBranchLocator = "08DB002801D0012000E0";
+
+    public static final String lowHealthMusicLocator = "00D10127";
 
     public static final List<Integer> consumableHeldItems = setupAllConsumableItems();
 
@@ -816,14 +819,6 @@ public class Gen5Constants {
         Map<Integer,Integer> m = new HashMap<>();
         m.put(255,0);
         return m;
-    }
-
-    public static int getFieldOverlayNumber(int romType) {
-        if (romType == Gen5Constants.Type_BW) {
-            return Gen5Constants.bw1FieldOverlayNumber;
-        } else {
-            return Gen5Constants.bw2FieldOverlayNumber;
-        }
     }
 
     public static ItemList allowedItems, nonBadItemsBW1, nonBadItemsBW2;

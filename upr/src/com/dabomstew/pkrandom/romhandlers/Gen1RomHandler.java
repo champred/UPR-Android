@@ -43,10 +43,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.dabomstew.pkrandom.FileFunctions;
-import com.dabomstew.pkrandom.GFXFunctions;
-import com.dabomstew.pkrandom.MiscTweak;
-import com.dabomstew.pkrandom.Settings;
+import com.dabomstew.pkrandom.*;
 import com.dabomstew.pkrandom.constants.*;
 import com.dabomstew.pkrandom.exceptions.RandomizationException;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
@@ -991,6 +988,12 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
     }
 
     @Override
+    public boolean supportsStarterHeldItems() {
+        // No held items in Gen 1
+        return false;
+    }
+
+    @Override
     public List<Integer> getStarterHeldItems() {
         // do nothing
         return new ArrayList<>();
@@ -1810,6 +1813,24 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         return (romEntry.getValue("StaticPokemonSupport") > 0) ? "Complete" : "No Static Pokemon";
     }
 
+    private static int find(byte[] haystack, String hexString) {
+        if (hexString.length() % 2 != 0) {
+            return -3; // error
+        }
+        byte[] searchFor = new byte[hexString.length() / 2];
+        for (int i = 0; i < searchFor.length; i++) {
+            searchFor[i] = (byte) Integer.parseInt(hexString.substring(i * 2, i * 2 + 2), 16);
+        }
+        List<Integer> found = RomFunctions.search(haystack, searchFor);
+        if (found.size() == 0) {
+            return -1; // not found
+        } else if (found.size() > 1) {
+            return -2; // not unique
+        } else {
+            return found.get(0);
+        }
+    }
+
     private void populateEvolutions() {
         for (Pokemon pkmn : pokes) {
             if (pkmn != null) {
@@ -2085,6 +2106,7 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         if (romEntry.getValue("CatchingTutorialMonOffset") != 0) {
             available |= MiscTweak.RANDOMIZE_CATCHING_TUTORIAL.getValue();
         }
+
         return available;
     }
 
@@ -2149,6 +2171,28 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
     private void randomizeCatchingTutorial() {
         if (romEntry.getValue("CatchingTutorialMonOffset") != 0) {
             rom[romEntry.getValue("CatchingTutorialMonOffset")] = (byte) pokeNumToRBYTable[this.randomPokemon().number];
+        }
+    }
+
+    @Override
+    public void enableGuaranteedPokemonCatching() {
+        int offset = find(rom, Gen1Constants.guaranteedCatchPrefix);
+        if (offset > 0) {
+            offset += Gen1Constants.guaranteedCatchPrefix.length() / 2; // because it was a prefix
+
+            // The game ensures that the Master Ball always catches a Pokemon by running the following code:
+            // ; Get the item ID.
+            //  ld hl, wcf91
+            //  ld a, [hl]
+            //
+            // ; The Master Ball always succeeds.
+            //  cp MASTER_BALL
+            //  jp z, .captured
+            // By making the jump here unconditional, we can ensure that catching always succeeds no
+            // matter the ball type. We check that the original condition is present just for safety.
+            if (rom[offset] == (byte)0xCA) {
+                rom[offset] = (byte)0xC3;
+            }
         }
     }
 

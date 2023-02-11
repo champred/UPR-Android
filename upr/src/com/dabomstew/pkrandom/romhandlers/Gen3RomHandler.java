@@ -1576,6 +1576,11 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     @Override
+    public boolean supportsStarterHeldItems() {
+        return true;
+    }
+
+    @Override
     public List<Integer> getStarterHeldItems() {
         List<Integer> sHeldItems = new ArrayList<>();
         if (romEntry.romType == Gen3Constants.RomType_FRLG) {
@@ -1786,7 +1791,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         if (romEntry.romType == Gen3Constants.RomType_FRLG) {
             // Ban Unown in FRLG because the game crashes if it is encountered outside of Tanoby Ruins.
             // See GenerateWildMon in wild_encounter.c in pokefirered
-            return Collections.singletonList(pokes[Species.unown]);
+            return new ArrayList<>(Collections.singletonList(pokes[Species.unown]));
         }
         return new ArrayList<>();
     }
@@ -1882,6 +1887,35 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 }
             }
             theTrainers.add(tr);
+        }
+
+        if (romEntry.romType == Gen3Constants.RomType_Em) {
+            int mossdeepStevenOffset = romEntry.getValue("MossdeepStevenTeamOffset");
+            Trainer mossdeepSteven = new Trainer();
+            mossdeepSteven.offset = mossdeepStevenOffset;
+            mossdeepSteven.index = amount;
+            mossdeepSteven.poketype = 1; // Custom moves, but no held items
+
+            // This is literally how the game does it too, lol. Have to subtract one because the
+            // trainers internally are one-indexed, but then theTrainers is zero-indexed.
+            Trainer meteorFallsSteven = theTrainers.get(Gen3Constants.emMeteorFallsStevenIndex - 1);
+            mossdeepSteven.trainerclass = meteorFallsSteven.trainerclass;
+            mossdeepSteven.name = meteorFallsSteven.name;
+            mossdeepSteven.fullDisplayName = meteorFallsSteven.fullDisplayName;
+
+            for (int i = 0; i < 3; i++) {
+                int currentOffset = mossdeepStevenOffset + (i * 20);
+                TrainerPokemon thisPoke = new TrainerPokemon();
+                thisPoke.pokemon = pokesInternal[readWord(currentOffset)];
+                thisPoke.IVs = rom[currentOffset + 2];
+                thisPoke.level = rom[currentOffset + 3];
+                for (int move = 0; move < 4; move++) {
+                    thisPoke.moves[move] = readWord(currentOffset + 12 + (move * 2));
+                }
+                mossdeepSteven.pokemon.add(thisPoke);
+            }
+
+            theTrainers.add(mossdeepSteven);
         }
 
         if (romEntry.romType == Gen3Constants.RomType_Ruby || romEntry.romType == Gen3Constants.RomType_Sapp) {
@@ -2007,6 +2041,21 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             }
         }
 
+        if (romEntry.romType == Gen3Constants.RomType_Em) {
+            int mossdeepStevenOffset = romEntry.getValue("MossdeepStevenTeamOffset");
+            Trainer mossdeepSteven = trainerData.get(amount - 1);
+
+            for (int i = 0; i < 3; i++) {
+                int currentOffset = mossdeepStevenOffset + (i * 20);
+                TrainerPokemon tp = mossdeepSteven.pokemon.get(i);
+                writeWord(currentOffset, pokedexToInternal[tp.pokemon.number]);
+                rom[currentOffset + 2] = (byte)tp.IVs;
+                rom[currentOffset + 3] = (byte)tp.level;
+                for (int move = 0; move < 4; move++) {
+                    writeWord(currentOffset + 12 + (move * 2), tp.moves[move]);
+                }
+            }
+        }
     }
 
     private void writeWildArea(int offset, int numOfEntries, EncounterSet encounters) {
@@ -4321,6 +4370,24 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             }
             rom[currentOffset + 2] = effectivenessInternal;
             currentOffset += 3;
+        }
+    }
+
+    @Override
+    public void enableGuaranteedPokemonCatching() {
+        int offset = find(rom, Gen3Constants.perfectOddsBranchLocator);
+        if (offset > 0) {
+            // In Cmd_handleballthrow, the middle of the function checks if the odds of catching a Pokemon
+            // is greater than 254; if it is, then the Pokemon is automatically caught. In ASM, this is
+            // represented by:
+            // cmp r6, #0xFE
+            // bls oddsLessThanOrEqualTo254
+            // The below code just nops these two instructions so that we *always* act like our odds are 255,
+            // and Pokemon are automatically caught no matter what.
+            rom[offset] = 0x00;
+            rom[offset + 1] = 0x00;
+            rom[offset + 2] = 0x00;
+            rom[offset + 3] = 0x00;
         }
     }
 

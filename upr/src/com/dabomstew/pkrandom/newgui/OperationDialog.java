@@ -59,6 +59,10 @@ public class OperationDialog extends javax.swing.JDialog {
         setLocationRelativeTo(parent);
     }
 
+    public void setLoadingLabelText(String text) {
+        loadingLabel.setText(text);
+    }
+
     /* @formatter:off */
     /**
      * This method is called from within the constructor to initialize the form.

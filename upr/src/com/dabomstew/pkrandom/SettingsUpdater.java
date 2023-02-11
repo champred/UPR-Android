@@ -292,7 +292,6 @@ public class SettingsUpdater {
         }
 
         if (oldVersion < 319) {
-
             // 5-10 custom starters, offset by 1 because of new "Random" option
             int starter1 = FileFunctions.read2ByteInt(dataBlock, 5);
             int starter2 = FileFunctions.read2ByteInt(dataBlock, 7);
@@ -308,6 +307,14 @@ public class SettingsUpdater {
 
             // 50 elite four unique pokemon (3 bits)
             insertExtraByte(50, (byte) 0);
+        }
+
+        if (oldVersion < 321) {
+            // Minimum Catch Rate got moved around to give it more space for Guaranteed Catch.
+            // Read the old one, clear it out, then write it to the new location.
+            int oldMinimumCatchRate = ((dataBlock[16] & 0x60) >> 5) + 1;
+            dataBlock[16] &= ~0x60;
+            dataBlock[50] |= ((oldMinimumCatchRate - 1) << 3);
         }
 
         // fix checksum

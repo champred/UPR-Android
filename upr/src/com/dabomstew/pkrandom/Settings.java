@@ -248,7 +248,7 @@ public class Settings {
         }
         int version = ByteBuffer.wrap(versionBytes).getInt();
         if (((version >> 24) & 0xFF) > 0 && ((version >> 24) & 0xFF) <= 172) {
-            throw new UnsupportedOperationException("The settings file is old and must be updated. Press Settings -> \"Update Pre-3.0.0 Settings File\" to update.");
+            throw new UnsupportedOperationException("The settings file is too old to update and cannot be loaded.");
         }
         if (version > VERSION) {
             throw new UnsupportedOperationException("Cannot read settings from a newer version of the randomizer.");
@@ -336,8 +336,7 @@ public class Settings {
         // 16 wild pokemon 2
         out.write(makeByteSelected(useMinimumCatchRate, blockWildLegendaries,
                 wildPokemonRestrictionMod == WildPokemonRestrictionMod.SIMILAR_STRENGTH, randomizeWildPokemonHeldItems,
-                banBadRandomWildPokemonHeldItems, false, false, balanceShakingGrass)
-                | ((minimumCatchRateLevel - 1) << 5));
+                banBadRandomWildPokemonHeldItems, false, false, balanceShakingGrass));
 
         // 17 static pokemon
         out.write(makeByteSelected(staticPokemonMod == StaticPokemonMod.UNCHANGED,
@@ -492,8 +491,8 @@ public class Settings {
                 pickupItemsMod == PickupItemsMod.UNCHANGED, banBadRandomPickupItems,
                 banIrregularAltFormes));
 
-        // 50 elite four unique pokemon (3 bits)
-        out.write(eliteFourUniquePokemonNumber);
+        // 50 elite four unique pokemon (3 bits) + catch rate level (3 bits)
+        out.write(eliteFourUniquePokemonNumber | ((minimumCatchRateLevel - 1) << 3));
 
         try {
             byte[] romName = this.romName.getBytes("US-ASCII");
@@ -613,8 +612,6 @@ public class Settings {
         settings.setBlockWildLegendaries(restoreState(data[16], 1));
         settings.setRandomizeWildPokemonHeldItems(restoreState(data[16], 3));
         settings.setBanBadRandomWildPokemonHeldItems(restoreState(data[16], 4));
-
-        settings.setMinimumCatchRateLevel(((data[16] & 0x60) >> 5) + 1);
         settings.setBalanceShakingGrass(restoreState(data[16], 7));
 
         settings.setStaticPokemonMod(restoreEnum(StaticPokemonMod.class, data[17], 0, // UNCHANGED
@@ -784,6 +781,7 @@ public class Settings {
         settings.setBanIrregularAltFormes(restoreState(data[49], 3));
 
         settings.setEliteFourUniquePokemonNumber(data[50] & 0x7);
+        settings.setMinimumCatchRateLevel(((data[50] & 0x38) >> 3) + 1);
 
         int romNameLength = data[LENGTH_OF_SETTINGS_DATA] & 0xFF;
         String romName = new String(data, LENGTH_OF_SETTINGS_DATA + 1, romNameLength, "US-ASCII");
@@ -941,7 +939,12 @@ public class Settings {
         }
 
         // starters
-        List<Pokemon> romPokemon = rh.getPokemonInclFormes();
+        List<Pokemon> romPokemon;
+        if (rh.hasStarterAltFormes()) {
+            romPokemon = rh.getPokemonInclFormes();
+        } else {
+            romPokemon = rh.getPokemon();
+        }
         List<Pokemon> romStarters = rh.getStarters();
         for (int starter = 0; starter < 3; starter++) {
             if (this.customStarters[starter] < 0 || this.customStarters[starter] >= romPokemon.size()) {

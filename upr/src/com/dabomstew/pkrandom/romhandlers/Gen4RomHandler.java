@@ -539,6 +539,12 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 (romEntry.romType == Gen4Constants.Type_Plat && romEntry.tweakFiles.containsKey("NewRoamerSubroutineTweak")) ||
                 (romEntry.romType == Gen4Constants.Type_HGSS && romEntry.tweakFiles.containsKey("NewRoamerSubroutineTweak"));
 
+        try {
+            computeCRC32sForRom();
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+
         // We want to guarantee that the catching tutorial in HGSS has Ethan/Lyra's new Pokemon. We also
         // want to allow the option of randomizing the enemy Pokemon too. Unfortunately, the latter can
         // occur *before* the former, but there's no guarantee that it will even happen. Since we *know*
@@ -547,12 +553,6 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             int extendBy = romEntry.getInt("Arm9ExtensionSize");
             arm9 = extendARM9(arm9, extendBy, romEntry.getString("TCMCopyingPrefix"), Gen4Constants.arm9Offset);
             genericIPSPatch(arm9, "NewCatchingTutorialSubroutineTweak");
-        }
-
-        try {
-            computeCRC32sForRom();
-        } catch (IOException e) {
-            throw new RandomizerIOException(e);
         }
     }
 
@@ -1567,14 +1567,25 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
+    public boolean supportsStarterHeldItems() {
+        return romEntry.romType == Gen4Constants.Type_DP || romEntry.romType == Gen4Constants.Type_Plat;
+    }
+
+    @Override
     public List<Integer> getStarterHeldItems() {
-        // do nothing
-        return new ArrayList<>();
+        int starterScriptNumber = romEntry.getInt("StarterPokemonScriptOffset");
+        int starterHeldItemOffset = romEntry.getInt("StarterPokemonHeldItemOffset");
+        byte[] file = scriptNarc.files.get(starterScriptNumber);
+        int item = FileFunctions.read2ByteInt(file, starterHeldItemOffset);
+        return Arrays.asList(item);
     }
 
     @Override
     public void setStarterHeldItems(List<Integer> items) {
-        // do nothing
+        int starterScriptNumber = romEntry.getInt("StarterPokemonScriptOffset");
+        int starterHeldItemOffset = romEntry.getInt("StarterPokemonHeldItemOffset");
+        byte[] file = scriptNarc.files.get(starterScriptNumber);
+        FileFunctions.write2ByteInt(file, starterHeldItemOffset, items.get(0));
     }
 
     @Override
@@ -3088,6 +3099,13 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 }
             }
         }
+    }
+
+    @Override
+    public List<Pokemon> bannedForWildEncounters() {
+        // Ban Unown in DPPt because you can't get certain letters outside of Solaceon Ruins.
+        // Ban Unown in HGSS because they don't show up unless you complete a puzzle in the Ruins of Alph.
+        return new ArrayList<>(Collections.singletonList(pokes[Species.unown]));
     }
 
     @Override
@@ -5251,6 +5269,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         if (romEntry.tweakFiles.get("FastDistortionWorldTweak") != null) {
             available |= MiscTweak.FAST_DISTORTION_WORLD.getValue();
         }
+        if (romEntry.romType == Gen4Constants.Type_Plat || romEntry.romType == Gen4Constants.Type_HGSS) {
+            available |= MiscTweak.UPDATE_ROTOM_FORME_TYPING.getValue();
+        }
         return available;
     }
 
@@ -5275,6 +5296,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             updateTypeEffectiveness();
         } else if (tweak == MiscTweak.FAST_DISTORTION_WORLD) {
             applyFastDistortionWorld();
+        } else if (tweak == MiscTweak.UPDATE_ROTOM_FORME_TYPING) {
+            updateRotomFormeTyping();
         }
     }
 
@@ -5506,6 +5529,38 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         scriptNarc.files.set(Gen4Constants.ptSpearPillarPortalScriptFile, spearPillarPortalScript);
     }
 
+    private void updateRotomFormeTyping() {
+        pokes[Species.Gen4Formes.rotomH].secondaryType = Type.FIRE;
+        pokes[Species.Gen4Formes.rotomW].secondaryType = Type.WATER;
+        pokes[Species.Gen4Formes.rotomFr].secondaryType = Type.ICE;
+        pokes[Species.Gen4Formes.rotomFa].secondaryType = Type.FLYING;
+        pokes[Species.Gen4Formes.rotomM].secondaryType = Type.GRASS;
+    }
+
+    @Override
+    public void enableGuaranteedPokemonCatching() {
+        try {
+            byte[] battleOverlay = readOverlay(romEntry.getInt("BattleOvlNumber"));
+            int offset = find(battleOverlay, Gen4Constants.perfectOddsBranchLocator);
+            if (offset > 0) {
+                // In Cmd_handleballthrow (name taken from pokeemerald decomp), the middle of the function checks
+                // if the odds of catching a Pokemon is greater than 254; if it is, then the Pokemon is automatically
+                // caught. In ASM, this is represented by:
+                // cmp r1, #0xFF
+                // bcc oddsLessThanOrEqualTo254
+                // The below code just nops these two instructions so that we *always* act like our odds are 255,
+                // and Pokemon are automatically caught no matter what.
+                battleOverlay[offset] = 0x00;
+                battleOverlay[offset + 1] = 0x00;
+                battleOverlay[offset + 2] = 0x00;
+                battleOverlay[offset + 3] = 0x00;
+                writeOverlay(romEntry.getInt("BattleOvlNumber"), battleOverlay);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+    }
+
     @Override
     public void applyCorrectStaticMusic(Map<Integer,Integer> specialMusicStaticChanges) {
         List<Integer> replaced = new ArrayList<>();
@@ -5612,6 +5667,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     @Override
     public boolean isRomValid() {
         if (romEntry.arm9ExpectedCRC32 != actualArm9CRC32) {
+            System.out.println(actualArm9CRC32);
             return false;
         }
 

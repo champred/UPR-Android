@@ -43,9 +43,13 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import static java.nio.file.Files.copy;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -87,6 +91,7 @@ public class NewRandomizerGUI {
     private JMenuItem removeGameUpdateMenuItem;
     private JMenuItem loadGetSettingsMenuItem;
     private JMenuItem keepOrUnloadGameAfterRandomizingMenuItem;
+    private JMenuItem batchRandomizationMenuItem;
 
     private ImageIcon emptyIcon = new ImageIcon(getClass().getResource("/com/dabomstew/pkrandom/newgui/emptyIcon.png"));
     private boolean haveCheckedCustomNames, unloadGameOnSuccess;
@@ -96,6 +101,9 @@ public class NewRandomizerGUI {
     private List<String> trainerSettingToolTips = new ArrayList<>();
     private final int TRAINER_UNCHANGED = 0, TRAINER_RANDOM = 1, TRAINER_RANDOM_EVEN = 2, TRAINER_RANDOM_EVEN_MAIN = 3,
                         TRAINER_TYPE_THEMED = 4, TRAINER_TYPE_THEMED_ELITE4_GYMS = 5;
+
+    private BatchRandomizationSettings batchRandomizationSettings;
+    private JarClassLoader batchLoader;
 
     public NewRandomizerGUI() {
 		initComponents();
@@ -112,6 +120,13 @@ public class NewRandomizerGUI {
         initExplicit();
         initTweaksPanel();
         initFileChooserDirectories();
+
+        //use fast batch generation if available
+        try {
+            batchLoader = loadBatchJar();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
 
         boolean canWrite = attemptWriteConfig();
         if (!canWrite) {
@@ -264,7 +279,8 @@ public class NewRandomizerGUI {
             if (gld.pressedOK()) {
                 currentRestrictions = gld.getChoice();
                 if (currentRestrictions != null && !currentRestrictions.allowTrainerSwapMegaEvolvables(
-                        romHandler.forceSwapStaticMegaEvos(), isTrainerSetting(TRAINER_TYPE_THEMED))) {
+                        romHandler.forceSwapStaticMegaEvos(), isTrainerSetting(TRAINER_TYPE_THEMED) ||
+                                isTrainerSetting(TRAINER_TYPE_THEMED_ELITE4_GYMS))) {
                     tpSwapMegaEvosCheckBox.setEnabled(false);
                     tpSwapMegaEvosCheckBox.setSelected(false);
                 }
@@ -321,6 +337,13 @@ public class NewRandomizerGUI {
                 enableOrDisableSubControls();
             }
         });
+        batchRandomizationMenuItem.addActionListener(e -> batchRandomizationSettingsDialog());
+    }
+
+    private JarClassLoader loadBatchJar() throws MalformedURLException {
+        File jarFile = new File(SysConstants.ROOT_PATH, "batch.jar");
+        if (!jarFile.exists()) return null;
+        return new JarClassLoader(jarFile.toURI().toURL());
     }
 
     private void showInitialPopup() {
@@ -472,6 +495,10 @@ public class NewRandomizerGUI {
             keepOrUnloadGameAfterRandomizingMenuItem.setText(bundle.getString("GUI.unloadGameAfterRandomizingMenuItem.text"));
         }
         settingsMenu.add(keepOrUnloadGameAfterRandomizingMenuItem);
+
+        batchRandomizationMenuItem = new JMenuItem();
+        batchRandomizationMenuItem.setText(bundle.getString("GUI.batchRandomizationMenuItem.text"));
+        settingsMenu.add(batchRandomizationMenuItem);
     }
 
     private void loadROM() {
@@ -555,6 +582,10 @@ public class NewRandomizerGUI {
         if (romHandler == null) {
             return; // none loaded
         }
+        if (raceModeCheckBox.isSelected() && batchRandomizationSettings.isBatchRandomizationEnabled()) {
+            JOptionPane.showMessageDialog(frame, bundle.getString("GUI.batchRandomizationRequirements"));
+            return;
+        }
         if (raceModeCheckBox.isSelected() && isTrainerSetting(TRAINER_UNCHANGED) && wpUnchangedRadioButton.isSelected()) {
             JOptionPane.showMessageDialog(frame, bundle.getString("GUI.raceModeRequirements"));
             return;
@@ -568,7 +599,10 @@ public class NewRandomizerGUI {
         romSaveChooser.setSelectedFile(null);
         boolean allowed = false;
         File fh = null;
-        if (outputType == SaveType.FILE) {
+        if (batchRandomizationSettings.isBatchRandomizationEnabled() && outputType != SaveType.INVALID) {
+            allowed = true;
+        }
+        else if (outputType == SaveType.FILE) {
             romSaveChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             int returnVal = romSaveChooser.showSaveDialog(frame);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -596,19 +630,109 @@ public class NewRandomizerGUI {
         }
 
         if (allowed && fh != null) {
-            // Get a seed
-            long seed = RandomSource.pickSeed();
-            // Apply it
-            RandomSource.seed(seed);
-            presetMode = false;
+            saveRandomizedRom(outputType, fh);
+        } else if (allowed && batchRandomizationSettings.isBatchRandomizationEnabled()) {
+            int numberOfRandomizedROMs = batchRandomizationSettings.getNumberOfRandomizedROMs();
+            int startingIndex = batchRandomizationSettings.getStartingIndex();
+            int endingIndex = startingIndex + numberOfRandomizedROMs;
+            final String progressTemplate = bundle.getString("GUI.batchRandomizationProgress");
+            OperationDialog batchProgressDialog = new OperationDialog(String.format(progressTemplate, 0, numberOfRandomizedROMs), frame, true);
+            SwingWorker swingWorker = new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    SwingUtilities.invokeLater(() -> batchProgressDialog.setVisible(true));
+                    try {
+                        String input;
+                        if (batchRandomizationSettings.shouldGenerateLogFile()) input = "yes";
+                        else input = "no";
+                        System.setIn(new ByteArrayInputStream((input + "\n").getBytes()));
+                        batchLoader.invokeClass(batchLoader.getMainClassName(), new String[] {
+                                String.valueOf(startingIndex),
+                                String.valueOf(endingIndex),
+                                romHandler.loadedFilename(),
+                                batchRandomizationSettings.getOutputDirectory(),
+                                batchRandomizationSettings.getFileNamePrefix(),
+                                Version.VERSION + getCurrentSettings().toString()
+                        });
+                    } catch (NullPointerException | IOException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException e) {
+                        e.printStackTrace();
+                        for (int i = startingIndex; i < endingIndex; i++) {
+                            String fileName = batchRandomizationSettings.getOutputDirectory() +
+                                    File.separator +
+                                    batchRandomizationSettings.getFileNamePrefix() +
+                                    i;
+                            if (outputType == SaveType.FILE) {
+                                fileName += '.' + romHandler.getDefaultExtension();
+                            }
+                            File rom = new File(fileName);
+                            if (outputType == SaveType.DIRECTORY) {
+                                rom.mkdirs();
+                            }
+                            int currentRomNumber = i - startingIndex + 1;
 
-            try {
-                CustomNamesSet cns = FileFunctions.getCustomNames();
-                performRandomization(fh.getAbsolutePath(), seed, cns, outputType == SaveType.DIRECTORY);
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(frame, bundle.getString("GUI.cantLoadCustomNames"));
-            }
+                            SwingUtilities.invokeLater(
+                                    () -> batchProgressDialog.setLoadingLabelText(String.format(progressTemplate,
+                                            currentRomNumber,
+                                            numberOfRandomizedROMs))
+                            );
+                            saveRandomizedRom(outputType, rom);
+                       }
+                    }
+                    String saveFileSource = batchRandomizationSettings.getSaveFilePath();
+                    if (!saveFileSource.isEmpty()) {
+                        String saveName = new File(saveFileSource).getName();
+                        String saveExtension = saveName.substring(saveName.indexOf('.'));
+                        for (int i = startingIndex; i < endingIndex; i++) {
+                            String saveFileDest = batchRandomizationSettings.getOutputDirectory() +
+                                    File.separator +
+                                    batchRandomizationSettings.getFileNamePrefix() +
+                                    i + saveExtension;
+                            try {
+                                copy(Paths.get(saveFileSource), Paths.get(saveFileDest));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                break;
+                            }
+                        }
+                    }
+                    return null;
+                }
 
+                @Override
+                protected void done() {
+                    super.done();
+                    if (batchRandomizationSettings.shouldAutoAdvanceStartingIndex()) {
+                        batchRandomizationSettings.setStartingIndex(endingIndex + 1);
+                        attemptWriteConfig();
+                    }
+                    SwingUtilities.invokeLater(() -> batchProgressDialog.setVisible(false));
+                    JOptionPane.showMessageDialog(frame, bundle.getString("GUI.randomizationDone"));
+                    if (unloadGameOnSuccess) {
+                        romHandler = null;
+                        initialState();
+                    } else {
+                        reinitializeRomHandler(false);
+                    }
+                    frame.setCursor(null);
+                }
+            };
+            swingWorker.execute();
+        }
+    }
+
+    private void saveRandomizedRom(SaveType outputType, File fh) {
+        // Get a seed
+        long seed = RandomSource.pickSeed();
+        // Apply it
+        RandomSource.seed(seed);
+        presetMode = false;
+
+        try {
+            CustomNamesSet cns = FileFunctions.getCustomNames();
+            performRandomization(fh.getAbsolutePath(), seed, cns, outputType == SaveType.DIRECTORY);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(frame, bundle.getString("GUI.cantLoadCustomNames"));
         }
     }
 
@@ -680,6 +804,7 @@ public class NewRandomizerGUI {
     private void performRandomization(final String filename, final long seed, CustomNamesSet customNames, boolean saveAsDirectory) {
         final Settings settings = createSettingsFromState(customNames);
         final boolean raceMode = settings.isRaceMode();
+        final boolean batchRandomization = batchRandomizationSettings.isBatchRandomizationEnabled() && !presetMode;
         // Setup verbose log
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream log;
@@ -695,7 +820,7 @@ public class NewRandomizerGUI {
             final AtomicInteger finishedCV = new AtomicInteger(0);
             opDialog = new OperationDialog(bundle.getString("GUI.savingText"), frame, true);
             Thread t = new Thread(() -> {
-                SwingUtilities.invokeLater(() -> opDialog.setVisible(true));
+                SwingUtilities.invokeLater(() -> opDialog.setVisible(!batchRandomization));
                 boolean succeededSave = false;
                 try {
                     romHandler.setLog(verboseLog);
@@ -730,19 +855,22 @@ public class NewRandomizerGUI {
                             JOptionPane.showMessageDialog(frame,
                                     String.format(bundle.getString("GUI.raceModeCheckValuePopup"),
                                             finishedCV.get()));
-                        } else {
+                        } else if (batchRandomization && batchRandomizationSettings.shouldGenerateLogFile()) {
+                            try {
+                                saveLogFile(filename, out);
+                            } catch (IOException e) {
+                                JOptionPane.showMessageDialog(frame,
+                                        bundle.getString("GUI.logSaveFailed"));
+                                return;
+                            }
+                        } else if (!batchRandomization) {
                             int response = JOptionPane.showConfirmDialog(frame,
                                     bundle.getString("GUI.saveLogDialog.text"),
                                     bundle.getString("GUI.saveLogDialog.title"),
                                     JOptionPane.YES_NO_OPTION);
                             if (response == JOptionPane.YES_OPTION) {
                                 try {
-                                    FileOutputStream fos = new FileOutputStream(filename + ".log");
-                                    fos.write(0xEF);
-                                    fos.write(0xBB);
-                                    fos.write(0xBF);
-                                    fos.write(out);
-                                    fos.close();
+                                    saveLogFile(filename, out);
                                 } catch (IOException e) {
                                     JOptionPane.showMessageDialog(frame,
                                             bundle.getString("GUI.logSaveFailed"));
@@ -760,9 +888,9 @@ public class NewRandomizerGUI {
                                 romHandler = null;
                                 initialState();
                             } else {
-                                reinitializeRomHandler();
+                                reinitializeRomHandler(false);
                             }
-                        } else {
+                        } else if (!batchRandomization) {
                             // Compile a config string
                             try {
                                 String configString = getCurrentSettings().toString();
@@ -778,7 +906,7 @@ public class NewRandomizerGUI {
                                 romHandler = null;
                                 initialState();
                             } else {
-                                reinitializeRomHandler();
+                                reinitializeRomHandler(false);
                             }
                         }
                     });
@@ -791,12 +919,25 @@ public class NewRandomizerGUI {
                 }
             });
             t.start();
+            if (batchRandomization) {
+                t.join();
+                reinitializeRomHandler(true);
+            }
         } catch (Exception ex) {
             attemptToLogException(ex, "GUI.saveFailed", "GUI.saveFailedNoLog", settings.toString(), Long.toString(seed));
             if (verboseLog != null) {
                 verboseLog.close();
             }
         }
+    }
+
+    private void saveLogFile(String filename, byte[] out) throws IOException {
+        FileOutputStream fos = new FileOutputStream(filename + ".log");
+        fos.write(0xEF);
+        fos.write(0xBB);
+        fos.write(0xBF);
+        fos.write(out);
+        fos.close();
     }
 
     private void presetLoader() {
@@ -1060,17 +1201,24 @@ public class NewRandomizerGUI {
         JOptionPane.showMessageDialog(frame, messages);
     }
 
-    // This is only intended to be used with the "Keep Game Loaded After Randomizing" setting; it assumes that
-    // the game has already been loaded once, and we just need to reload the same game to reinitialize the
-    // RomHandler. Don't use this for other purposes unless you know what you're doing.
-    private void reinitializeRomHandler() {
+    private void batchRandomizationSettingsDialog() {
+        BatchRandomizationSettingsDialog dlg = new BatchRandomizationSettingsDialog(frame, batchRandomizationSettings);
+        batchRandomizationSettings = dlg.getCurrentSettings();
+        attemptWriteConfig();
+    }
+
+    // This is only intended to be used with the "Keep Game Loaded After Randomizing" setting or between randomization
+    // iterations when batch randomization is enabled. It assumes that the game has already been loaded once, and we just need
+    // to reload the same game to reinitialize the RomHandler. Don't use this for other purposes unless you know what
+    // you're doing.
+    private void reinitializeRomHandler(boolean batchRandomization) {
         String currentFN = this.romHandler.loadedFilename();
         for (RomHandler.Factory rhf : checkHandlers) {
             if (rhf.isLoadable(currentFN)) {
                 this.romHandler = rhf.create(RandomSource.instance());
                 opDialog = new OperationDialog(bundle.getString("GUI.loadingText"), frame, true);
                 Thread t = new Thread(() -> {
-                    SwingUtilities.invokeLater(() -> opDialog.setVisible(true));
+                    SwingUtilities.invokeLater(() -> opDialog.setVisible(!batchRandomization));
                     try {
                         this.romHandler.loadRom(currentFN);
                         if (gameUpdates.containsKey(this.romHandler.getROMCode())) {
@@ -1084,7 +1232,13 @@ public class NewRandomizerGUI {
                     });
                 });
                 t.start();
-
+                if (batchRandomization) {
+                    try {
+                        t.join();
+                    } catch(InterruptedException ex) {
+                        attemptToLogException(ex, "GUI.loadFailed", "GUI.loadFailedNoLog", null, null);
+                    }
+                }
                 return;
             }
         }
@@ -2349,7 +2503,7 @@ public class NewRandomizerGUI {
 
             pbsStandardizeEXPCurvesCheckBox.setEnabled(true);
             pbsLegendariesSlowRadioButton.setSelected(true);
-            pbsUpdateBaseStatsCheckBox.setEnabled(pokemonGeneration < 8);
+            pbsUpdateBaseStatsCheckBox.setEnabled(pokemonGeneration < GlobalConstants.HIGHEST_POKEMON_GEN);
             pbsFollowMegaEvosCheckBox.setVisible(romHandler.hasMegaEvolutions());
             pbsUpdateComboBox.setVisible(pokemonGeneration < 8);
             ExpCurve[] expCurves = getEXPCurvesForGeneration(pokemonGeneration);
@@ -2412,11 +2566,11 @@ public class NewRandomizerGUI {
             }
             populateDropdowns();
 
-            boolean hasStarterHeldItems = (pokemonGeneration == 2 || pokemonGeneration == 3);
-            spRandomizeStarterHeldItemsCheckBox.setEnabled(hasStarterHeldItems);
-            spRandomizeStarterHeldItemsCheckBox.setVisible(hasStarterHeldItems);
+            boolean supportsStarterHeldItems = romHandler.supportsStarterHeldItems();
+            spRandomizeStarterHeldItemsCheckBox.setEnabled(supportsStarterHeldItems);
+            spRandomizeStarterHeldItemsCheckBox.setVisible(supportsStarterHeldItems);
             spBanBadItemsCheckBox.setEnabled(false);
-            spBanBadItemsCheckBox.setVisible(hasStarterHeldItems);
+            spBanBadItemsCheckBox.setVisible(supportsStarterHeldItems);
 
             stpUnchangedRadioButton.setEnabled(true);
             stpUnchangedRadioButton.setSelected(true);
@@ -2525,6 +2679,7 @@ public class NewRandomizerGUI {
             tpNoEarlyWonderGuardCheckBox.setVisible(pokemonGeneration >= 3);
             tpRandomShinyTrainerPokemonCheckBox.setVisible(pokemonGeneration >= 7);
             tpBetterMovesetsCheckBox.setVisible(pokemonGeneration >= 3);
+            tpBetterMovesetsCheckBox.setEnabled(pokemonGeneration >= 3);
 
             totpPanel.setVisible(pokemonGeneration == 7);
             if (totpPanel.isVisible()) {
@@ -2983,8 +3138,6 @@ public class NewRandomizerGUI {
             tpSwapMegaEvosCheckBox.setSelected(false);
             tpRandomShinyTrainerPokemonCheckBox.setEnabled(false);
             tpRandomShinyTrainerPokemonCheckBox.setSelected(false);
-            tpBetterMovesetsCheckBox.setEnabled(false);
-            tpBetterMovesetsCheckBox.setSelected(false);
             tpDoubleBattleModeCheckBox.setEnabled(false);
             tpDoubleBattleModeCheckBox.setSelected(false);
             tpBossTrainersCheckBox.setEnabled(false);
@@ -3020,7 +3173,6 @@ public class NewRandomizerGUI {
                 tpSwapMegaEvosCheckBox.setSelected(false);
             }
             tpRandomShinyTrainerPokemonCheckBox.setEnabled(true);
-            tpBetterMovesetsCheckBox.setEnabled(true);
             tpDoubleBattleModeCheckBox.setEnabled(tpDoubleBattleModeCheckBox.isVisible());
             tpBossTrainersCheckBox.setEnabled(tpBossTrainersCheckBox.isVisible());
             tpImportantTrainersCheckBox.setEnabled(tpImportantTrainersCheckBox.isVisible());
@@ -3409,8 +3561,8 @@ public class NewRandomizerGUI {
             spComboBox3.setSelectedIndex(allPokes.indexOf(currentStarters.get(2)));
         }
 
-        String[] baseStatGenerationNumbers = new String[Math.min(3, GlobalConstants.HIGHEST_POKEMON_GEN - romHandler.generationOfPokemon())];
-        int j = Math.max(6,romHandler.generationOfPokemon() + 1);
+        String[] baseStatGenerationNumbers = new String[Math.min(4, GlobalConstants.HIGHEST_POKEMON_GEN - romHandler.generationOfPokemon())];
+        int j = Math.max(6, romHandler.generationOfPokemon() + 1);
         for (int i = 0; i < baseStatGenerationNumbers.length; i++) {
             baseStatGenerationNumbers[i] = String.valueOf(j);
             j++;
@@ -3495,6 +3647,7 @@ public class NewRandomizerGUI {
     private void attemptReadConfig() {
         // Things that should be true by default should be manually set here
         unloadGameOnSuccess = true;
+        batchRandomizationSettings = new BatchRandomizationSettings();
         File fh = new File(SysConstants.ROOT_PATH + "config.ini");
         if (!fh.exists() || !fh.canRead()) {
             return;
@@ -3534,6 +3687,30 @@ public class NewRandomizerGUI {
                         if (key.equals("showinvalidrompopup")) {
                             showInvalidRomPopup = Boolean.parseBoolean(tokens[1].trim());
                         }
+                        if (key.equals("batchrandomization.enabled")) {
+                            batchRandomizationSettings.setBatchRandomizationEnabled(Boolean.parseBoolean(tokens[1].trim()));
+                        }
+                        if (key.equals("batchrandomization.generatelogfiles")){
+                            batchRandomizationSettings.setGenerateLogFile(Boolean.parseBoolean(tokens[1].trim()));
+                        }
+                        if (key.equals("batchrandomization.autoadvanceindex")){
+                            batchRandomizationSettings.setAutoAdvanceStartingIndex(Boolean.parseBoolean(tokens[1].trim()));
+                        }
+                        if (key.equals("batchrandomization.numberofrandomizedroms")){
+                            batchRandomizationSettings.setNumberOfRandomizedROMs(Integer.parseInt(tokens[1].trim()));
+                        }
+                        if (key.equals("batchrandomization.startingindex")){
+                            batchRandomizationSettings.setStartingIndex(Integer.parseInt(tokens[1].trim()));
+                        }
+                        if (key.equals("batchrandomization.filenameprefix")){
+                            batchRandomizationSettings.setFileNamePrefix(tokens[1].trim());
+                        }
+                        if (key.equals("batchrandomization.outputdirectory")){
+                            batchRandomizationSettings.setOutputDirectory(tokens[1].trim());
+                        }
+                        if (key.equals("batchrandomization.savefilepath")){
+                            batchRandomizationSettings.setSaveFilePath(tokens[1].trim());
+                        }
                     }
                 } else if (isReadingUpdates) {
                     isReadingUpdates = false;
@@ -3557,6 +3734,7 @@ public class NewRandomizerGUI {
             ps.println("checkedcustomnames172=" + haveCheckedCustomNames);
             ps.println("unloadgameonsuccess=" + unloadGameOnSuccess);
             ps.println("showinvalidrompopup=" + showInvalidRomPopup);
+            ps.println(batchRandomizationSettings.toString());
             if (!initialPopup) {
                 ps.println("firststart=" + Version.VERSION_STRING);
             }
@@ -4016,6 +4194,8 @@ public class NewRandomizerGUI {
 		miscFasterHPAndEXPBarsCheckBox = new JCheckBox();
 		miscForceChallengeModeCheckBox = new JCheckBox();
 		miscFastDistortionWorldCheckBox = new JCheckBox();
+        miscDisableLowHPMusicCheckBox = new JCheckBox();
+        miscUpdateRotomFormeTypingCheckBox = new JCheckBox();
 		JPanel hSpacer58 = new JPanel(null);
 		JPanel vSpacer60 = new JPanel(null);
 		JPanel hSpacer59 = new JPanel(null);
@@ -5724,11 +5904,11 @@ public class NewRandomizerGUI {
 						//---- wpSetMinimumCatchRateSlider ----
 						wpSetMinimumCatchRateSlider.setEnabled(false);
 						wpSetMinimumCatchRateSlider.setMajorTickSpacing(1);
-						wpSetMinimumCatchRateSlider.setMaximum(4);
+						wpSetMinimumCatchRateSlider.setMaximum(5);
 						wpSetMinimumCatchRateSlider.setMinimum(1);
 						wpSetMinimumCatchRateSlider.setPaintLabels(true);
 						wpSetMinimumCatchRateSlider.setSnapToTicks(true);
-						wpSetMinimumCatchRateSlider.setToolTipText(bundle.getString("GUI.wpMinimumCatchRateLevelSlider.toolTipText"));
+						wpSetMinimumCatchRateSlider.setToolTipText(bundle.getString("GUI.wpSetMinimumCatchRateSlider.toolTipText"));
 						wpSetMinimumCatchRateSlider.setValue(1);
 						panel17.add(wpSetMinimumCatchRateSlider, new GridBagConstraints(4, 3, 1, 2, 0.0, 0.0,
 							GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
@@ -6527,6 +6707,20 @@ public class NewRandomizerGUI {
 						miscTweaksPanel.add(miscFastDistortionWorldCheckBox, new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
+
+                        miscUpdateRotomFormeTypingCheckBox.setEnabled(false);
+                        miscUpdateRotomFormeTypingCheckBox.setText(bundle.getString("CodeTweaks.updateRotomFormeTyping.name"));
+                        miscUpdateRotomFormeTypingCheckBox.setToolTipText(bundle.getString("CodeTweaks.updateRotomFormeTyping.toolTipText"));
+                        miscTweaksPanel.add(miscUpdateRotomFormeTypingCheckBox, new GridBagConstraints(3, 6, 1, 1, 0.0, 0.0,
+                                GridBagConstraints.WEST, GridBagConstraints.NONE,
+                                new Insets(0, 0, 0, 0), 0, 0));
+
+                        miscDisableLowHPMusicCheckBox.setEnabled(false);
+                        miscDisableLowHPMusicCheckBox.setText(bundle.getString("CodeTweaks.disableLowHpMusic.name"));
+                        miscDisableLowHPMusicCheckBox.setToolTipText(bundle.getString("CodeTweaks.disableLowHpMusic.toolTipText"));
+                        miscTweaksPanel.add(miscDisableLowHPMusicCheckBox, new GridBagConstraints(2, 6, 1, 1, 0.0, 0.0,
+                                GridBagConstraints.WEST, GridBagConstraints.NONE,
+                                new Insets(0, 0, 0, 0), 0, 0));
 					}
 					baseTweaksPanel.add(miscTweaksPanel, new GridBagConstraints(1, 1, 1, 1, 0.1, 0.1,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -7017,4 +7211,6 @@ public class NewRandomizerGUI {
 	private JButton saveSettingsButton;
 	private JButton loadSettingsButton;
 	private JLabel wikiLinkLabel;
+    private JCheckBox miscDisableLowHPMusicCheckBox;
+    private JCheckBox miscUpdateRotomFormeTypingCheckBox;
 }
