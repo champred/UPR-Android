@@ -13,14 +13,14 @@ Properties groupStrings = importStrings.groupBy {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
     defaultConfig {
         applicationId "ly.mens.rndpkmn"
         minSdkVersion 29
-        targetSdkVersion 30
-        versionCode 16
-        versionName "0.2.2"
+        targetSdkVersion 33
+        versionCode 17
+        versionName "0.3.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         //add properties to resources
@@ -31,30 +31,36 @@ android {
         //add properties to build config
         buildConfigField prefixMapType, "PREFIX_MAP", mapToString(groupStrings, prefixMapType)
         //add presets to build config
-        buildConfigField "String", "FRLG_STANDARD", '"320WQIEEjIBAAQABwCRAAKeBnsECQEACQACCQAuEgAAAAAABRi45ATkAYAICTIGBAIyAAUAEEZpcmUgUmVkIChVKSAxLjHHK9Hc48M4ig=="'
-        buildConfigField "String", "FRLG_ULTIMATE", '"320WRIEEjIBAAQABwCRAAKeBnsECQEACQACCQAuEgAAAAAABRi45ATkAYAICTIGBAIyAAUAEEZpcmUgUmVkIChVKSAxLjF+CLkR48M4ig=="'
-        buildConfigField "String", "FRLG_KAIZO", '"320WRIEEjIBAAQABwCRAAKeBnsECQEAFAACCQAuEgAAAAAABRi45ATkAYYICTIGBAIyAAUAEEZpcmUgUmVkIChVKSAxLjGwV2lQ48M4ig=="'
-        buildConfigField "String", "FRLG_SURVIVAL", '"320WRIEEjIBAAQABwCRAAKeBnsEiAEAFAACCQAuEgAAAAAABRi45ATkAYYICTIGBAIyEwUAEEZpcmUgUmVkIChVKSAxLjHRHQLn48M4ig=="'
-        buildConfigField "String", "RSE_STANDARD", '"320WQIEEjL8AP8AAgGRAAKeBnsECQEACQACCQAuEgAAAAAABBi45ATkAYAICTIGBAIyAAUAC0VtZXJhbGQgKFUp4Nb6s+PDOIo="'
-        buildConfigField "String", "RSE_ULTIMATE", '"320WRIEEjL8AP8AAgGRAAKeBnsECQEACQACCQAuEgAAAAAABBi45ATkAYAICTIGBAIyAAUAC0VtZXJhbGQgKFUpWrfcfOPDOIo="'
-        buildConfigField "String", "RSE_KAIZO", '"320WRIEEjL8AP8AAgGRAAKeBnsECQEAFAACCQAuEgAAAAAABBi45ATkAYYICTIGBAIyAAUAC0VtZXJhbGQgKFUp5ZxuSuPDOIo="'
-        buildConfigField "String", "RSE_SURVIVAL", '"320WRIEEjL8AP8AAgGRAAKeBnsEiAEAFAACCQAuEgAAAAAABBi45ATkAYYICTIGBAIyEwUAC0VtZXJhbGQgKFUpBgGvAePDOIo="'
-        buildConfigField "String", "HGSS_STANDARD", '"320WQIEEgKYAJsAngCRAAKeBnsECQEACQACCQAuEgAAAAAADBCI5ATkQYAICTIGBQIyAAUAFlBva2Vtb24gU291bFNpbHZlciAoVSm1y3vA48M4ig=="'
-        buildConfigField "String", "HGSS_ULTIMATE", '"320WRIEEgKYAJsAngCRAAKeBnsECQEACQACCQAuEgAAAAAADBCI5ATkQYAICTIGBQIyAAUAFlBva2Vtb24gU291bFNpbHZlciAoVSnJ949p48M4ig=="'
-        buildConfigField "String", "HGSS_KAIZO", '"320WRIEEgKYAJsAngCRAAKeBnsECQEAFAACCQAuEgAAAAAADBCI5ATkQYYICTIGBQIyAAUAFlBva2Vtb24gU291bFNpbHZlciAoVSmMWY1H48M4ig=="'
-        buildConfigField "String", "HGSS_SURVIVAL", '"320WRIEEgKYAJsAngCRAAKeBnsEiAEAFAACCQAuEgAAAAAADBCI5ATkQYYICTIGBQIyEwUAFlBva2Vtb24gU291bFNpbHZlciAoVSnYyPGY48M4ig=="'
-        buildConfigField "String", "DPPT_STANDARD", '"320WQIEEgLDAXQA+ACRAAKeBnsECQEACQACCQAuEgAAAAAADBCI5ATkQYAICTIGBQIyAAUAGlBva2Vtb24gUGxhdGludW0gKFUgUmV2IDEp7+VvbePDOIo="'
-        buildConfigField "String", "DPPT_ULTIMATE", '"320WRIEEgLDAXQA+ACRAAKeBnsECQEACQACCQAuEgAAAAAADBCI5ATkQYAICTIGBQIyAAUAGlBva2Vtb24gUGxhdGludW0gKFUgUmV2IDEpRwumBuPDOIo="'
-        buildConfigField "String", "DPPT_KAIZO", '"320WRIEEgLDAXQA+ACRAAKeBnsECQEAFAACCQAuEgAAAAAADBCI5ATkQYYICTIGBQIyAAUAGlBva2Vtb24gUGxhdGludW0gKFUgUmV2IDEpMlCOHePDOIo="'
-        buildConfigField "String", "DPPT_SURVIVAL", '"320WRIEEgLDAXQA+ACRAAKeBnsEiAEAFAACCQAuEgAAAAAADBCI5ATkQYYICTIGBQIyEwUAGlBva2Vtb24gUGxhdGludW0gKFUgUmV2IDEpFdCYUOPDOIo="'
-        buildConfigField "String", "BW_STANDARD", '"320WQIEEgLvAfIB9QGRAAKeJHsECQEAFAACCQAuEgAAAAAABHCI5ATkwYAICTIGBgIyAAUAEVBva2Vtb24gQmxhY2sgKFUpjCSWi+PDOIo="'
-        buildConfigField "String", "BW_ULTIMATE", '"320WRIEEgLvAfIB9QGRAAKeJHsECQEAFAACCQAuEgAAAAAABHCI5ATkwYAICTIGBgIyAAUAEVBva2Vtb24gQmxhY2sgKFUpaUgL7uPDOIo="'
-        buildConfigField "String", "BW_KAIZO", '"320WRIEEgLvAfIB9QGRAAKeJHsECQEAFAACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyAAUAEVBva2Vtb24gQmxhY2sgKFUp+Cnbd+PDOIo="'
-        buildConfigField "String", "BW_SURVIVAL", '"320WRIEEgLvAfIB9QGRAAKeJHsEiAEAFAACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyEwUAEVBva2Vtb24gQmxhY2sgKFUprU23M+PDOIo="'
-        buildConfigField "String", "B2W2_STANDARD", '"320WQIEEgLvAfIB9QGRAAKeBnsECQEACQACCSAuEgAAAAAABHCI5ATkwYAICTIGBgAyAAUAE1Bva2Vtb24gQmxhY2sgMiAoVSnDIzZ848M4ig=="'
-        buildConfigField "String", "B2W2_ULTIMATE", '"320WRIEEgLvAfIB9QGRAAKeBnsECQEACQACCSAuEgAAAAAABHCI5ATkwYAICTIGBgIyAAUAE1Bva2Vtb24gQmxhY2sgMiAoVSnFcYVW48M4ig=="'
-        buildConfigField "String", "B2W2_KAIZO", '"320WRIEEgLvAfIB9QGRAAKeBnsECQEACQACCSAuEgAAAAAABHCI5ATkwYYICTIGBgIyAAUAE1Bva2Vtb24gQmxhY2sgMiAoVSnjIfew48M4ig=="'
-        buildConfigField "String", "B2W2_SURVIVAL", '"320WRIEEgLvAfIB9QGRAAKeBnsEiAEACQACCSAuEgAAAAAABHCI5ATkwYYICTIGBgIyEwUAE1Bva2Vtb24gQmxhY2sgMiAoVSkzMAWm48M4ig=="'
+        //FRLG
+        buildConfigField "String", "FRLG_STANDARD", '"321WQIEEjIBAAQABwCRAAKeBhsECQEACQACCQAuEgAAAAAABRi45ATkAYAICTIGBAIyAAUYEEZpcmUgUmVkIChVKSAxLjEDx+K248M4ig=="'
+        buildConfigField "String", "FRLG_ULTIMATE", '"321WRIEEjIBAAQABwCRAAKeBhsECQEACQACCQAuEgAAAAAABRi45ATkAYAICTIGBAIyAAUYEEZpcmUgUmVkIChVKSAxLjG65Ip748M4ig=="'
+        buildConfigField "String", "FRLG_KAIZO", '"321WRIEEjIBAAQABwCRAAKeBhsECQEAFAACCQAuEgAAAAAABRi45ATkAYYICTIGBAIyAAUYEEZpcmUgUmVkIChVKSAxLjF0u1o648M4ig=="'
+        buildConfigField "String", "FRLG_SURVIVAL", '"321WRIEEjIBAAQABwCRAAKeBhsEiAEAFAACCQAuEgAAAAAABRi45ATkAYYICTIGBAIyEwUYEEZpcmUgUmVkIChVKSAxLjEV8TGN48M4ig=="'
+        //RSE
+        buildConfigField "String", "RSE_STANDARD", '"321WQIEEjL8AP8AAgGRAAKeBhsECQEACQACCQAuEgAAAAAABBC45ATkAYAICTIGBAIyAAUYC0VtZXJhbGQgKFUpZtO82OPDOIo="'
+        buildConfigField "String", "RSE_ULTIMATE", '"321WRIEEjL8AP8AAgGRAAKeBhsECQEACQACCQAuEgAAAAAABBC45ATkAYAICTIGBAIyAAUYC0VtZXJhbGQgKFUp3LKaF+PDOIo="'
+        buildConfigField "String", "RSE_KAIZO", '"321WRIEEjL8AP8AAgGRAAKeBhsECQEAFAACCQAuEgAAAAAABBC45ATkAYYICTIGBAIyAAUYC0VtZXJhbGQgKFUpY5koIePDOIo="'
+        buildConfigField "String", "RSE_SURVIVAL", '"321WRIEEjL8AP8AAgGRAAKeBhsEiAEAFAACCQAuEgAAAAAABBC45ATkAYYICTIGBAIyEwUYC0VtZXJhbGQgKFUpgATpauPDOIo="'
+        //HGSS
+        buildConfigField "String", "HGSS_STANDARD", '"321WQIEEgKYAJsAngCRAAKeBhsECQEACQACCQAuEgAAAAAADBCI5ATkQYAICTIGBQIyAAUYFlBva2Vtb24gU291bFNpbHZlciAoVSnwKlW248M4ig=="'
+        buildConfigField "String", "HGSS_ULTIMATE", '"321WRIEEgKYAJsAngCRAAKeBhsECQEACQACCQAuEgAAAAAADBCI5ATkQYAICTIGBQIyAAUYFlBva2Vtb24gU291bFNpbHZlciAoVSmMFqEf48M4ig=="'
+        buildConfigField "String", "HGSS_KAIZO", '"321WRIEEgKYAJsAngCRAAKeBhsECQEAFAACCQAuEgAAAAAADBCI5ATkQYYICTIGBQIyAAUYFlBva2Vtb24gU291bFNpbHZlciAoVSnJuKMx48M4ig=="'
+        buildConfigField "String", "HGSS_SURVIVAL", '"321WRIEEgKYAJsAngCRAAKeBhsEiAEAFAACCQAuEgAAAAAADBCI5ATkQYYICTIGBQIyEwUYFlBva2Vtb24gU291bFNpbHZlciAoVSmdKd/u48M4ig=="'
+        //DPPT
+        buildConfigField "String", "DPPT_STANDARD", '"321WQIEEjLDAXQA+ACRAAKeBhsECQEACQACCQAuEgAAAAAADBCI5ATkQYAICTIGBQIyAAUYGlBva2Vtb24gUGxhdGludW0gKFUgUmV2IDEp+Fri/OPDOIo="'
+        buildConfigField "String", "DPPT_ULTIMATE", '"321WRIEEjLDAXQA+ACRAAKeBhsECQEACQACCQAuEgAAAAAADBCI5ATkQYAICTIGBQIyAAUYGlBva2Vtb24gUGxhdGludW0gKFUgUmV2IDEpULQrl+PDOIo="'
+        buildConfigField "String", "DPPT_KAIZO", '"321WRIEEjLDAXQA+ACRAAKeBhsECQEAFAACCQAuEgAAAAAADBCI5ATkQYYICTIGBQIyAAUYGlBva2Vtb24gUGxhdGludW0gKFUgUmV2IDEpJe8DjOPDOIo="'
+        buildConfigField "String", "DPPT_SURVIVAL", '"321WRIEEjLDAXQA+ACRAAKeBhsEiAEAFAACCQAuEgAAAAAADBCI5ATkQYYICTIGBQIyEwUYGlBva2Vtb24gUGxhdGludW0gKFUgUmV2IDEpAm8VwePDOIo="'
+        //BW
+        buildConfigField "String", "BW_STANDARD", '"321WQIEEgLvAfIB9QGRAAKeJBsECQEAFAACCQAuEgAAAAAABHCI5ATkwYAICTIGBgIyAAUYEVBva2Vtb24gQmxhY2sgKFUpIYfy/uPDOIo="'
+        buildConfigField "String", "BW_ULTIMATE", '"321WRIEEgLvAfIB9QGRAAKeJBsECQEAFAACCQAuEgAAAAAABHCI5ATkwYAICTIGBgIyAAUYEVBva2Vtb24gQmxhY2sgKFUpxOtvm+PDOIo="'
+        buildConfigField "String", "BW_KAIZO", '"321WRIEEgLvAfIB9QGRAAKeJBsECQEAFAACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyAAUYEVBva2Vtb24gQmxhY2sgKFUpVYq/AuPDOIo="'
+        buildConfigField "String", "BW_SURVIVAL", '"321WRIEEgLvAfIB9QGRAAKeJBsEiAEAFAACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyEwUYEVBva2Vtb24gQmxhY2sgKFUpAO7TRuPDOIo="'
+        //B2W2
+        buildConfigField "String", "B2W2_STANDARD", '"321WQIEEgLvAfIB9QGRAAKeBhsECQEACQACCSAuEgAAAAAABHCI5ATkwYAICTIGBgAyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSnbtLMt48M4ig=="'
+        buildConfigField "String", "B2W2_ULTIMATE", '"321WRIEEgLvAfIB9QGRAAKeBhsECQEACQACCSAuEgAAAAAABHCI5ATkwYAICTIGBgIyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSnd5gAH48M4ig=="'
+        buildConfigField "String", "B2W2_KAIZO", '"321WRIEEgLvAfIB9QGRAAKeBhsECQEACQACCSAuEgAAAAAABHCI5ATkwYYICTIGBgIyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSn7tnLh48M4ig=="'
+        buildConfigField "String", "B2W2_SURVIVAL", '"321WRIEEgLvAfIB9QGRAAKeBhsEiAEACQACCSAuEgAAAAAABHCI5ATkwYYICTIGBgIyEwUYE1Bva2Vtb24gQmxhY2sgMiAoVSkrp4D348M4ig=="'
     }
     buildTypes {
         release {
@@ -87,16 +93,16 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    implementation 'androidx.compose.ui:ui:1.1.1'
-    implementation 'androidx.compose.ui:ui-tooling:1.1.1'
-    implementation 'androidx.compose.foundation:foundation:1.1.1'
-    implementation 'androidx.compose.material:material:1.1.1'
-    implementation 'androidx.compose.material:material-icons-core:1.1.1'
-    implementation 'androidx.compose.material:material-icons-extended:1.1.1'
-    implementation 'androidx.activity:activity-compose:1.4.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1'
-    implementation 'androidx.compose.runtime:runtime-livedata:1.1.1'
-    implementation 'androidx.navigation:navigation-compose:2.4.2'
+    implementation 'androidx.compose.ui:ui:1.3.3'
+    implementation 'androidx.compose.ui:ui-tooling:1.3.3'
+    implementation 'androidx.compose.foundation:foundation:1.3.1'
+    implementation 'androidx.compose.material:material:1.3.1'
+    implementation 'androidx.compose.material:material-icons-core:1.3.1'
+    implementation 'androidx.compose.material:material-icons-extended:1.3.1'
+    implementation 'androidx.activity:activity-compose:1.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
+    implementation 'androidx.compose.runtime:runtime-livedata:1.3.3'
+    implementation 'androidx.navigation:navigation-compose:2.5.3'
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.1.1'
