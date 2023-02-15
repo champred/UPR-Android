@@ -16,7 +16,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import ly.mens.rndpkmn.R
 import ly.mens.rndpkmn.settings.RandomizerSettings
@@ -35,7 +34,7 @@ fun RandomizerApp() {
 		val scaffold = rememberScaffoldState()
 		val scope = rememberCoroutineScope()
 		Scaffold(scaffoldState = scaffold, topBar = { RandomizerAppBar(scope, scaffold, nav) }, drawerContent = { RandomizerDrawer(scope, scaffold, nav) }) {
-			NavHost(nav, START_ROUTE, Modifier.padding(horizontal = 8.dp)) {
+			NavHost(nav, START_ROUTE, Modifier.padding(it)) {
 				composable(START_ROUTE) { RandomizerHome(scaffold) }
 				SettingsCategory.values().forEach { category ->
 					composable(category.name) { SettingsList(category) }
@@ -72,14 +71,20 @@ fun RandomizerAppBar(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavCon
 @Composable
 fun RandomizerDrawer(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavController) {
 	val ctx = LocalContext.current
-	RandomizerDrawerItem(stringResource(R.string.title_general)) {
+	var current by rememberSaveable { mutableStateOf(START_ROUTE) }
+	LaunchedEffect(nav) {
+		nav.currentBackStackEntryFlow.collect {
+			current = it.destination.route ?: START_ROUTE
+		}
+	}
+	RandomizerDrawerItem(stringResource(R.string.title_general), current == START_ROUTE) {
 		if (nav.currentDestination?.route != START_ROUTE) {
 			nav.popBackStack()
 		}
 		scope.launch { scaffold.drawerState.close() }
 	}
 	SettingsCategory.values().forEach { category ->
-		RandomizerDrawerItem(stringResource(category.title)) {
+		RandomizerDrawerItem(stringResource(category.title), current == category.name) {
 			if (RandomizerSettings.handler != null) {
 				nav.navigate(category.name) {
 					popUpTo(START_ROUTE)
@@ -94,7 +99,7 @@ fun RandomizerDrawer(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavCon
 			}
 		}
 	}
-	RandomizerDrawerItem(stringResource(R.string.title_misc)) {
+	RandomizerDrawerItem(stringResource(R.string.title_misc), current == MISC_ROUTE) {
 		if (RandomizerSettings.handler != null) {
 			nav.navigate(MISC_ROUTE) {
 				popUpTo(START_ROUTE)
@@ -111,10 +116,11 @@ fun RandomizerDrawer(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavCon
 }
 
 @Composable
-fun RandomizerDrawerItem(text: String, onClick: ()->Unit) {
-	Text(text, Modifier
+fun RandomizerDrawerItem(label: String, isCurrent: Boolean, onClick: ()->Unit) {
+	Text(label, Modifier
 			.fillMaxWidth()
 			.clickable(onClick = onClick)
+			.background(if (isCurrent) MaterialTheme.colors.primary else MaterialTheme.colors.secondary)
 			.padding(8.dp),
 			style = MaterialTheme.typography.h5
 	)
