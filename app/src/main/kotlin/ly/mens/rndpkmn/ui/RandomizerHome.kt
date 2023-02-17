@@ -510,5 +510,5 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		seedText = seed.toString(seedBase)
 		validSeed = true
 		updateName()
-	}) { Text(stringResource(R.string.action_random_seed)) }
+	}, Modifier.padding(8.dp)) { Text(stringResource(R.string.action_random_seed)) }
 }
