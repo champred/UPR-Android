@@ -168,25 +168,8 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 						toggle?.setBoolean(RandomizerSettings, it)
 					})
 					Text(String.format(label, position.toInt()), Modifier.clickable(onClick = onClick))
-					if (length > 10) {
-						val numPattern = Regex("^-?\\d+$")
-						var input by rememberSaveable { mutableStateOf(position.toString().substringBefore('.')) }
-						val keyCon = LocalSoftwareKeyboardController.current
-						TextField(input, {
-							input = it
-							position = numPattern.matchEntire(it)?.run {
-								val num = value.toFloat().coerceIn(limit)
-								setInt(RandomizerSettings, num.toInt())
-								num
-							} ?: position
-						}, Modifier.width(64.dp).offset(x = 2.dp), checked,
-								keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-								keyboardActions = KeyboardActions { keyCon?.hide() })
-					}
 				}
-				if (length <= 10) {
-					Slider(position, { position = it }, Modifier.fillMaxWidth(), checked, limit, length - 1, { setInt(RandomizerSettings, position.toInt()) })
-				}
+				Slider(position, { position = it }, Modifier.fillMaxWidth(), checked, limit, length - 1, { setInt(RandomizerSettings, position.toInt()) })
 			}
 		}
 	} else if (type.isEnum) {
