@@ -1,5 +1,6 @@
 package ly.mens.rndpkmn.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,18 +21,20 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.dabomstew.pkrandom.MiscTweak
 import com.dabomstew.pkrandom.Settings
 import ly.mens.rndpkmn.R
+import ly.mens.rndpkmn.renderText
 import ly.mens.rndpkmn.settings.RandomizerSettings
 import ly.mens.rndpkmn.settings.SettingsCategory
 import ly.mens.rndpkmn.settings.SettingsPrefix
-import ly.mens.rndpkmn.toast
 import java.lang.reflect.Field
 
 @Composable
 fun TweaksList() {
-	val ctx = LocalContext.current
+	val dialogText = rememberSaveable { mutableStateOf<CharSequence?>(null) }
+	HintDialog(dialogText)
 	LazyColumn {
 		item {
 			Text(stringResource(R.string.title_misc), style = MaterialTheme.typography.h6)
@@ -47,7 +50,7 @@ fun TweaksList() {
 					RandomizerSettings.currentMiscTweaks = RandomizerSettings.currentMiscTweaks xor tweak.value
 				})
 				Text(tweak.tweakName, Modifier.clickable {
-					ctx.toast(tweak.tooltipText)
+					dialogText.value = renderText(tweak.tooltipText)
 				})
 			}
 		}
@@ -57,6 +60,8 @@ fun TweaksList() {
 @Composable
 fun SettingsList(category: SettingsCategory) {
 	val ctx = LocalContext.current
+	val dialogText = rememberSaveable { mutableStateOf<CharSequence?>(null) }
+	HintDialog(dialogText)
 	LazyColumn {
 		category.prefixes.filter { p ->
 			RandomizerSettings.handler?.let { p.isSupported(it) } ?: false
@@ -75,9 +80,7 @@ fun SettingsList(category: SettingsCategory) {
 								?: 1..7)) {
 					field.SettingsComponent(prefix.strings[label] ?: label) {
 						val id = ctx.resources.getIdentifier(label.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
-						if (id != 0) {
-							ctx.toast(id)
-						}
+						if (id != 0) dialogText.value = ctx.renderText(id)
 					}
 				}
 			}
@@ -87,21 +90,30 @@ fun SettingsList(category: SettingsCategory) {
 
 @Composable
 fun SettingsGroup(prefix: SettingsPrefix, subtitle: String, group: MutableMap<String, Field>) {
+	val ctx = LocalContext.current
+	val groupField = group.values.first()
+	val groupEnum = groupField.get(RandomizerSettings) as Enum<*>
+	val selectedIndex = rememberSaveable { mutableStateOf(groupEnum.ordinal) }
+	// TODO causes crash on configuration change if saved
+	val dialogText = remember { mutableStateOf<CharSequence?>(null) }
+	HintDialog(dialogText)
 	Column {
-		if (subtitle.isNotEmpty()) {
-			Text(prefix.strings[subtitle]!!, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-		}
-		val groupField = group.values.first()
-		val groupEnum = groupField.get(RandomizerSettings) as Enum<*>
-		val selectedIndex = rememberSaveable { mutableStateOf(groupEnum.ordinal) }
-		val ctx = LocalContext.current
+		if (subtitle.isNotEmpty()) Text(prefix.strings[subtitle]!!, fontSize = 16.sp, fontWeight = FontWeight.Bold)
 		group.keys.forEachIndexed { index, label ->
 			groupField.SettingsComponent(prefix.strings[label] ?: label, index, selectedIndex) {
 				val id = ctx.resources.getIdentifier(label.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
-				if (id != 0) {
-					ctx.toast(id)
-				}
+				if (id != 0) dialogText.value = ctx.renderText(id)
 			}
+		}
+	}
+}
+
+@Composable
+fun HintDialog(text: MutableState<CharSequence?>) {
+	if (text.value != null) {
+		Dialog({ text.value = null }) {
+			// TODO render HTML
+			Text(text.value.toString(), Modifier.background(MaterialTheme.colors.background).padding(8.dp))
 		}
 	}
 }

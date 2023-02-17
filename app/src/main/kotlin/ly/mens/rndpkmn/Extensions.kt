@@ -36,6 +36,9 @@ fun Context.toast(text: String, length: Int = Toast.LENGTH_LONG) {
     Toast.makeText(this, text.parseAsHtml(), length).show()
 }
 
+fun Context.renderText(@StringRes resId: Int) = renderText(getString(resId))
+fun renderText(text: String) = text.parseAsHtml()
+
 fun Context.loadFromUri(uri: Uri, file: File) {
     //copy selected file to app directory
     if (!file.exists()) {
