@@ -19,8 +19,8 @@ android {
         applicationId "ly.mens.rndpkmn"
         minSdkVersion 29
         targetSdkVersion 33
-        versionCode 19
-        versionName "0.3.2"
+        versionCode 20
+        versionName "0.3.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         //add properties to resources
@@ -57,10 +57,10 @@ android {
         buildConfigField "String", "BW_KAIZO", '"321WRIEEgLvAfIB9QGRAAKeJBsECQEAFAACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyAAUYEVBva2Vtb24gQmxhY2sgKFUpVYq/AuPDOIo="'
         buildConfigField "String", "BW_SURVIVAL", '"321WRIEEgLvAfIB9QGRAAKeJBsEiAEAFAACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyEwUYEVBva2Vtb24gQmxhY2sgKFUpAO7TRuPDOIo="'
         //B2W2
-        buildConfigField "String", "B2W2_STANDARD", '"321WQIEEgLvAfIB9QGRAAKeBhsECQEACQACCSAuEgAAAAAABHCI5ATkwYAICTIGBgAyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSnbtLMt48M4ig=="'
-        buildConfigField "String", "B2W2_ULTIMATE", '"321WRIEEgLvAfIB9QGRAAKeBhsECQEACQACCSAuEgAAAAAABHCI5ATkwYAICTIGBgIyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSnd5gAH48M4ig=="'
-        buildConfigField "String", "B2W2_KAIZO", '"321WRIEEgLvAfIB9QGRAAKeBhsECQEACQACCSAuEgAAAAAABHCI5ATkwYYICTIGBgIyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSn7tnLh48M4ig=="'
-        buildConfigField "String", "B2W2_SURVIVAL", '"321WRIEEgLvAfIB9QGRAAKeBhsEiAEACQACCSAuEgAAAAAABHCI5ATkwYYICTIGBgIyEwUYE1Bva2Vtb24gQmxhY2sgMiAoVSkrp4D348M4ig=="'
+        buildConfigField "String", "B2W2_STANDARD", '"321WQIEEgLvAfIB9QGRAAKeBhsECQEACQACCQAuEgAAAAAABHCI5ATkwYAICTIGBgAyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSkifvUE48M4ig=="'
+        buildConfigField "String", "B2W2_ULTIMATE", '"321WRIEEgLvAfIB9QGRAAKeBhsECQEACQACCQAuEgAAAAAABHCI5ATkwYAICTIGBgIyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSkkLEYu48M4ig=="'
+        buildConfigField "String", "B2W2_KAIZO", '"321WRIEEgLvAfIB9QGRAAKeBhsECQEACQACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSkCfDTI48M4ig=="'
+        buildConfigField "String", "B2W2_SURVIVAL", '"321WRIEEgLvAfIB9QGRAAKeBhsEiAEACQACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyEwUYE1Bva2Vtb24gQmxhY2sgMiAoVSnSbcbe48M4ig=="'
     }
     buildTypes {
         release {
