@@ -16,6 +16,7 @@ enum class SettingsPreset {
 	open fun getPreset(): String? {
 		val name = RandomizerSettings.romName ?: return null
 		val prefix: String = when (RandomizerSettings.currentGen) {
+			1 -> "RBY"
 			3 -> {
 				if ("Red" in name || "Green" in name) "FRLG"
 				else if ("Ruby" in name || "Sapphire" in name || "Emerald" in name) "RSE"
