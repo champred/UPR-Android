@@ -3,9 +3,9 @@
     <option name="JAR_PATH" value="$PROJECT_DIR$/upr/build/libs/upr.jar" />
     <option name="VM_PARAMETERS" value="-Xmx4608M" />
     <option name="PROGRAM_PARAMETERS" value="please-use-the-launcher" />
-    <option name="WORKING_DIRECTORY" value="E:\Android\AndroidStudioProjects\UPR-Android" />
+    <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-    <option name="ALTERNATIVE_JRE_PATH" value="Android Studio java home" />
+    <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
     <method v="2" />
   </configuration>
 </component>
