@@ -19,8 +19,8 @@ android {
         applicationId "ly.mens.rndpkmn"
         minSdkVersion 29
         targetSdkVersion 33
-        versionCode 20
-        versionName "0.3.3"
+        versionCode 21
+        versionName "0.3.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         //add properties to resources
@@ -44,8 +44,8 @@ android {
         //RSE
         buildConfigField "String", "RSE_STANDARD", '"321WQIEEjL8AP8AAgGRAAKeBhsECQEACQACCQAuEgAAAAAABBC45ATkAYAICTIGBAIyAAUYC0VtZXJhbGQgKFUpZtO82OPDOIo="'
         buildConfigField "String", "RSE_ULTIMATE", '"321WRIEEjL8AP8AAgGRAAKeBhsECQEACQACCQAuEgAAAAAABBC45ATkAYAICTIGBAIyAAUYC0VtZXJhbGQgKFUp3LKaF+PDOIo="'
-        buildConfigField "String", "RSE_KAIZO", '"321WRIEEjL8AP8AAgGRAAKeBhsECQEAFAACCQAuEgAAAAAABBC45ATkAYYICTIGBAIyAAUYC0VtZXJhbGQgKFUpY5koIePDOIo="'
-        buildConfigField "String", "RSE_SURVIVAL", '"321WRIEEjL8AP8AAgGRAAKeBhsEiAEAFAACCQAuEgAAAAAABBC45ATkAYYICTIGBAIyEwUYC0VtZXJhbGQgKFUpgATpauPDOIo="'
+        buildConfigField "String", "RSE_KAIZO", '"321WRIEEjL8AP8AAgGRAAKeBhsECQEAFAACCQAuEgAAAAAABBC47gTuAYYICTIGBAIyAAUYC0VtZXJhbGQgKFUpwG59w+PDOIo="'
+        buildConfigField "String", "RSE_SURVIVAL", '"321WRIEEjL8AP8AAgGRAAKeBhsEiAEAFAACCQAuEgAAAAAABBC47gTuAYYICTIGBAIyEwUYC0VtZXJhbGQgKFUpI/O8iOPDOIo="'
         //HGSS
         buildConfigField "String", "HGSS_STANDARD", '"321WQIEEgKYAJsAngCRAAKeBhsECQEACQACCQAuEgAAAAAADBCI5ATkQYAICTIGBQIyAAUYFlBva2Vtb24gU291bFNpbHZlciAoVSnwKlW248M4ig=="'
         buildConfigField "String", "HGSS_ULTIMATE", '"321WRIEEgKYAJsAngCRAAKeBhsECQEACQACCQAuEgAAAAAADBCI5ATkQYAICTIGBQIyAAUYFlBva2Vtb24gU291bFNpbHZlciAoVSmMFqEf48M4ig=="'
