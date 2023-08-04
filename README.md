@@ -1,5 +1,7 @@
 # Randomizer for Pokémon
 
+[![Android CI](https://github.com/champred/UPR-Android/actions/workflows/android.yml/badge.svg)](https://github.com/champred/UPR-Android/actions/workflows/android.yml)
+
 Building an Android UI wrapper around Universal Pokemon Game Randomizer.
 
 This repo is forked from an old project that started on it but didn't get very far.
@@ -35,10 +37,6 @@ A: 3DS games will not work due to the large size of the ROM not being feasible t
 **Q: Why does the randomizer fail?**
 
 A: Most likely this is due to the source ROM being invalid (patched ROMs, ROM hacks, and ROMs that are not clean are all invalid). It can also happen if you select a setting not supported by the generation of game you have. This should not happen if you are using a valid settings string for that generation.
-
-**Q: What games are presets available for?**
-
-A: Currently, only FRLG, RSE, HGSS, DPPt, and BW/B2W2 have built-in presets. You can choose from any of the 4 main ironMON challenges (Standard, Ultimate, Kaizo, and Survival). Other generations of games can still be used, but you need to manually put in a settings string.
 
 **Q: Why does it take up so much storage?**
 
