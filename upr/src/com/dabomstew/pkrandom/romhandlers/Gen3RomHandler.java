@@ -1373,13 +1373,18 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         List<Byte> data = new ArrayList<>();
         while (text.length() != 0) {
             int i = Math.max(0, 4 - text.length());
-            if (text.charAt(0) == '\\' && text.charAt(1) == 'x') {
-                data.add((byte) Integer.parseInt(text.substring(2, 4), 16));
-                text = text.substring(4);
-            } else if (text.charAt(0) == '\\' && text.charAt(1) == 'v') {
-                data.add((byte) Gen3Constants.textVariable);
-                data.add((byte) Integer.parseInt(text.substring(2, 4), 16));
-                text = text.substring(4);
+            if (text.charAt(0) == '\\') {
+                if (text.charAt(1) == 'x') {
+                    data.add((byte) Integer.parseInt(text.substring(2, 4), 16));
+                    text = text.substring(4);
+                } else if (text.charAt(1) == 'v') {
+                    data.add((byte) Gen3Constants.textVariable);
+                    data.add((byte) Integer.parseInt(text.substring(2, 4), 16));
+                    text = text.substring(4);
+                } else if (text.charAt(1) == 'u') {
+                    data.add(d.get(text.substring(0, 6)));
+                    text = text.substring(6);
+                }
             } else {
                 while (!(d.containsKey(text.substring(0, 4 - i)) || (i == 4))) {
                     i++;
