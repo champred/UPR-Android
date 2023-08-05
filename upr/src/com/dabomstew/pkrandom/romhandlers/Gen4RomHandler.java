@@ -1321,7 +1321,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 }
                 // Fix starter text
                 List<String> spStrings = getStrings(romEntry.getInt("StarterScreenTextOffset"));
-                String[] intros = new String[] { "So, you like", "You’ll take", "Do you want" };
+                String[] intros = new String[] { "So, you like", "You'll take", "Do you want" };
                 for (int i = 0; i < 3; i++) {
                     Pokemon newStarter = newStarters.get(i);
                     int color = (i == 0) ? 3 : i;
@@ -1550,13 +1550,13 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     List<String> lakeStrings = getStrings(romEntry.getInt("StarterLocationTextOffset"));
                     lakeStrings
                             .set(Gen4Constants.dpStarterStringIndex,
-                                    "\\v0103\\z0000: Fwaaah!\\nYour Pokémon totally rocked!\\pBut mine was way tougher\\nthan yours!\\p...They were other people’s\\nPokémon, though...\\pBut we had to use them...\\nThey won’t mind, will they?\\p");
+                                    "\\v0103\\z0000: Fwaaah!\\nYour Pokémon totally rocked!\\pBut mine was way tougher\\nthan yours!\\p...They were other people's\\nPokémon, though...\\pBut we had to use them...\\nThey won't mind, will they?\\p");
                     setStrings(romEntry.getInt("StarterLocationTextOffset"), lakeStrings);
                 } else {
                     // what rival says after we get the Pokemon
                     List<String> r201Strings = getStrings(romEntry.getInt("StarterLocationTextOffset"));
                     r201Strings.set(Gen4Constants.ptStarterStringIndex,
-                            "\\v0103\\z0000\\z0000: Then, I choose you!\\nI’m picking this one!\\p");
+                            "\\v0103\\z0000\\z0000: Then, I choose you!\\nI'm picking this one!\\p");
                     setStrings(romEntry.getInt("StarterLocationTextOffset"), r201Strings);
                 }
             } catch (IOException e) {
