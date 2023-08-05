@@ -10,7 +10,6 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.HexFormat;
 
 import com.dabomstew.pkrandom.FileFunctions;
 
@@ -32,9 +31,9 @@ public class UnicodeParser {
                     tb[Integer.parseInt(r[0], 16)] = r[1];
                     d.put(r[1], Integer.parseInt(r[0], 16));
                     //add escape sequence for unicode characters
-                    if (r[1].length() == 1 && r[1].codePointAt(0) >= 160) {
-                            HexFormat hf = HexFormat.of();
-                            d.put("\\u" + hf.toHexDigits(r[1].charAt(0)), d.get(r[1]));
+                    int cp = r[1].codePointAt(0);
+                    if (r[1].length() == 1 && cp >= 160) {
+                            d.put(String.format("\\u%04x", cp), d.get(r[1]));
                     }
                 }
             }
