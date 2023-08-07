@@ -3,12 +3,15 @@ package ly.mens.rndpkmn.settings
 import android.util.Log
 import com.dabomstew.pkrandom.*
 import com.dabomstew.pkrandom.constants.GlobalConstants
+import com.dabomstew.pkrandom.constants.Gen4Constants
+import com.dabomstew.pkrandom.constants.Items
 import com.dabomstew.pkrandom.pokemon.ExpCurve
 import com.dabomstew.pkrandom.pokemon.GenRestrictions
 import com.dabomstew.pkrandom.pokemon.Pokemon
 import com.dabomstew.pkrandom.romhandlers.*
 import ly.mens.rndpkmn.Trie
 import ly.mens.rndpkmn.fileName
+import ly.mens.rndpkmn.BuildConfig
 import java.io.*
 import java.lang.NumberFormatException
 import java.lang.reflect.Field
@@ -110,6 +113,7 @@ object RandomizerSettings : Settings() {
 			title to names
 		}.toList()
 		currentRestrictions = GenRestrictions()
+		Gen4Constants.nonBadItems.banRange(Items.figyBerry, BuildConfig.BERRY_COUNT); // berries without useful battle effects
 	}
 
 	fun loadRom(file: File): Boolean {

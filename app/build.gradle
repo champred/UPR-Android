@@ -82,6 +82,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    flavorDimensions "version"
+    productFlavors {
+        //variant without extra berries using old item ban count
+        noBerries {
+            applicationIdSuffix ".old"
+            versionNameSuffix "-no-berries"
+            buildConfigField "int", "BERRY_COUNT", "54"
+        }
+        withBerries {
+            applicationIdSuffix ".new"
+            versionNameSuffix "-with-berries"
+            buildConfigField "int", "BERRY_COUNT", "25"
+        }
+    }
     sourceSets.main.java.srcDirs = ['src/main/kotlin']
     namespace 'ly.mens.rndpkmn'
     buildFeatures {

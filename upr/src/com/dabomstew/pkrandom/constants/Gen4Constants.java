@@ -920,7 +920,6 @@ public class Gen4Constants {
         nonBadItems.banRange(Items.growthMulch, 4); // mulch
         nonBadItems.banRange(Items.adamantOrb, 2); // orbs
         nonBadItems.banRange(Items.mail1, 12); // mails
-        nonBadItems.banRange(Items.figyBerry, 25); // berries without useful battle effects
         nonBadItems.banRange(Items.luckyPunch, 4); // pokemon specific
         nonBadItems.banRange(Items.redScarf, 5); // contest scarves
 
