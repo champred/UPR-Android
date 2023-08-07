@@ -14,14 +14,19 @@ The goal for this project is to build a complete UI using Jetpack Compose that s
 2. Open the downloaded APK from your web browser or file manager. You may need to allow your web browser or file manager to install apps by going to `Android Settings>Apps & Notifications>Advanced>Special app access>Install unknown apps`.
 3. Once the app is installed, you should see this after opening it:
 <img src="https://user-images.githubusercontent.com/46391895/173204207-f182c85c-ded6-42fd-9faa-7cbbfefbb8e3.png" height="440">
+
 4. Pressing "Open ROM" will allow you to select a ROM from your file manager:
 <img src="https://user-images.githubusercontent.com/46391895/173205001-6109b694-74bf-4c79-80b6-a629a415046c.png" width="440">
-5. Once the ROM has been loaded, you can replace the settings string by pasting one or selecting a preset (if available). You can also replace the seed if you want an identical ROM. If you want to re-randomize, press "Random Seed". The filename will automatically be updated with the new seed to keep filenames unique. For both of these fields, you need to press the check button to save your changes, it will show an error if the value is invalid.
-<img src="https://user-images.githubusercontent.com/46391895/173205672-0b3400a5-7c1e-4533-b18b-9f56ea7fab45.png" height="440">
+
+5. Once the ROM has been loaded, you can replace the settings string by pasting one or selecting a preset. You can also customize the seed or re-roll the random one. The filename will automatically be updated with the new seed to keep filenames unique. For both of these fields, you need to press the check button to save your changes, it will show an error if the value is invalid.
+<img src="https://github.com/champred/UPR-Android/assets/46391895/99715796-76a2-4ac5-8355-05f8e7f61cdd" width="440">
+
 6. If you want to manually customize the randomization settings, open the menu by swiping to the right or clicking the icon in the top left corner. From here you can choose which category of settings to modify. Pressing the back button will return you to the home screen.
 <img src="https://user-images.githubusercontent.com/46391895/173205812-c46d03ac-5a61-4970-a253-36f9aaa675b1.png" height="440">
+
 7. Pressing "Save ROM" will allow you to select where to put the randomized ROM in your file manager:
 <img src="https://user-images.githubusercontent.com/46391895/173205922-0d91e6cc-b25f-4695-8122-9509747bbae9.png" width="440">
+
 8. Pressing "Save Log" will allow you to do the same with the randomization log. It is saved with the `.txt` extension so that it can be viewed properly. Do note that some log files can be very large depending on what randomization settings you use.
 
 ## FAQ
