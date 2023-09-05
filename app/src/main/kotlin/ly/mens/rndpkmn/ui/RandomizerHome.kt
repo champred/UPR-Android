@@ -87,7 +87,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			showProgress = false
 		}
 	}
-	val saveRomLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument()) { uri ->
+	val saveRomLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
 		val name = DocumentFile.fromSingleUri(ctx, uri)!!.name ?: uri.lastPathSegment!!
 		romFileName.value = name.substringAfter(':')
@@ -107,7 +107,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			showProgress = false
 		}
 	}
-	val saveLogLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument()) { uri ->
+	val saveLogLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
 		scope.launch(Dispatchers.IO) {
 			ctx.contentResolver.openOutputStream(uri).use {
