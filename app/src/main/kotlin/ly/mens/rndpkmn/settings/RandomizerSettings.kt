@@ -83,13 +83,13 @@ object RandomizerSettings : Settings() {
 						"int" -> "Slider"
 						else -> ""
 					}
-					for (pre in SettingsPrefix.values()) {
+					for (pre in SettingsPrefix.entries) {
 						if (pre.search(fld, suffix)) break
 					}
 				} else if (type.enclosingClass == Settings::class.java) {
 					val prefix = type.getField("PREFIX").get(null) as String
 					type.enumConstants.forEach {
-						for (pre in SettingsPrefix.values()) {
+						for (pre in SettingsPrefix.entries) {
 							if (prefix == pre.prefix && pre.searchEnum(fld, it as Enum<*>)) break
 						}
 					}
