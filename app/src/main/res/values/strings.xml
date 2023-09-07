@@ -41,4 +41,8 @@
     <string name="title_general">General Settings</string>
     <string name="title_misc">Miscellaneous Settings</string>
     <string name="desc_batch">Shows progress of batch randomization.</string>
+
+    <string name="status_batch_missing">Cannot show progress notification.</string>
+    <string name="status_batch_granted">See notification for progress.</string>
+    <string name="empty" />
 </resources>
