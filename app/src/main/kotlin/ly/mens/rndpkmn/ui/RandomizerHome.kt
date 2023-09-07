@@ -431,7 +431,7 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	}
 	Text(stringResource(R.string.choose_preset))
 	Row(Modifier.horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically) {
-		SettingsPreset.values().forEach {
+		SettingsPreset.entries.forEach {
 			RadioButton(preset == it, { updatePreset(it) })
 			Text(it.name)
 		}

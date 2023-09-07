@@ -36,7 +36,7 @@ fun RandomizerApp() {
 		Scaffold(scaffoldState = scaffold, topBar = { RandomizerAppBar(scope, scaffold, nav) }, drawerContent = { RandomizerDrawer(scope, scaffold, nav) }) { pv ->
 			NavHost(nav, START_ROUTE, Modifier.padding(pv).padding(8.dp)) {
 				composable(START_ROUTE) { RandomizerHome(scaffold) }
-				SettingsCategory.values().forEach { category ->
+				SettingsCategory.entries.forEach { category ->
 					composable(category.name) { SettingsList(category) }
 				}
 				composable(MISC_ROUTE) { TweaksList() }
@@ -83,7 +83,7 @@ fun RandomizerDrawer(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavCon
 		}
 		scope.launch { scaffold.drawerState.close() }
 	}
-	SettingsCategory.values().forEach { category ->
+	SettingsCategory.entries.forEach { category ->
 		RandomizerDrawerItem(stringResource(category.title), current == category.name) {
 			if (RandomizerSettings.handler != null) {
 				nav.navigate(category.name) {
