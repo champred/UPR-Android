@@ -1,7 +1,10 @@
 package ly.mens.rndpkmn.ui
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -35,6 +38,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.documentfile.provider.DocumentFile
@@ -118,7 +122,9 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		}
 	}
 
-	if (showProgress) LinearProgressIndicator(Modifier.fillMaxWidth().padding(vertical = 8.dp))
+	if (showProgress) LinearProgressIndicator(Modifier
+			.fillMaxWidth()
+			.padding(vertical = 8.dp))
 	romFileName.value?.let { Text(stringResource(R.string.current_rom, it)) }
 	Row(verticalAlignment = Alignment.CenterVertically) {
 		Button({ openLauncher.launch("application/octet-stream") }, Modifier.padding(8.dp)) {
@@ -163,6 +169,7 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 	var end by rememberSaveable { mutableStateOf(10) }
 	var saveLog by rememberSaveable { mutableStateOf(false) }
 	var stateName by rememberSaveable { mutableStateOf<String?>(null) }
+	var status by rememberSaveable { mutableStateOf(R.string.empty) }
 
 	val keyCon = LocalSoftwareKeyboardController.current
 	val (first, second) = remember { FocusRequester.createRefs() }
@@ -175,11 +182,23 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 	}
 	val manager = NotificationManagerCompat.from(ctx)
 
+	val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+		status = if (granted) R.string.status_batch_granted else R.string.status_batch_missing
+	}
+
 	val batchLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
 		keyCon?.hide()
-		openDialog.value = false
 		if (start >= end || uri == null) return@rememberLauncherForActivityResult
 		val dir = DocumentFile.fromTreeUri(ctx, uri)!!
+		val len = end - start + 1
+
+		//look for existing ROMs
+		val files = dir.listFiles()
+		files.sortByDescending { it.name }
+		start = files.firstOrNull { it.name?.startsWith(prefix) ?: false }
+				?.name?.substringAfterLast('-')?.substringBefore('.')
+				?.toIntOrNull()?.plus(1) ?: start
+		end = start + len - 1
 
 		//copy the save state if selected
 		if (stateName != null) {
@@ -199,13 +218,18 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 		}
 
 		//determine how many ROMs we can make at a time
-		val len = end - start + 1;
 		val count = AtomicInteger(start)
 		val numHandlers = len.coerceAtMost(RandomizerSettings.romLimit)
-		val romsPerHandler = len / numHandlers;
+		val romsPerHandler = len / numHandlers
 		val remainingRoms = len % numHandlers
-		val lock = Semaphore(start);
+		val lock = Semaphore(start)
 		var last = 0
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+				ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) !=
+				PackageManager.PERMISSION_GRANTED) {
+			permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+		} else status = R.string.status_batch_granted
 
 		val saveRom = fun(_: Int) {
 			//update the progress notification
@@ -214,7 +238,8 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 			val current = lock.availablePermits()
 			if (current > last && lock.tryAcquire(current)) {
 				builder.setProgress(len, current - start + 1, false)
-				manager.notify(CHANNEL_ID, builder.build())
+				if (status == R.string.status_batch_granted)
+					manager.notify(CHANNEL_ID, builder.build())
 				last = current
 				lock.release(current)
 			}
@@ -274,7 +299,9 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 	}
 
 	Dialog({ openDialog.value = false }) {
-		Column(Modifier.background(MaterialTheme.colors.background).padding(8.dp)) {
+		Column(Modifier
+				.background(MaterialTheme.colors.background)
+				.padding(8.dp)) {
 			TextField(prefix,
 					{ prefix = it },
 					Modifier.fillMaxWidth(),
@@ -288,7 +315,10 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 					val tmp = it.replace(notNumPattern, "").trimStart('0')
 					start = if (tmp.isNotEmpty()) tmp.toInt() else 0
 				},
-						Modifier.weight(1f).focusRequester(first).padding(end = 2.dp),
+						Modifier
+								.weight(1f)
+								.focusRequester(first)
+								.padding(end = 2.dp),
 						label = { Text(stringResource(R.string.name_start)) },
 						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
 						keyboardActions = KeyboardActions { second.requestFocus() }
@@ -297,7 +327,10 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 					val tmp = it.replace(notNumPattern, "").trimStart('0')
 					end = if (tmp.isNotEmpty()) tmp.toInt() else 0
 				},
-						Modifier.weight(1f).focusRequester(second).padding(start = 2.dp),
+						Modifier
+								.weight(1f)
+								.focusRequester(second)
+								.padding(start = 2.dp),
 						label = { Text(stringResource(R.string.name_end)) },
 						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
 						keyboardActions = KeyboardActions { batchLauncher.launch(null) }
@@ -312,6 +345,7 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 				stateName?.let { Text(it) }
 			}
 			Button({ batchLauncher.launch(null) }) { Text(stringResource(R.string.action_choose_dir)) }
+			Text(stringResource(status))
 		}
 	}
 }
@@ -322,7 +356,9 @@ fun NamesDialog(openDialog: MutableState<Boolean>, label: String, names: Mutable
 	val scope = rememberCoroutineScope()
 	var text by rememberSaveable { mutableStateOf(names.joinToString("\n")) }
 	Dialog({ openDialog.value = false }) {
-		Column(Modifier.background(MaterialTheme.colors.background).padding(8.dp)) {
+		Column(Modifier
+				.background(MaterialTheme.colors.background)
+				.padding(8.dp)) {
 			TextField(text, { text = it }, label = { Text(label) }, maxLines = 10)
 			Button({
 				names.clear()
@@ -341,7 +377,9 @@ fun NamesDialog(openDialog: MutableState<Boolean>, label: String, names: Mutable
 @Composable
 fun LimitDialog(openDialog: MutableState<Boolean>) {
 	Dialog({ openDialog.value = false }) {
-		Column(Modifier.background(MaterialTheme.colors.background).padding(8.dp)) {
+		Column(Modifier
+				.background(MaterialTheme.colors.background)
+				.padding(8.dp)) {
 			Text(stringResource(R.string.GenerationLimitDialog_includePokemonHeader))
 			with(RandomizerSettings.currentRestrictions) {
 				for (i in 1..RandomizerSettings.currentGen) {
