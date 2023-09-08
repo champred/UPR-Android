@@ -58,7 +58,7 @@ import java.util.concurrent.atomic.AtomicInteger
 @Composable
 fun RandomizerHome(scaffold: ScaffoldState) {
 	val romName = rememberSaveable { mutableStateOf<String?>(null) }
-	Column(Modifier.verticalScroll(rememberScrollState())) {
+	Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
 		RomButtons(scaffold, romName)
 		DialogButtons(romName)
 		if (romName.value != null) ConfigFields(scaffold, romName)

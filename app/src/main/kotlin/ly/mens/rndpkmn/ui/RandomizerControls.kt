@@ -1,12 +1,11 @@
 package ly.mens.rndpkmn.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -17,8 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -33,9 +30,9 @@ import java.lang.reflect.Field
 
 @Composable
 fun TweaksList() {
-	val dialogText = rememberSaveable { mutableStateOf<CharSequence?>(null) }
-	HintDialog(dialogText)
-	LazyColumn {
+	val dialogText = rememberSaveable { mutableStateOf("") }
+	if (dialogText.value.isNotEmpty()) HintDialog(dialogText)
+	LazyColumn(Modifier.fillMaxWidth()) {
 		item {
 			Text(stringResource(R.string.title_misc), style = MaterialTheme.typography.h6)
 		}
@@ -50,7 +47,7 @@ fun TweaksList() {
 					RandomizerSettings.currentMiscTweaks = RandomizerSettings.currentMiscTweaks xor tweak.value
 				})
 				Text(tweak.tweakName, Modifier.clickable {
-					dialogText.value = renderText(tweak.tooltipText)
+					dialogText.value = tweak.tooltipText
 				})
 			}
 		}
@@ -59,10 +56,9 @@ fun TweaksList() {
 
 @Composable
 fun SettingsList(category: SettingsCategory) {
-	val ctx = LocalContext.current
-	val dialogText = rememberSaveable { mutableStateOf<CharSequence?>(null) }
-	HintDialog(dialogText)
-	LazyColumn {
+	val dialogLabel = rememberSaveable { mutableStateOf("") }
+	if (dialogLabel.value.isNotEmpty()) HintDialog(dialogLabel)
+	LazyColumn(Modifier.fillMaxWidth()) {
 		category.prefixes.filter { p ->
 			RandomizerSettings.handler?.let { p.isSupported(it) } ?: false
 		}.forEach { prefix ->
@@ -79,8 +75,7 @@ fun SettingsList(category: SettingsCategory) {
 				if (RandomizerSettings.currentGen in (RandomizerSettings.generations[field]
 								?: 1..7)) {
 					field.SettingsComponent(prefix.strings[label] ?: label) {
-						val id = ctx.resources.getIdentifier(label.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
-						if (id != 0) dialogText.value = ctx.renderText(id)
+						dialogLabel.value = label
 					}
 				}
 			}
@@ -90,35 +85,33 @@ fun SettingsList(category: SettingsCategory) {
 
 @Composable
 fun SettingsGroup(prefix: SettingsPrefix, subtitle: String, group: MutableMap<String, Field>) {
-	val ctx = LocalContext.current
 	val groupField = group.values.first()
 	val groupEnum = groupField.get(RandomizerSettings) as Enum<*>
 	val selectedIndex = rememberSaveable { mutableStateOf(groupEnum.ordinal) }
-	// TODO causes crash on configuration change if saved
-	val dialogText = remember { mutableStateOf<CharSequence?>(null) }
-	HintDialog(dialogText)
+	val dialogLabel = rememberSaveable { mutableStateOf("") }
+	if (dialogLabel.value.isNotEmpty()) HintDialog(dialogLabel)
 	Column {
 		if (subtitle.isNotEmpty()) Text(prefix.strings[subtitle]!!, fontSize = 16.sp, fontWeight = FontWeight.Bold)
 		group.keys.forEachIndexed { index, label ->
 			groupField.SettingsComponent(prefix.strings[label] ?: label, index, selectedIndex) {
-				val id = ctx.resources.getIdentifier(label.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
-				if (id != 0) dialogText.value = ctx.renderText(id)
+				dialogLabel.value = label
 			}
 		}
 	}
 }
 
 @Composable
-fun HintDialog(text: MutableState<CharSequence?>) {
-	if (text.value != null) {
-		Dialog({ text.value = null }) {
-			// TODO render HTML
-			Text(text.value.toString(), Modifier.background(MaterialTheme.colors.background).padding(8.dp))
-		}
+@SuppressLint("DiscouragedApi")
+fun HintDialog(text: MutableState<String>) {
+	val ctx = LocalContext.current
+	val id = ctx.resources.getIdentifier(text.value.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
+	text.value = if (id != 0) ctx.renderText(id).toString() else renderText(text.value).toString()
+	Dialog({ text.value = "" }) {
+		Text(text.value, Modifier.background(MaterialTheme.colors.background).padding(8.dp))
 	}
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: MutableState<Int>? = null, onClick: () -> Unit) {
 	if (type.isPrimitive) {

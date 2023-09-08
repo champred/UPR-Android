@@ -33,8 +33,12 @@ fun RandomizerApp() {
 		val nav = rememberNavController()
 		val scaffold = rememberScaffoldState()
 		val scope = rememberCoroutineScope()
-		Scaffold(scaffoldState = scaffold, topBar = { RandomizerAppBar(scope, scaffold, nav) }, drawerContent = { RandomizerDrawer(scope, scaffold, nav) }) { pv ->
-			NavHost(nav, START_ROUTE, Modifier.padding(pv).padding(8.dp)) {
+		Scaffold(scaffoldState = scaffold,
+				topBar = { RandomizerAppBar(scope, scaffold, nav) },
+				drawerContent = { RandomizerDrawer(scope, scaffold, nav) }) { pv ->
+			NavHost(nav, START_ROUTE, Modifier
+					.padding(pv)
+					.padding(8.dp)) {
 				composable(START_ROUTE) { RandomizerHome(scaffold) }
 				SettingsCategory.entries.forEach { category ->
 					composable(category.name) { SettingsList(category) }
@@ -77,16 +81,32 @@ fun RandomizerDrawer(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavCon
 			current = it.destination.route ?: START_ROUTE
 		}
 	}
-	RandomizerDrawerItem(stringResource(R.string.title_general), current == START_ROUTE) {
-		if (nav.currentDestination?.route != START_ROUTE) {
-			nav.popBackStack()
+	Column(Modifier.verticalScroll(rememberScrollState())) {
+		RandomizerDrawerItem(stringResource(R.string.title_general), current == START_ROUTE) {
+			if (nav.currentDestination?.route != START_ROUTE) {
+				nav.popBackStack()
+			}
+			scope.launch { scaffold.drawerState.close() }
 		}
-		scope.launch { scaffold.drawerState.close() }
-	}
-	SettingsCategory.entries.forEach { category ->
-		RandomizerDrawerItem(stringResource(category.title), current == category.name) {
+		SettingsCategory.entries.forEach { category ->
+			RandomizerDrawerItem(stringResource(category.title), current == category.name) {
+				if (RandomizerSettings.handler != null) {
+					nav.navigate(category.name) {
+						popUpTo(START_ROUTE)
+						launchSingleTop = true
+					}
+					scope.launch { scaffold.drawerState.close() }
+				} else {
+					scope.launch {
+						scaffold.drawerState.close()
+						scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.rom_not_loaded))
+					}
+				}
+			}
+		}
+		RandomizerDrawerItem(stringResource(R.string.title_misc), current == MISC_ROUTE) {
 			if (RandomizerSettings.handler != null) {
-				nav.navigate(category.name) {
+				nav.navigate(MISC_ROUTE) {
 					popUpTo(START_ROUTE)
 					launchSingleTop = true
 				}
@@ -96,20 +116,6 @@ fun RandomizerDrawer(scope: CoroutineScope, scaffold: ScaffoldState, nav: NavCon
 					scaffold.drawerState.close()
 					scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.rom_not_loaded))
 				}
-			}
-		}
-	}
-	RandomizerDrawerItem(stringResource(R.string.title_misc), current == MISC_ROUTE) {
-		if (RandomizerSettings.handler != null) {
-			nav.navigate(MISC_ROUTE) {
-				popUpTo(START_ROUTE)
-				launchSingleTop = true
-			}
-			scope.launch { scaffold.drawerState.close() }
-		} else {
-			scope.launch {
-				scaffold.drawerState.close()
-				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.rom_not_loaded))
 			}
 		}
 	}
