@@ -58,7 +58,9 @@ import java.util.concurrent.atomic.AtomicInteger
 @Composable
 fun RandomizerHome(scaffold: ScaffoldState) {
 	val romName = rememberSaveable { mutableStateOf<String?>(null) }
-	Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
+	Column(Modifier
+			.fillMaxWidth()
+			.verticalScroll(rememberScrollState())) {
 		RomButtons(scaffold, romName)
 		DialogButtons(romName)
 		if (romName.value != null) ConfigFields(scaffold, romName)
@@ -127,7 +129,10 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			.padding(vertical = 8.dp))
 	romFileName.value?.let { Text(stringResource(R.string.current_rom, it)) }
 	Row(verticalAlignment = Alignment.CenterVertically) {
-		Button({ openLauncher.launch("application/octet-stream") }, Modifier.padding(8.dp)) {
+		Button({
+			romFileName.value = null
+			openLauncher.launch("application/octet-stream")
+			   }, Modifier.padding(8.dp)) {
 			Text(stringResource(R.string.action_open_rom))
 		}
 		Text(stringResource(if (romFileName.value == null) R.string.rom_not_loaded else R.string.rom_loaded))
@@ -418,8 +423,8 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	val ctx = LocalContext.current
 	val keyCon = LocalSoftwareKeyboardController.current
 
-	var validSettings by remember { mutableStateOf(true) }
-	var settingsText by remember { mutableStateOf(RandomizerSettings.versionString) }
+	var validSettings by rememberSaveable { mutableStateOf(true) }
+	var settingsText by rememberSaveable { mutableStateOf(RandomizerSettings.versionString) }
 	val updateSettings: ()->Unit = {
 		keyCon?.hide()
 		if (RandomizerSettings.updateFromString(settingsText)) {
@@ -475,9 +480,18 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		}
 	}
 
-	var validSeed by remember { mutableStateOf(true) }
-	var seedText by remember { mutableStateOf(RandomizerSettings.currentSeed.toString(16)) }
-	var seedBase by remember { mutableStateOf(16) }
+	var berryCheckbox by remember { mutableStateOf(RandomizerSettings.allowExtraBerries) }
+	Row(verticalAlignment = Alignment.CenterVertically) {
+		Checkbox(berryCheckbox, {
+			berryCheckbox = it
+			RandomizerSettings.allowExtraBerries = it
+		}, enabled = RandomizerSettings.currentGen == 4)
+		Text(stringResource(R.string.allow_berries))
+	}
+
+	var validSeed by rememberSaveable { mutableStateOf(true) }
+	var seedText by rememberSaveable { mutableStateOf(RandomizerSettings.currentSeed.toString(16)) }
+	var seedBase by rememberSaveable { mutableStateOf(16) }
 	val updateName: ()->Unit = {
 		val name = RandomizerSettings.romFileName.let {
 			Triple(
