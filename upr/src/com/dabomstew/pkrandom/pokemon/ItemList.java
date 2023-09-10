@@ -59,6 +59,12 @@ public class ItemList {
         }
     }
 
+    public void unbanRange(int startIndex, int length) {
+        for (int i = 0; i < length; i++) {
+            items[i + startIndex] = true;
+        }
+    }
+
     public void tmRange(int startIndex, int length) {
         for (int i = 0; i < length; i++) {
             tms[i + startIndex] = true;
