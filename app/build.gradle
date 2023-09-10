@@ -14,14 +14,14 @@ Properties groupStrings = importStrings.groupBy {
 }
 
 android {
-    compileSdkVersion 33
-    buildToolsVersion "30.0.3"
+    compileSdk 33
+    buildToolsVersion = "30.0.3"
     defaultConfig {
         applicationId "ly.mens.rndpkmn"
         minSdkVersion 29
         targetSdkVersion 33
-        versionCode 21
-        versionName "0.3.4"
+        versionCode 22
+        versionName "0.3.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         //add properties to resources
@@ -76,25 +76,15 @@ android {
         buildConfigField "String", "B2W2_ULTIMATE", '"321WRIEEgLvAfIB9QGRAAKeBhsECQEACQACCQAuEgAAAAAABHCI5ATkwYAICTIGBgIyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSkkLEYu48M4ig=="'
         buildConfigField "String", "B2W2_KAIZO", '"321WRIEEgLvAfIB9QGRAAKeBhsECQEACQACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSkCfDTI48M4ig=="'
         buildConfigField "String", "B2W2_SURVIVAL", '"321WRIEEgLvAfIB9QGRAAKeBhsEiAEACQACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyEwUYE1Bva2Vtb24gQmxhY2sgMiAoVSnSbcbe48M4ig=="'
+        //add berry counts to build config
+        //used for banning "bad" items
+        buildConfigField "int", "BERRY_COUNT_OLD", "54"
+        buildConfigField "int", "BERRY_COUNT_NEW", "25"
     }
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-    flavorDimensions "version"
-    productFlavors {
-        //variant without extra berries using old item ban count
-        noBerries {
-            applicationIdSuffix ".old"
-            versionNameSuffix "-no-berries"
-            buildConfigField "int", "BERRY_COUNT", "54"
-        }
-        withBerries {
-            applicationIdSuffix ".new"
-            versionNameSuffix "-with-berries"
-            buildConfigField "int", "BERRY_COUNT", "25"
         }
     }
     sourceSets.main.java.srcDirs = ['src/main/kotlin']

@@ -69,6 +69,19 @@ object RandomizerSettings : Settings() {
 	val versionString: String get() = "$VERSION$this"
 	val selections: MutableMap<Field?, List<Any>> = mutableMapOf()
 	val nameLists: List<Pair<String, MutableList<String>>>
+	var allowExtraBerries = true
+		set(value) {
+		// berries without useful battle effects
+		if (value) {
+			// include extra berries
+			Gen4Constants.nonBadItems.unbanRange(Items.figyBerry, BuildConfig.BERRY_COUNT_OLD)
+			Gen4Constants.nonBadItems.banRange(Items.figyBerry, BuildConfig.BERRY_COUNT_NEW)
+		} else {
+			// don't include extra berries
+			Gen4Constants.nonBadItems.banRange(Items.figyBerry, BuildConfig.BERRY_COUNT_OLD)
+		}
+		field = value
+	}
 
 	private const val TAG = "Settings"
 
@@ -113,7 +126,6 @@ object RandomizerSettings : Settings() {
 			title to names
 		}.toList()
 		currentRestrictions = GenRestrictions()
-		Gen4Constants.nonBadItems.banRange(Items.figyBerry, BuildConfig.BERRY_COUNT); // berries without useful battle effects
 	}
 
 	fun loadRom(file: File): Boolean {
