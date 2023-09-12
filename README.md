@@ -33,7 +33,7 @@ The goal for this project is to build a complete UI using Jetpack Compose that s
 
 **Q: What versions of Android are supported?**
 
-A: Officially, only Android 10+ is supported, however there is a compatibility APK built for Android 8+ that may work on older devices. To use it, download the APK that has `android8` in the filename.
+A: Officially, only Android 10+ is supported, however there is a [compatibility APK](https://github.com/champred/UPR-Android/releases/download/v0.1.2a/upr-android8-v0.1.2a.apk) built for Android 8+ that may work on older devices. This version is missing many of the newer features and fixes.
 
 **Q: Are 3DS games supported?**
 
@@ -41,7 +41,7 @@ A: 3DS games will not work due to the large size of the ROM not being feasible t
 
 **Q: Why does the randomizer fail?**
 
-A: Most likely this is due to the source ROM being invalid (patched ROMs, ROM hacks, and ROMs that are not clean are all invalid). It can also happen if you select a setting not supported by the generation of game you have. This should not happen if you are using a valid settings string for that generation.
+A: Most likely this is due to the source ROM being invalid (for example if you have incorrectly applied a patch). It can also happen if you select a setting not supported by the generation of game you have. This should not happen if you are using a valid settings string for that generation.
 
 **Q: Why does it take up so much storage?**
 
@@ -49,20 +49,24 @@ A: The app has to copy every ROM that is opened to its internal storage. This co
 
 **Q: How to make multiple ROMs at once?**
 
-A: If you press the "Batch Randomize" button, it will open a dialog that allows you to choose a prefix, starting number, and ending number. This will generate a ROM for each number between the starting and ending numbers. The file name will simply be the prefix with the current number (0 padded so they sort correctly). The files will be saved to a folder using the "Choose Directory" button.
+A: If you press the "Batch Randomize" button, it will open a dialog that allows you to choose a prefix, starting number, and ending number. This will generate a ROM for each number between the starting and ending numbers. The file name will simply be the prefix with the current number (0 padded so they sort correctly). Every time you create a new batch the numbers will be automatically incremented. The files will be saved to a folder using the "Choose Directory" button. Progress will be shown as a notification. On Android 13+ you will be required to grant the notifications permission to see it. This will continue to run in the background, so you can leave the app if you wish (just don't close it in your recent apps).
 
-**Q: How fast is batch randomization?**
+**Q: What does the *X* setting do?**
 
-A: The speed at which ROMs can be randomized is limited by the amount of RAM your phone has and how big the ROM is. For GBA games, you can expect the speed to be about 10x faster than using the randomizer normally. However DS games are so big that only one can be done at a time, meaning the performance gain is not as drastic.
+A: If you are curious to see what a certain setting does, tapping on the text label will bring up a hint dialog with a description. Tapping outside of the dialog will close it.
+
+**Q: How to disable extra berries?**
+
+A: The newest version of the randomizer introduced extra berries for Generation 4 games (HGSS, DPPt) that some consider "useless." If you prefer to play without them, uncheck the box below the settings string.
 
 ## Development
 
-The source code includes the [randomizer](https://github.com/Ajarmar/universal-pokemon-randomizer-zx) itself as well as the Android app. It should work when imported into Android Studio. There is an additional configuration to run the randomizer JAR file from the IDE.
+The source code includes the [randomizer](https://github.com/Ajarmar/universal-pokemon-randomizer-zx) itself as well as the Android app.
+
+The project should work when imported into Android Studio with support for Kotlin 1.9. There is an additional configuration to run the randomizer JAR file from the IDE.
 
 The randomizer was included as a subtree rather than a submodule so that I don't need to maintain a separate fork of the randomizer due to needing to make some changes:
 * Fixed invalid characters in source code
 * Generated Java code for the GUI rather than using `.form` files
 * Included Gradle build file
 * Ability to make other changes as necessary
-
-The subtree can be updated using the command `git subtree -P upr pull https://github.com/Ajarmar/universal-pokemon-randomizer-zx.git master`. Alternatively, you can configure the upstream as a remote and use that instead of the URL. Commits from the upstream are added to a different branch and squash merged into the master branch.
