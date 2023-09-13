@@ -39,8 +39,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.documentfile.provider.DocumentFile
 import com.dabomstew.pkrandom.RandomSource
 import com.dabomstew.pkrandom.SysConstants
@@ -50,10 +48,7 @@ import ly.mens.rndpkmn.*
 import ly.mens.rndpkmn.R
 import ly.mens.rndpkmn.settings.RandomizerSettings
 import ly.mens.rndpkmn.settings.SettingsPreset
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.util.concurrent.Semaphore
-import java.util.concurrent.atomic.AtomicInteger
 
 @Composable
 fun RandomizerHome(scaffold: ScaffoldState) {
@@ -181,11 +176,7 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 	val scope = rememberCoroutineScope()
 
 	val ctx = LocalContext.current
-	val builder = NotificationCompat.Builder(ctx, CHANNEL_ID.toString()).apply {
-		setSmallIcon(R.drawable.ic_batch_save)
-		setContentTitle(ctx.getString(R.string.action_batch_random))
-	}
-	val manager = NotificationManagerCompat.from(ctx)
+	val service = Intent(ctx, BatchService::class.java)
 
 	val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
 		status = if (granted) R.string.status_batch_granted else R.string.status_batch_missing
@@ -196,102 +187,30 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 		if (start >= end || uri == null) return@rememberLauncherForActivityResult
 		val dir = DocumentFile.fromTreeUri(ctx, uri)!!
 		val len = end - start + 1
-
-		//look for existing ROMs
-		val files = dir.listFiles()
-		files.sortByDescending { it.name }
-		start = files.firstOrNull { it.name?.startsWith(prefix) ?: false }
-				?.name?.substringAfterLast('-')?.substringBefore('.')
-				?.toIntOrNull()?.plus(1) ?: start
-		end = start + len - 1
-
-		//copy the save state if selected
-		if (stateName != null) {
-			scope.launch(Dispatchers.IO) {
-				val stateFile = File(ctx.filesDir, stateName!!)
-				for (i in start..end) {
-					val copyName = Triple(
-							prefix,
-							i.toString().padStart(4, '0'),
-							stateName!!.substringAfter('.')
-					).fileName
-					val copyUri = dir.createFile("application/octet-stream", copyName)?.uri
-							?: return@launch
-					ctx.saveToUri(copyUri, stateFile)
-				}
+		scope.launch(Dispatchers.IO) {
+			//look for existing ROMs
+			val files = dir.listFiles()
+			files.sortByDescending { it.name }
+			start = files.firstOrNull { it.name?.startsWith(prefix) ?: false }
+					?.name?.substringAfterLast('-')?.substringBefore('.')
+					?.toIntOrNull()?.plus(1) ?: start
+			end = start + len - 1
+			service.apply {
+				putExtra("prefix", prefix)
+				putExtra("start", start)
+				putExtra("end", end)
+				putExtra("saveLog", saveLog)
+				putExtra("stateName", stateName)
+				putExtra("uri", uri)
+				putExtra("suffix", name.substringAfterLast('.'))
 			}
+			ctx.startForegroundService(service)
 		}
-
-		//determine how many ROMs we can make at a time
-		val count = AtomicInteger(start)
-		val numHandlers = len.coerceAtMost(RandomizerSettings.romLimit)
-		val romsPerHandler = len / numHandlers
-		val remainingRoms = len % numHandlers
-		val lock = Semaphore(start)
-		var last = 0
-
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
 				ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) !=
 				PackageManager.PERMISSION_GRANTED) {
 			permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
 		} else status = R.string.status_batch_granted
-
-		val saveRom = fun(_: Int) {
-			//update the progress notification
-			//only allow one thread to update it at a time
-			//make sure the progress is greater than the last update
-			val current = lock.availablePermits()
-			if (current > last && lock.tryAcquire(current)) {
-				builder.setProgress(len, current - start + 1, false)
-				if (status == R.string.status_batch_granted)
-					manager.notify(CHANNEL_ID, builder.build())
-				last = current
-				lock.release(current)
-			}
-			val file = File(ctx.filesDir, Triple(
-					prefix,
-					count.getAndIncrement().toString().padStart(4, '0'),
-					name.substringAfterLast('.')
-			).fileName)
-			val fileUri = dir.createFile("application/octet-stream", file.name)?.uri ?: return
-			val log = if (saveLog) ByteArrayOutputStream(1024 * 1024) else null
-			val logUri = log?.let { dir.createFile("text/plain", "${file.name}.log.txt")?.uri }
-			if (!RandomizerSettings.saveRom(file, RandomSource.pickSeed(), log)) return
-			ctx.saveToUri(fileUri, file)
-			//clean up temporary file
-			ctx.deleteFile(file.name)
-			if (logUri != null) {
-				ctx.contentResolver.openOutputStream(logUri).use {
-					if (it != null) {
-						log.writeTo(it)
-					}
-				}
-			}
-			//we can use this to synchronize on the number of ROMs saved
-			lock.release()
-		}
-
-		if (numHandlers > 1) {
-			//split ROMs evenly among handlers
-			for (i in 1..numHandlers) {
-				scope.launch(Dispatchers.IO) {
-					repeat(romsPerHandler, saveRom)
-				}
-			}
-			//finish remaining ROMs
-			scope.launch(Dispatchers.IO) {
-				repeat(remainingRoms, saveRom)
-			}
-		} else scope.launch(Dispatchers.IO) {
-			repeat(romsPerHandler, saveRom)
-		}
-
-		scope.launch(Dispatchers.Default) {
-			//dismiss notification when complete
-			//once the last ROM has been saved we will have one more permit than the ending ROM number
-			lock.acquireUninterruptibly(end + 1)
-			manager.cancel(CHANNEL_ID)
-		}
 	}
 	val stateLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
 		keyCon?.hide()
