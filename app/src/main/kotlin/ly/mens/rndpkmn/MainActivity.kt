@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
             testForRequiredConfigs()
         }
         val channel = NotificationChannel(
-                CHANNEL_ID.toString(),
+                CHANNEL_ID,
                 getString(R.string.action_batch_random),
                 NotificationManager.IMPORTANCE_LOW
         ).apply {
@@ -26,6 +26,7 @@ class MainActivity : ComponentActivity() {
         }
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
+        notificationManager.deleteNotificationChannel("69420")
         setContent { RandomizerApp() }
     }
 

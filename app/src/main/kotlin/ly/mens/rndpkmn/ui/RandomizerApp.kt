@@ -23,7 +23,7 @@ import ly.mens.rndpkmn.settings.SettingsCategory
 
 const val START_ROUTE = "GENERAL"
 const val MISC_ROUTE = "MISC"
-const val CHANNEL_ID = 69_420
+const val CHANNEL_ID = "BATCH_RANDO"
 
 @Composable
 fun RandomizerApp() {
