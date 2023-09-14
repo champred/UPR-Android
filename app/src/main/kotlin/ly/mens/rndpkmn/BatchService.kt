@@ -84,7 +84,7 @@ class BatchService : Service() {
 				if (current > last && lock.tryAcquire(current)) {
 					builder.setProgress(len, current - start + 1, false)
 					try {
-						manager.notify(CHANNEL_ID, builder.build())
+						manager.notify(NOTIFICATION_ID, builder.build())
 					} catch (_: SecurityException) {
 						Log.e(TAG, "Unable to display notification.")
 					}
@@ -130,13 +130,14 @@ class BatchService : Service() {
 	}
 
 	override fun onCreate() {
+		super.onCreate()
 		HandlerThread(TAG, Process.THREAD_PRIORITY_BACKGROUND).apply {
 			start()
 			serviceLooper = looper
 			serviceHandler = ServiceHandler(looper)
 		}
 		manager = NotificationManagerCompat.from(this)
-		builder = NotificationCompat.Builder(this, CHANNEL_ID.toString()).apply {
+		builder = NotificationCompat.Builder(this, CHANNEL_ID).apply {
 			setSmallIcon(R.drawable.ic_batch_save)
 			setContentTitle(getString(R.string.action_batch_random))
 			setContentText(getString(R.string.desc_batch))
@@ -148,12 +149,12 @@ class BatchService : Service() {
 	}
 
 	override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+		startForeground(NOTIFICATION_ID, builder.build())
 		serviceHandler.obtainMessage().also { msg ->
 			msg.arg1 = startId
 			msg.data = intent?.extras
 			serviceHandler.sendMessage(msg)
 		}
-		startForeground(CHANNEL_ID, builder.build())
 		return START_NOT_STICKY
 	}
 
@@ -162,11 +163,13 @@ class BatchService : Service() {
 	}
 
 	override fun onDestroy() {
-		manager.cancel(CHANNEL_ID)
+		manager.cancel(NOTIFICATION_ID)
 		job.cancel()
+		super.onDestroy()
 	}
 
 	companion object {
 		private const val TAG = "BatchService"
+		private const val NOTIFICATION_ID = 69_420
 	}
 }
