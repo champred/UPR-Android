@@ -105,7 +105,7 @@ fun SettingsGroup(prefix: SettingsPrefix, subtitle: String, group: MutableMap<St
 fun HintDialog(text: MutableState<String>) {
 	val ctx = LocalContext.current
 	val id = ctx.resources.getIdentifier(text.value.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
-	text.value = if (id != 0) ctx.renderText(id).toString() else renderText(text.value).toString()
+	text.value = if (id != 0) ctx.renderText(id).toString() else ""
 	Dialog({ text.value = "" }) {
 		Text(text.value, Modifier.background(MaterialTheme.colors.background).padding(8.dp))
 	}
