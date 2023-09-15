@@ -5529,7 +5529,7 @@ public class NewRandomizerGUI {
 						//---- tpConsumableItemsOnlyCheckBox ----
 						tpConsumableItemsOnlyCheckBox.setEnabled(false);
 						tpConsumableItemsOnlyCheckBox.setText(bundle.getString("GUI.tpConsumableItemsOnlyForTrainerPokemonCheckBox.text"));
-						tpConsumableItemsOnlyCheckBox.setToolTipText(bundle.getString("GUI.tpConsumableItemsOnlyForTrainerPokemonCheckBox.tooltip"));
+						tpConsumableItemsOnlyCheckBox.setToolTipText(bundle.getString("GUI.tpConsumableItemsOnlyForTrainerPokemonCheckBox.toolTipText"));
 						panel15.add(tpConsumableItemsOnlyCheckBox, new GridBagConstraints(1, 10, 2, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -5537,7 +5537,7 @@ public class NewRandomizerGUI {
 						//---- tpSensibleItemsCheckBox ----
 						tpSensibleItemsCheckBox.setEnabled(false);
 						tpSensibleItemsCheckBox.setText(bundle.getString("GUI.tpSensibleItemsOnlyForTrainerPokemonCheckBox.text"));
-						tpSensibleItemsCheckBox.setToolTipText(bundle.getString("GUI.tpSensibleItemsOnlyForTrainerPokemonCheckBox.tooltip"));
+						tpSensibleItemsCheckBox.setToolTipText(bundle.getString("GUI.tpSensibleItemsOnlyForTrainerPokemonCheckBox.toolTipText"));
 						panel15.add(tpSensibleItemsCheckBox, new GridBagConstraints(3, 10, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
@@ -5545,7 +5545,7 @@ public class NewRandomizerGUI {
 						//---- tpHighestLevelGetsItemCheckBox ----
 						tpHighestLevelGetsItemCheckBox.setEnabled(false);
 						tpHighestLevelGetsItemCheckBox.setText(bundle.getString("GUI.tpHighestLevelOnlyGetsItemsForTrainerPokemonCheckBox.text"));
-						tpHighestLevelGetsItemCheckBox.setToolTipText(bundle.getString("GUI.tpHighestLevelOnlyGetsItemsForTrainerPokemonCheckBox.tooltip"));
+						tpHighestLevelGetsItemCheckBox.setToolTipText(bundle.getString("GUI.tpHighestLevelOnlyGetsItemsForTrainerPokemonCheckBox.toolTipText"));
 						panel15.add(tpHighestLevelGetsItemCheckBox, new GridBagConstraints(4, 10, 1, 1, 0.0, 0.0,
 							GridBagConstraints.WEST, GridBagConstraints.NONE,
 							new Insets(0, 0, 0, 0), 0, 0));
