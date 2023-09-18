@@ -68,15 +68,16 @@ public abstract class AbstractGBCRomHandler extends AbstractGBRomHandler {
                         r[1] = r[1].substring(0, r[1].length() - 2);
                     }
                     int hexcode = Integer.parseInt(r[0], 16);
+                    if (tb[hexcode] != null) {
+                        String oldMatch = tb[hexcode];
+                        tb[hexcode] = null;
+                        if (d.get(oldMatch) == hexcode) {
+                            d.remove(oldMatch);
+                        }
+                    }
                     tb[hexcode] = r[1];
                     longestTableToken = Math.max(longestTableToken, r[1].length());
                     d.put(r[1], (byte) hexcode);
-                    //add escape sequence for unicode characters
-                    int cp = r[1].codePointAt(0);
-                    if (cp >= 160) {
-                        String code = String.format("\\u%04x", cp);
-                        d.put(code, (byte)hexcode);
-                    }
                 }
             }
             sc.close();
@@ -123,12 +124,9 @@ public abstract class AbstractGBCRomHandler extends AbstractGBRomHandler {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while (text.length() != 0) {
             int i = Math.max(0, longestTableToken - text.length());
-            if (text.startsWith("\\x")) {
-                    baos.write(Integer.parseInt(text.substring(2, 4), 16));
-                    text = text.substring(4);
-            } else if (text.startsWith("\\u")) {
-                    baos.write(d.getOrDefault(text.substring(0, 6), (byte)0x7F) & 0xFF);
-                    text = text.substring(6);
+            if (text.charAt(0) == '\\' && text.charAt(1) == 'x') {
+                baos.write(Integer.parseInt(text.substring(2, 4), 16));
+                text = text.substring(4);
             } else {
                 while (!(d.containsKey(text.substring(0, longestTableToken - i)) || (i == longestTableToken))) {
                     i++;

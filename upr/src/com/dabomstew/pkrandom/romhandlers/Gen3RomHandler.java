@@ -331,15 +331,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                     if (r[1].endsWith("\r\n")) {
                         r[1] = r[1].substring(0, r[1].length() - 2);
                     }
-                    int hc = Integer.parseInt(r[0], 16);
-                    tb[hc] = r[1];
-                    d.put(r[1], (byte)hc);
-                    //add escape sequence for unicode characters
-                    int cp = r[1].codePointAt(0);
-                    if (cp >= 160) {
-                        String code = String.format("\\u%04x", cp);
-                        d.put(code, (byte)hc);
-                    }
+                    tb[Integer.parseInt(r[0], 16)] = r[1];
+                    d.put(r[1], (byte) Integer.parseInt(r[0], 16));
                 }
             }
             sc.close();
@@ -1380,16 +1373,13 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         List<Byte> data = new ArrayList<>();
         while (text.length() != 0) {
             int i = Math.max(0, 4 - text.length());
-            if (text.startsWith("\\x")) {
-                    data.add((byte) Integer.parseInt(text.substring(2, 4), 16));
-                    text = text.substring(4);
-            } else if (text.startsWith("\\v")) {
-                    data.add((byte) Gen3Constants.textVariable);
-                    data.add((byte) Integer.parseInt(text.substring(2, 4), 16));
-                    text = text.substring(4);
-            } else if (text.startsWith("\\u")) {
-                    data.add(d.getOrDefault(text.substring(0, 6), (byte)0));
-                    text = text.substring(6);
+            if (text.charAt(0) == '\\' && text.charAt(1) == 'x') {
+                data.add((byte) Integer.parseInt(text.substring(2, 4), 16));
+                text = text.substring(4);
+            } else if (text.charAt(0) == '\\' && text.charAt(1) == 'v') {
+                data.add((byte) Gen3Constants.textVariable);
+                data.add((byte) Integer.parseInt(text.substring(2, 4), 16));
+                text = text.substring(4);
             } else {
                 while (!(d.containsKey(text.substring(0, 4 - i)) || (i == 4))) {
                     i++;

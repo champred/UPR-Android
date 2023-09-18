@@ -67,9 +67,6 @@ public class TextToPoke {
                 } else if (text.substring(1, 4).equals("and")) {
                     data.add(0x1C2);
                     text = text.substring(4);
-                } else if (text.charAt(1) == 'u') {
-                    data.add(UnicodeParser.d.getOrDefault(text.substring(0, 6), 0));
-                    text = text.substring(6);
                 } else {
                     System.out.printf("unknown escape: %s\n", text.substring(1, 2));
                     text = text.substring(2);

@@ -28,14 +28,8 @@ public class UnicodeParser {
                     if (r[1].endsWith("\r\n")) {
                         r[1] = r[1].substring(0, r[1].length() - 2);
                     }
-                    int hc = Integer.parseInt(r[0], 16);
-                    tb[hc] = r[1];
-                    d.put(r[1], hc);
-                    //add escape sequence for unicode characters
-                    int cp = r[1].codePointAt(0);
-                    if (cp >= 160) {
-                        d.put(String.format("\\u%04x", cp), hc);
-                    }
+                    tb[Integer.parseInt(r[0], 16)] = r[1];
+                    d.put(r[1], Integer.parseInt(r[0], 16));
                 }
             }
             sc.close();
