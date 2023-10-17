@@ -1,5 +1,11 @@
 package ly.mens.rndpkmn
 
+fun <T> makeTriple(vararg elems: T) = Triple(
+	elems.getOrNull(0),
+	elems.getOrNull(1),
+	elems.getOrNull(2)
+)
+
 //https://gist.github.com/sagar-viradiya/891cf7d08b6ac13bb1fbdc411b76f6a5
 class Trie {
 

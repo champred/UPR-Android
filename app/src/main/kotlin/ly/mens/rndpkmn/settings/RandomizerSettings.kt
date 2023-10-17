@@ -12,6 +12,7 @@ import com.dabomstew.pkrandom.romhandlers.*
 import ly.mens.rndpkmn.BuildConfig
 import ly.mens.rndpkmn.Trie
 import ly.mens.rndpkmn.fileName
+import ly.mens.rndpkmn.makeTriple
 import java.io.*
 import java.lang.NumberFormatException
 import java.lang.reflect.Field
@@ -145,8 +146,7 @@ object RandomizerSettings : Settings() {
 			return false
 		}
 
-		val (first, second, third) = romHandler.starters
-		currentStarters = Triple(first, second, third)
+		currentStarters = makeTriple(*romHandler.starters.toTypedArray())
 		pokeTrie.clear()
 		for (i in 1 until romHandler.pokemon.size) {
 			pokeTrie.insert(romHandler.pokemon[i].name)

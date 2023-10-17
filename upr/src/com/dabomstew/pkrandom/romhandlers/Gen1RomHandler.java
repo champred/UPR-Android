@@ -828,7 +828,7 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         starters.add(pokes[pokeRBYToNumTable[rom[romEntry.arrayEntries.get("StarterOffsets2")[0]] & 0xFF]]);
         if (!romEntry.isYellow) {
             starters.add(pokes[pokeRBYToNumTable[rom[romEntry.arrayEntries.get("StarterOffsets3")[0]] & 0xFF]]);
-        }
+        } else starters.add(null);
         return starters;
     }
 
