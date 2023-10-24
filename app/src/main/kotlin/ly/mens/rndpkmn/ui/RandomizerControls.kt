@@ -73,9 +73,10 @@ fun SettingsList(category: SettingsCategory) {
 			}
 			items(prefix.props.toList()) { (label, field) ->
 				if (RandomizerSettings.currentGen in (RandomizerSettings.generations[field]
-								?: 1..7)) {
+								?: 1..5)) {
 					field.SettingsComponent(prefix.strings[label] ?: label) {
-						dialogLabel.value = label
+						dialogLabel.value = prefix.strings[label
+							.replace(".text", ".toolTipText")] ?: ""
 					}
 				}
 			}
@@ -94,20 +95,20 @@ fun SettingsGroup(prefix: SettingsPrefix, subtitle: String, group: MutableMap<St
 		if (subtitle.isNotEmpty()) Text(prefix.strings[subtitle]!!, fontSize = 16.sp, fontWeight = FontWeight.Bold)
 		group.keys.forEachIndexed { index, label ->
 			groupField.SettingsComponent(prefix.strings[label] ?: label, index, selectedIndex) {
-				dialogLabel.value = label
+				dialogLabel.value = prefix.strings[label
+					.replace(".text", ".toolTipText")] ?: ""
 			}
 		}
 	}
 }
 
 @Composable
-@SuppressLint("DiscouragedApi")
 fun HintDialog(text: MutableState<String>) {
-	val ctx = LocalContext.current
-	val id = ctx.resources.getIdentifier(text.value.replace(".text", "_toolTipText").substring(4), "string", ctx.packageName)
-	text.value = if (id != 0) ctx.renderText(id).toString() else ""
 	Dialog({ text.value = "" }) {
-		Text(text.value, Modifier.background(MaterialTheme.colors.background).padding(8.dp))
+		Text(renderText(text.value).toString(), Modifier
+			.background(MaterialTheme.colors.background)
+			.padding(8.dp)
+		)
 	}
 }
 

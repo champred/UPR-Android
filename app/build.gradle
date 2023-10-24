@@ -20,8 +20,8 @@ android {
         applicationId "ly.mens.rndpkmn"
         minSdkVersion 29
         targetSdkVersion 33
-        versionCode 23
-        versionName "0.3.6"
+        versionCode 24
+        versionName "0.3.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         //add properties to resources
@@ -139,9 +139,11 @@ String mapToString(Map map, String type) {
     def value = new StringBuilder()
     for (e in map) {
         if (e.value instanceof Map) {
-            value.append(String.format('put("%s",%s); ', e.key, mapToString(e.value, "java.util.HashMap<String, String>")))
+            def rec = mapToString(e.value, "java.util.HashMap<String, String>")
+            value.append(String.format('put("%s",%s); ', e.key, rec))
         } else {
-            value.append(String.format('put("%s","%s"); ', e.key, e.value.replaceAll("\n", " ").replaceAll("\"", "'")))
+            def esc = e.value.replace('\n':'\\n','"':'\\"')
+            value.append(String.format('put("%s","%s"); ', e.key, esc))
         }
     }
     return String.format('%s%s%s', prefix, value, suffix)
