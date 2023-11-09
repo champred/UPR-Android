@@ -17,7 +17,7 @@ enum class SettingsPreset {
 		val prefix: String = when (RandomizerSettings.currentGen) {
 			1 -> "RBY"
 			2 -> "GSC"
-			3 -> if ("Fire" in name || "Leaf" in name) "FRLG" else "RSE"
+			3 -> if ("Fire" in name || "Leaf" in name) "FRLG" else if ("ND" in name) "END" else "RSE"
 			4 -> if ("Heart" in name || "Soul" in name) "HGSS" else "DPPT"
 			5 -> if ("2" in name) "B2W2" else "BW"
 			else -> return null

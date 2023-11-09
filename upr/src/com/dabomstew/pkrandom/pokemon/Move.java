@@ -67,6 +67,7 @@ public class Move {
     public int effectIndex;
     public int target;
     public double hitCount = 1; // not saved, only used in randomized move powers.
+    public boolean valid = true; // used to ignore EFFECT_PLACEHOLDER
 
     public Move() {
         // Initialize all statStageChanges to something sensible so that we don't need to have

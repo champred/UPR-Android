@@ -129,6 +129,10 @@ public class Gen3Items {
     public static final int unknown100 = 100;
     public static final int unknown101 = 101;
     public static final int unknown102 = 102;
+    public static final int shinyStone = 99;
+    public static final int duskStone = 100;
+    public static final int dawnStone = 101;
+    public static final int iceStone = 102;
     public static final int tinyMushroom = 103;
     public static final int bigMushroom = 104;
     public static final int unknown105 = 105;
@@ -253,6 +257,7 @@ public class Gen3Items {
     public static final int thickClub = 224;
     public static final int stick = 225;
     public static final int unknown226 = 226;
+    public static final int fairyFeather = 226;
     public static final int unknown227 = 227;
     public static final int unknown228 = 228;
     public static final int unknown229 = 229;

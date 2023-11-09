@@ -26,17 +26,13 @@ package com.dabomstew.pkrandom.pokemon;
 /*----------------------------------------------------------------------------*/
 
 import com.dabomstew.pkrandom.constants.Species;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import com.dabomstew.pkrandom.romhandlers.Gen3RomHandler;
+import java.util.*;
 
 public class Pokemon implements Comparable<Pokemon> {
 
     public String name;
-    public int number;
+    public int number, speciesNumber;
 
     public String formeSuffix = "";
     public Pokemon baseForme = null;
@@ -260,6 +256,8 @@ public class Pokemon implements Comparable<Pokemon> {
         final int prime = 31;
         int result = 1;
         result = prime * result + number;
+        if (Gen3RomHandler.useNatDex)
+            result = prime * result + speciesNumber;
         return result;
     }
 
@@ -272,15 +270,22 @@ public class Pokemon implements Comparable<Pokemon> {
         if (getClass() != obj.getClass())
             return false;
         Pokemon other = (Pokemon) obj;
+        if (Gen3RomHandler.useNatDex) {
+            if (number != other.number)
+                return false;
+            return speciesNumber == other.speciesNumber;
+        }
         return number == other.number;
     }
 
     @Override
     public int compareTo(Pokemon o) {
+        if (Gen3RomHandler.useNatDex)
+            return (number == o.number) ? speciesNumber - o.speciesNumber : number - o.number;
         return number - o.number;
     }
 
-    private static final List<Integer> legendaries = Arrays.asList(Species.articuno, Species.zapdos, Species.moltres,
+    private static final Set<Integer> legendaries = new HashSet<>(Arrays.asList(Species.articuno, Species.zapdos, Species.moltres,
             Species.mewtwo, Species.mew, Species.raikou, Species.entei, Species.suicune, Species.lugia, Species.hoOh,
             Species.celebi, Species.regirock, Species.regice, Species.registeel, Species.latias, Species.latios,
             Species.kyogre, Species.groudon, Species.rayquaza, Species.jirachi, Species.deoxys, Species.uxie,
@@ -291,22 +296,46 @@ public class Pokemon implements Comparable<Pokemon> {
             Species.meloetta, Species.genesect, Species.xerneas, Species.yveltal, Species.zygarde, Species.diancie,
             Species.hoopa, Species.volcanion, Species.typeNull, Species.silvally, Species.tapuKoko, Species.tapuLele,
             Species.tapuBulu, Species.tapuFini, Species.cosmog, Species.cosmoem, Species.solgaleo, Species.lunala,
-            Species.necrozma, Species.magearna, Species.marshadow, Species.zeraora);
-
-    private static final List<Integer> strongLegendaries = Arrays.asList(Species.mewtwo, Species.lugia, Species.hoOh,
+            Species.necrozma, Species.magearna, Species.marshadow, Species.zeraora));
+    private static final Set<Integer> strongLegendaries = new HashSet<>(Arrays.asList(Species.mewtwo, Species.lugia, Species.hoOh,
             Species.kyogre, Species.groudon, Species.rayquaza, Species.dialga, Species.palkia, Species.regigigas,
             Species.giratina, Species.arceus, Species.reshiram, Species.zekrom, Species.kyurem, Species.xerneas,
-            Species.yveltal, Species.cosmog, Species.cosmoem, Species.solgaleo, Species.lunala);
+            Species.yveltal, Species.cosmog, Species.cosmoem, Species.solgaleo, Species.lunala));
+
+    private static final Set<Integer> natdexLegendaries = new HashSet<>(Arrays.asList(1024, 1026, 1028, Species.dragonite, Species.mew, 1035,
+            1036, 1037, Species.tyranitar, Species.celebi, Species.salamence, Species.metagross, Species.latias,
+            Species.latios, Species.jirachi, Species.deoxys, 1129, 1130, 1131, Species.garchomp, Species.heatran,
+            Species.manaphy, Species.darkrai, Species.shaymin, 1144, Species.victini, Species.hydreigon, Species.landorus,
+            1149, Species.meloetta, 1153, Species.genesect, Species.goodra, 1119, Species.zygarde, Species.diancie,
+            Species.hoopa, Species.volcanion, Species.kommoO, Species.necrozma, Species.magearna, Species.marshadow,
+            Species.zeraora, Species.melmetal, Species.dragapult, Species.zarude, Species.baxcalibur, 1033, 1034, 1030, 1042, 1062, 1162,
+            1018, 1060, 1021, 1039, 1040, 1045, 1019, 1020, 1041, 1029, 1154, 1174, Species.kyurem, Species.zacian,
+            Species.zamazenta, Species.slaking, Species.kyogre, Species.groudon, Species.regigigas, Species.koraidon, Species.miraidon, Species.mewtwo,
+            Species.lugia, Species.hoOh, Species.rayquaza, Species.dialga, 1141, Species.palkia, 1142, Species.giratina, 1143,
+            Species.reshiram, Species.zekrom, Species.xerneas, Species.yveltal, 1158, Species.solgaleo, Species.lunala, 1164,
+            1165, 1171, 1172, Species.eternatus, 1038, 1054, 1055, 1056, 1057, 1059, 1152, 1151, 1064, 1168, 1169, 1157,
+            Species.arceus, 1166, 1066, 1067, 1031, 1032, 1065));
+
+    private static final Set<Integer> natdexStrongLegendaries = new HashSet<>(Arrays.asList(Species.kyurem, Species.zacian,
+            Species.zamazenta, Species.kyogre, Species.groudon, Species.regigigas, Species.koraidon, Species.miraidon, Species.mewtwo,
+            Species.lugia, Species.hoOh, Species.rayquaza, Species.dialga, 1141, Species.palkia, 1142, Species.giratina, 1143,
+            Species.reshiram, Species.zekrom, Species.xerneas, Species.yveltal, 1158, Species.solgaleo, Species.lunala, 1164,
+            1165, 1171, 1172, Species.eternatus, 1056, 1057, 1152, 1151, 1064, 1168, 1169, 1157,
+            Species.arceus, 1166, 1066, 1067, 1031, 1032, 1065));
 
     private static final List<Integer> ultraBeasts = Arrays.asList(Species.nihilego, Species.buzzwole, Species.pheromosa,
             Species.xurkitree, Species.celesteela, Species.kartana, Species.guzzlord, Species.poipole, Species.naganadel,
             Species.stakataka, Species.blacephalon);
 
     public boolean isLegendary() {
+        if (Gen3RomHandler.useNatDex)
+            return formeNumber == 0 ? natdexLegendaries.contains(this.number) : natdexLegendaries.contains(this.baseForme.number);
         return formeNumber == 0 ? legendaries.contains(this.number) : legendaries.contains(this.baseForme.number);
     }
 
     public boolean isStrongLegendary() {
+        if (Gen3RomHandler.useNatDex)
+            return formeNumber == 0 ? natdexStrongLegendaries.contains(this.number) : natdexStrongLegendaries.contains(this.baseForme.number);
         return formeNumber == 0 ? strongLegendaries.contains(this.number) : strongLegendaries.contains(this.baseForme.number);
     }
 

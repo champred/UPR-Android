@@ -20,8 +20,8 @@ android {
         applicationId "ly.mens.rndpkmn"
         minSdkVersion 29
         targetSdkVersion 33
-        versionCode 24
-        versionName "0.3.7"
+        versionCode 25
+        versionName "0.4.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         //add properties to resources
@@ -76,6 +76,11 @@ android {
         buildConfigField "String", "B2W2_ULTIMATE", '"321WRIEEgLvAfIB9QGRAAKeBhsECQEACQACCQAuEgAAAAAABHCI5ATkwYAICTIGBgIyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSkkLEYu48M4ig=="'
         buildConfigField "String", "B2W2_KAIZO", '"321WRIEEgLvAfIB9QGRAAKeBhsECQEACQACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSkCfDTI48M4ig=="'
         buildConfigField "String", "B2W2_SURVIVAL", '"321WRIEEgLvAfIB9QGRAAKeBhsEiAEACQACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyEwUYE1Bva2Vtb24gQmxhY2sgMiAoVSnSbcbe48M4ig=="'
+        //Emerald Nat Dex Hack
+        buildConfigField "String", "END_ULTIMATE", '"321WRIEEjL8AP8AAgGRAAKeBhkECQEACQASCQAuEgAAAAAABBiw5ATkBIAICTIGBAIyAAUYC0VtZXJhbGQgKFUpsfdZEePDOIo="'
+        buildConfigField "String", "END_KAIZO", '"321WRIEEjL8AP8AAgGRAAKeBhsECQEAFAASCQAuEgAAAAAABBiw7gTuAoYICTIGBAIyAAUYC0VtZXJhbGQgKFUpz+T6X+PDOIo="'
+        buildConfigField "String", "END_SURVIVAL", '"321WRIEEjL8AP8AAgGRAAKeBhsEiAEAFAASCQAuEgAAAAAABBiw7gTuAoYICTIGBAIyEwUYC0VtZXJhbGQgKFUpLHk7FOPDOIo="'
+        buildConfigField "String", "END_DOUBLES", '"321WRIEEjL8AP8AAgGRAAKeBhsECQEAFAASCQAuEgAAAAAABBiw7gTuApcJCTIGBAMyEQUYC0VtZXJhbGQgKFUpOPJ94+PDOIo="'
         //add berry counts to build config
         //used for banning "bad" items
         buildConfigField "int", "BERRY_COUNT_OLD", "54"

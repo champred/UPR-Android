@@ -365,6 +365,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     private int pickupItemsTableOffset;
     private long actualCRC32;
     private boolean effectivenessUpdated;
+    public static boolean useNatDex = false;
 
     @Override
     public boolean detectRom(byte[] rom) {
@@ -374,6 +375,15 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     private static boolean detectRomInner(byte[] rom, int romSize) {
         if (romSize != Gen3Constants.size8M && romSize != Gen3Constants.size16M && romSize != Gen3Constants.size32M) {
             return false; // size check
+        }
+        // Nat Dex support
+        if (useNatDex) {
+            // give it a rom code so it can be detected
+            rom[Gen3Constants.romCodeOffset] = 'B';
+            rom[Gen3Constants.romCodeOffset + 1] = 'P';
+            rom[Gen3Constants.romCodeOffset + 2] = 'E';
+            rom[Gen3Constants.romCodeOffset + 3] = 'N';
+            rom[Gen3Constants.headerChecksumOffset] = 0x66;
         }
         // Special case for Emerald unofficial translation
         if (romName(rom, Gen3Constants.unofficialEmeraldROMName)) {
@@ -393,7 +403,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             return false;
         }
         // Pokedex Order header
-        if (findMultiple(rom, Gen3Constants.pokedexOrderPointerPrefix).size() != 3) {
+        if (findMultiple(rom, useNatDex ? Gen3Constants.natdexOrderPointerPrefix : Gen3Constants.pokedexOrderPointerPrefix).size() != 3) {
             return false;
         }
         for (RomEntry re : roms) {
@@ -419,7 +429,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         jamboMovesetHack = false;
 
         // Pokemon count stuff, needs to be available first
-        List<Integer> pokedexOrderPrefixes = findMultiple(rom, Gen3Constants.pokedexOrderPointerPrefix);
+        List<Integer> pokedexOrderPrefixes = findMultiple(rom, useNatDex ? Gen3Constants.natdexOrderPointerPrefix : Gen3Constants.pokedexOrderPointerPrefix);
         romEntry.entries.put("PokedexOrder", readPointer(pokedexOrderPrefixes.get(1) + 16));
 
         // Pokemon names offset
@@ -3103,11 +3113,11 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         for (int i = 1; i <= numRealPokemon; i++) {
             Pokemon pk = pokemonList.get(i);
             int idx = pokedexToInternal[pk.number];
-            int evoOffset = baseOffset + (idx) * 0x28;
-            for (int j = 0; j < 5; j++) {
+            int evoOffset = baseOffset + (idx) * (useNatDex ? 0x40 : 0x28);
+            for (int j = 0; j < (useNatDex ? 8 : 5); j++) {
                 int method = readWord(evoOffset + j * 8);
                 int evolvingTo = readWord(evoOffset + j * 8 + 4);
-                if (method >= 1 && method <= Gen3Constants.evolutionMethodCount && evolvingTo >= 1
+                if (method >= 1 && method <= Gen3Constants.evolutionMethodCount + (useNatDex ? 4 : 0) && evolvingTo >= 1
                         && evolvingTo <= numInternalPokes) {
                     int extraInfo = readWord(evoOffset + j * 8 + 2);
                     EvolutionType et = EvolutionType.fromIndex(3, method);
@@ -3135,7 +3145,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         for (int i = 1; i <= numRealPokemon; i++) {
             Pokemon pk = pokemonList.get(i);
             int idx = pokedexToInternal[pk.number];
-            int evoOffset = baseOffset + (idx) * 0x28;
+            int evoOffset = baseOffset + (idx) * (useNatDex ? 0x40 : 0x28);
+            int evoLimit = useNatDex ? 8 : 5;
             int evosWritten = 0;
             for (Evolution evo : pk.evolutionsFrom) {
                 writeWord(evoOffset, evo.type.toIndex(3));
@@ -3144,11 +3155,11 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 writeWord(evoOffset + 6, 0);
                 evoOffset += 8;
                 evosWritten++;
-                if (evosWritten == 5) {
+                if (evosWritten == evoLimit) {
                     break;
                 }
             }
-            while (evosWritten < 5) {
+            while (evosWritten < evoLimit) {
                 writeWord(evoOffset, 0);
                 writeWord(evoOffset + 2, 0);
                 writeWord(evoOffset + 4, 0);

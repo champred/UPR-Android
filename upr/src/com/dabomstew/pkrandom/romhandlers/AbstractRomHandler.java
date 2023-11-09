@@ -3697,7 +3697,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         allBanned.addAll(this.getIllegalMoves());
 
         for (Move mv : allMoves) {
-            if (mv != null && !GlobalConstants.bannedRandomMoves[mv.number] && !allBanned.contains(mv.number)) {
+            if (mv != null && !GlobalConstants.bannedRandomMoves[mv.number] && !allBanned.contains(mv.number) && mv.valid) {
                 validMoves.add(mv);
                 if (mv.type != null) {
                     if (!validTypeMoves.containsKey(mv.type)) {
@@ -5477,11 +5477,83 @@ public abstract class AbstractRomHandler implements RomHandler {
             for (Pokemon pk : pokemonPool) {
                 for (Evolution ev : pk.evolutionsFrom) {
                     oldEvoPairs.add(new EvolutionPair(ev.from, ev.to));
-                    if (generationOfPokemon() >= 7 && ev.from.number == Species.cosmoem) { // Special case for Cosmoem to add Lunala/Solgaleo since we remove the split evo
+                    if (ev.from.number == Species.cosmoem) { // Special case for Cosmoem to add Lunala/Solgaleo since we remove the split evo
                         int oppositeVersionLegendary = ev.to.number == Species.solgaleo ? Species.lunala : Species.solgaleo;
                         Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
                         if (toPkmn != null) {
                             oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                        }
+                    }
+                    if (this instanceof Gen3RomHandler && Gen3RomHandler.useNatDex) {
+                        if (ev.from.number == Species.pikachu) {
+                            int oppositeVersionLegendary = ev.to.number == Species.raichu ? 1070 : Species.raichu; // 1070 =  alolan raichu
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.exeggcute) {
+                            int oppositeVersionLegendary = ev.to.number == Species.exeggutor ? 1084 : Species.exeggutor; // 1084 =  alolan exeggutor
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.koffing) {
+                            int oppositeVersionLegendary = ev.to.number == Species.weezing ? 1092 : Species.weezing; // 1092 =  galarian weezing
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.mimeJr) {
+                            int oppositeVersionLegendary = ev.to.number == Species.mrMime ? 1093 : Species.mrMime; // 1093 =  galarian mr. mime
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.quilava) {
+                            int oppositeVersionLegendary = ev.to.number == Species.typhlosion ? 1109 : Species.typhlosion; // 1109 =  hisuian typhlosion
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.dewott) {
+                            int oppositeVersionLegendary = ev.to.number == Species.samurott ? 1112 : Species.samurott; // 1112 =  hisuian samurott
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.petilil) {
+                            int oppositeVersionLegendary = ev.to.number == Species.lilligant ? 1113 : Species.lilligant; // 1113 =  hisuian lilligant
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.goomy) {
+                            int oppositeVersionLegendary = ev.to.number == Species.sliggoo ? 1118 : Species.sliggoo; // 1118 =  hisuian sliggoo
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.bergmite) {
+                            int oppositeVersionLegendary = ev.to.number == Species.bergmite ? 1120 : Species.bergmite; // 1120 =  hisuian avalugg
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.dartrix) {
+                            int oppositeVersionLegendary = ev.to.number == Species.decidueye ? 1121 : Species.decidueye; // 1121 =  hisuian decidueye
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
                         }
                     }
                 }
@@ -5710,11 +5782,83 @@ public abstract class AbstractRomHandler implements RomHandler {
             for (Pokemon pk : pokemonPool) {
                 for (Evolution ev : pk.evolutionsFrom) {
                     oldEvoPairs.add(new EvolutionPair(ev.from, ev.to));
-                    if (generationOfPokemon() >= 7 && ev.from.number == Species.cosmoem) { // Special case for Cosmoem to add Lunala/Solgaleo since we remove the split evo
+                    if (ev.from.number == Species.cosmoem) { // Special case for Cosmoem to add Lunala/Solgaleo since we remove the split evo
                         int oppositeVersionLegendary = ev.to.number == Species.solgaleo ? Species.lunala : Species.solgaleo;
                         Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
                         if (toPkmn != null) {
                             oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                        }
+                    }
+                    if (this instanceof Gen3RomHandler && Gen3RomHandler.useNatDex) {
+                        if (ev.from.number == Species.pikachu) {
+                            int oppositeVersionLegendary = ev.to.number == Species.raichu ? 1070 : Species.raichu; // 1070 =  alolan raichu
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.exeggcute) {
+                            int oppositeVersionLegendary = ev.to.number == Species.exeggutor ? 1084 : Species.exeggutor; // 1084 =  alolan exeggutor
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.koffing) {
+                            int oppositeVersionLegendary = ev.to.number == Species.weezing ? 1092 : Species.weezing; // 1092 =  galarian weezing
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.mimeJr) {
+                            int oppositeVersionLegendary = ev.to.number == Species.mrMime ? 1093 : Species.mrMime; // 1093 =  galarian mr. mime
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.quilava) {
+                            int oppositeVersionLegendary = ev.to.number == Species.typhlosion ? 1109 : Species.typhlosion; // 1109 =  hisuian typhlosion
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.dewott) {
+                            int oppositeVersionLegendary = ev.to.number == Species.samurott ? 1112 : Species.samurott; // 1112 =  hisuian samurott
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.petilil) {
+                            int oppositeVersionLegendary = ev.to.number == Species.lilligant ? 1113 : Species.lilligant; // 1113 =  hisuian lilligant
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.goomy) {
+                            int oppositeVersionLegendary = ev.to.number == Species.sliggoo ? 1118 : Species.sliggoo; // 1118 =  hisuian sliggoo
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.bergmite) {
+                            int oppositeVersionLegendary = ev.to.number == Species.avalugg ? 1120 : Species.avalugg; // 1120 =  hisuian avalugg
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
+                        }
+                        if (ev.from.number == Species.dartrix) {
+                            int oppositeVersionLegendary = ev.to.number == Species.decidueye ? 1121 : Species.decidueye; // 1121 =  hisuian decidueye
+                            Pokemon toPkmn = findPokemonInPoolWithSpeciesID(pokemonPool, oppositeVersionLegendary);
+                            if (toPkmn != null) {
+                                oldEvoPairs.add(new EvolutionPair(ev.from, toPkmn));
+                            }
                         }
                     }
                 }

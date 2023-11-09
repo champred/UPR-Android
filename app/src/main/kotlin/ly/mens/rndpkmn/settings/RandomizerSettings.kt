@@ -2,9 +2,7 @@ package ly.mens.rndpkmn.settings
 
 import android.util.Log
 import com.dabomstew.pkrandom.*
-import com.dabomstew.pkrandom.constants.Gen4Constants
-import com.dabomstew.pkrandom.constants.GlobalConstants
-import com.dabomstew.pkrandom.constants.Items
+import com.dabomstew.pkrandom.constants.*
 import com.dabomstew.pkrandom.pokemon.ExpCurve
 import com.dabomstew.pkrandom.pokemon.GenRestrictions
 import com.dabomstew.pkrandom.pokemon.Pokemon
@@ -83,6 +81,27 @@ object RandomizerSettings : Settings() {
 		}
 		field = value
 	}
+	var useNatDex = false
+		set(value) {
+			if (value) {
+				Gen3Constants.allowedItems.unbanRange(Gen3Items.unknown99, 4)
+				Gen3Constants.allowedItems.unbanRange(Gen3Items.unknown226, 1)
+				Gen3Constants.nonBadItemsRSE.banSingles(Gen3Items.dragonScale, Gen3Items.upGrade)
+				Gen3Constants.nonBadItemsRSE.unbanRange(Gen3Items.oranBerry, 1)
+				Gen3Constants.nonBadItemsRSE.unbanRange(Gen3Items.figyBerry, 5)
+				Gen3Constants.nonBadItemsRSE.banRange(Gen3Items.tinyMushroom, 8)
+			} else {
+				Gen3Constants.allowedItems.banRange(Gen3Items.unknown99, 4)
+				Gen3Constants.allowedItems.banRange(Gen3Items.unknown226, 28)
+				Gen3Constants.nonBadItemsRSE.banSingles(Gen3Items.oranBerry)
+				Gen3Constants.nonBadItemsRSE.unbanRange(Gen3Items.dragonScale, 1)
+				Gen3Constants.nonBadItemsRSE.unbanRange(Gen3Items.upGrade, 1)
+				Gen3Constants.nonBadItemsRSE.banRange(Gen3Items.figyBerry, 33)
+				Gen3Constants.nonBadItemsRSE.unbanRange(Gen3Items.tinyMushroom, 8)
+			}
+			Gen3RomHandler.useNatDex = value
+			field = value
+		}
 
 	private const val TAG = "Settings"
 

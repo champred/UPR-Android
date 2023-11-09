@@ -123,6 +123,15 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			.fillMaxWidth()
 			.padding(vertical = 8.dp))
 	romFileName.value?.let { Text(stringResource(R.string.current_rom, it)) }
+
+	var dexCheckbox by remember { mutableStateOf(RandomizerSettings.useNatDex) }
+	Row(verticalAlignment = Alignment.CenterVertically) {
+		Checkbox(dexCheckbox, {
+			dexCheckbox = it
+			RandomizerSettings.useNatDex = it
+		})
+		Text(stringResource(R.string.nat_dex))
+	}
 	Row(verticalAlignment = Alignment.CenterVertically) {
 		Button({
 			romFileName.value = null
