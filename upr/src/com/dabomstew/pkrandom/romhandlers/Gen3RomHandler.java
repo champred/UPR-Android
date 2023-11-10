@@ -136,7 +136,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     private static void loadROMInfo() {
         roms = new ArrayList<>();
-        RomEntry current = null;
+        RomEntry current = new RomEntry();
         try {
             Scanner sc = new Scanner(FileFunctions.openConfig("gen3_offsets.ini"), "UTF-8");
             while (sc.hasNextLine()) {
@@ -376,15 +376,6 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         if (romSize != Gen3Constants.size8M && romSize != Gen3Constants.size16M && romSize != Gen3Constants.size32M) {
             return false; // size check
         }
-        // Nat Dex support
-        if (useNatDex) {
-            // give it a rom code so it can be detected
-            rom[Gen3Constants.romCodeOffset] = 'B';
-            rom[Gen3Constants.romCodeOffset + 1] = 'P';
-            rom[Gen3Constants.romCodeOffset + 2] = 'E';
-            rom[Gen3Constants.romCodeOffset + 3] = 'N';
-            rom[Gen3Constants.headerChecksumOffset] = 0x66;
-        }
         // Special case for Emerald unofficial translation
         if (romName(rom, Gen3Constants.unofficialEmeraldROMName)) {
             // give it a rom code so it can be detected
@@ -421,6 +412,10 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 romEntry = new RomEntry(re); // clone so we can modify
                 break;
             }
+        }
+        // Nat Dex support
+        if (useNatDex) {
+            romEntry = new RomEntry(roms.get(7)); // need to hardcode index
         }
 
         tb = new String[256];
