@@ -122,7 +122,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	if (showProgress) LinearProgressIndicator(Modifier
 			.fillMaxWidth()
 			.padding(vertical = 8.dp))
-	romFileName.value?.let { Text(stringResource(R.string.current_rom, it)) }
+	romFileName.value?.let { Text(stringResource(R.string.current_rom, it, RandomizerSettings.romName)) }
 
 	var dexCheckbox by remember { mutableStateOf(RandomizerSettings.useNatDex) }
 	Row(verticalAlignment = Alignment.CenterVertically) {
@@ -147,7 +147,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		}
 		Text(stringResource(if (romSaved) R.string.rom_saved else R.string.rom_not_saved))
 	}
-	Button({ saveLogLauncher.launch("${romFileName.value}.log.txt") }, Modifier.padding(8.dp), romSaved) {
+	Button({ saveLogLauncher.launch("${romFileName.value!!.substringBefore('.')}.txt") }, Modifier.padding(8.dp), romSaved) {
 		Text(stringResource(R.string.action_save_log))
 	}
 }
