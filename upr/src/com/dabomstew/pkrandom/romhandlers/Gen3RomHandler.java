@@ -131,14 +131,14 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     private static List<RomEntry> roms;
 
     static {
-        loadROMInfo();
+        loadROMInfo("gen3_offsets.ini");
     }
 
-    private static void loadROMInfo() {
+    private static void loadROMInfo(String filename) {
         roms = new ArrayList<>();
         RomEntry current = new RomEntry();
         try {
-            Scanner sc = new Scanner(FileFunctions.openConfig("gen3_offsets.ini"), "UTF-8");
+            Scanner sc = new Scanner(FileFunctions.openConfig(filename), "UTF-8");
             while (sc.hasNextLine()) {
                 String q = sc.nextLine().trim();
                 if (q.contains("//")) {
@@ -407,6 +407,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     @Override
     public void loadedRom() {
+        actualCRC32 = FileFunctions.getCRC32(rom);
         for (RomEntry re : roms) {
             if (romCode(rom, re.romCode) && (rom[0xBC] & 0xFF) == re.version) {
                 romEntry = new RomEntry(re); // clone so we can modify
@@ -415,7 +416,13 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         }
         // Nat Dex support
         if (useNatDex) {
-            romEntry = new RomEntry(roms.get(7)); // need to hardcode index
+            loadROMInfo("end_offsets.ini");
+            for (RomEntry re : roms) {
+                if (re.expectedCRC32 == actualCRC32) {
+                    romEntry = new RomEntry(re);
+                    break;
+                }
+            }
         }
 
         tb = new String[256];
@@ -489,8 +496,6 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
         allowedItems = Gen3Constants.allowedItems.copy();
         nonBadItems = Gen3Constants.getNonBadItems(romEntry.romType).copy();
-
-        actualCRC32 = FileFunctions.getCRC32(rom);
     }
 
     private int findPointerPrefixAndSuffix(String prefix, String suffix) {
