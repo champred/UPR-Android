@@ -50,7 +50,13 @@ object RandomizerSettings : Settings() {
 		val mem = rt.maxMemory() - (rt.totalMemory() - rt.freeMemory())
 		return (mem / inputFile.length() / 3L).toInt().coerceAtLeast(1)
 	}
-	val currentGen: Int get() = if (RandomizerSettings::romHandler.isInitialized) romHandler.generationOfPokemon() else 1
+	val currentGen: Int
+		get() {
+			return if (RandomizerSettings::romHandler.isInitialized) {
+				if (useNatDex) 9
+				else romHandler.generationOfPokemon()
+			} else 0
+		}
 	val isValid: Boolean get() = if (RandomizerSettings::romHandler.isInitialized) romHandler.isRomValid else false
 	var currentStarters: Triple<Pokemon?, Pokemon?, Pokemon?> = Triple(null, null, null)
 		set(value) {

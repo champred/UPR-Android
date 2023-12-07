@@ -127,6 +127,14 @@ public abstract class AbstractRomHandler implements RomHandler {
                 addPokesFromRange(mainPokemonList, allPokemon, Species.rowlet, maxGen7SpeciesID);
             }
 
+            if (restrictions.allow_gen8 && Gen3RomHandler.useNatDex) {
+                addPokesFromRange(mainPokemonList, allPokemon, Species.meltan, Species.enamorus);
+            }
+
+            if (restrictions.allow_gen9 && Gen3RomHandler.useNatDex) {
+                addPokesFromRange(mainPokemonList, allPokemon, Species.sprigatito, Species.ogerpon);
+            }
+
             // If the user specified it, add all the evolutionary relatives for everything in the mainPokemonList
             if (restrictions.allow_evolutionary_relatives) {
                 addEvolutionaryRelatives(mainPokemonList);
