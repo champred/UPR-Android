@@ -344,6 +344,7 @@ public class Pokemon implements Comparable<Pokemon> {
     // In contexts where formes are involved, use "if (ultraBeastList.contains(...))" instead,
     // assuming "checkPokemonRestrictions" has been used at some point beforehand.
     public boolean isUltraBeast() {
+        if (Gen3RomHandler.useNatDex) return false;
         return ultraBeasts.contains(this.number);
     }
 
