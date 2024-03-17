@@ -41,10 +41,10 @@ import com.dabomstew.pkrandom.pokemon.GenRestrictions;
 import com.dabomstew.pkrandom.pokemon.Pokemon;
 import com.dabomstew.pkrandom.romhandlers.Gen1RomHandler;
 import com.dabomstew.pkrandom.romhandlers.Gen2RomHandler;
-import com.dabomstew.pkrandom.romhandlers.Gen3RomHandler;
 import com.dabomstew.pkrandom.romhandlers.Gen5RomHandler;
 import com.dabomstew.pkrandom.romhandlers.RomHandler;
 
+@SuppressWarnings("unused")
 public class Settings {
 
     public static final int VERSION = Version.VERSION;
@@ -912,6 +912,7 @@ public class Settings {
             return changedStarter;
         }
 
+        @SuppressWarnings("UnusedReturnValue")
         public TweakForROMFeedback setChangedStarter(boolean changedStarter) {
             this.changedStarter = changedStarter;
             return this;
@@ -921,6 +922,7 @@ public class Settings {
             return removedCodeTweaks;
         }
 
+        @SuppressWarnings("UnusedReturnValue")
         public TweakForROMFeedback setRemovedCodeTweaks(boolean removedCodeTweaks) {
             this.removedCodeTweaks = removedCodeTweaks;
             return this;
@@ -959,7 +961,7 @@ public class Settings {
         }
 
         // gen restrictions
-        if (rh instanceof Gen1RomHandler || (rh instanceof Gen3RomHandler && !rh.isRomValid())) {
+        if (rh instanceof Gen1RomHandler) {
             this.currentRestrictions = null;
             this.setLimitPokemon(false);
         } else if (this.currentRestrictions != null) {
@@ -2395,7 +2397,7 @@ public class Settings {
             }
         }
         // We have to return something, so return the default
-        return index >= 0 ? index : 0;
+        return Math.max(index, 0);
     }
 
     protected static void checkChecksum(byte[] data) {

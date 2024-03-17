@@ -5344,7 +5344,7 @@ public class NewRandomizerGUI {
 						//---- tpPercentageLevelModifierSlider ----
 						tpPercentageLevelModifierSlider.setEnabled(false);
 						tpPercentageLevelModifierSlider.setMajorTickSpacing(10);
-						tpPercentageLevelModifierSlider.setMaximum(50);
+						tpPercentageLevelModifierSlider.setMaximum(60);
 						tpPercentageLevelModifierSlider.setMinimum(-50);
 						tpPercentageLevelModifierSlider.setMinorTickSpacing(2);
 						tpPercentageLevelModifierSlider.setPaintLabels(true);
@@ -5889,7 +5889,7 @@ public class NewRandomizerGUI {
 						//---- wpPercentageLevelModifierSlider ----
 						wpPercentageLevelModifierSlider.setEnabled(false);
 						wpPercentageLevelModifierSlider.setMajorTickSpacing(10);
-						wpPercentageLevelModifierSlider.setMaximum(50);
+						wpPercentageLevelModifierSlider.setMaximum(60);
 						wpPercentageLevelModifierSlider.setMinimum(-50);
 						wpPercentageLevelModifierSlider.setMinorTickSpacing(2);
 						wpPercentageLevelModifierSlider.setPaintLabels(true);
