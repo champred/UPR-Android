@@ -3,6 +3,7 @@ package ly.mens.rndpkmn.settings
 import android.util.Log
 import com.dabomstew.pkrandom.*
 import com.dabomstew.pkrandom.constants.*
+import com.dabomstew.pkrandom.constants.GlobalConstants.HIGHEST_POKEMON_GEN
 import com.dabomstew.pkrandom.pokemon.ExpCurve
 import com.dabomstew.pkrandom.pokemon.GenRestrictions
 import com.dabomstew.pkrandom.pokemon.Pokemon
@@ -116,7 +117,7 @@ object RandomizerSettings : Settings() {
 			"MegaEvo" in it.name || "AltForme" in it.name
 		}.forEach { prop ->
 			val fld = prop.javaField
-			if (fld != null) {
+			if (fld != null && fld.declaringClass == Settings::class.java) {
 				val type = fld.type
 				fld.isAccessible = true
 				if (type.isPrimitive) {
@@ -341,28 +342,28 @@ object RandomizerSettings : Settings() {
 			::updateMoves.javaField to ::updateMovesToGeneration.javaField,
 	)
 	val generations: Map<Field?, IntRange> = mapOf(
-			::randomizeInGameTradesOTs.javaField to 2..7,
-			::randomizeInGameTradesIVs.javaField to 2..7,
-			::randomizeInGameTradesItems.javaField to 2..7,
+			::randomizeInGameTradesOTs.javaField to 2..HIGHEST_POKEMON_GEN,
+			::randomizeInGameTradesIVs.javaField to 2..HIGHEST_POKEMON_GEN,
+			::randomizeInGameTradesItems.javaField to 2..HIGHEST_POKEMON_GEN,
 			::evolutionMovesForAll.javaField to 7..7,
-			::doubleBattleMode.javaField to 3..7,
-			::additionalRegularTrainerPokemon.javaField to 3..7,
-			::additionalImportantTrainerPokemon.javaField to 3..7,
-			::additionalBossTrainerPokemon.javaField to 3..7,
-			::randomizeHeldItemsForRegularTrainerPokemon.javaField to 3..7,
-			::randomizeHeldItemsForImportantTrainerPokemon.javaField to 3..7,
-			::randomizeHeldItemsForBossTrainerPokemon.javaField to 3..7,
-			::consumableItemsOnlyForTrainerPokemon.javaField to 3..7,
-			::sensibleItemsOnlyForTrainerPokemon.javaField to 3..7,
-			::highestLevelOnlyGetsItemsForTrainerPokemon.javaField to 3..7,
-			::eliteFourUniquePokemonNumber.javaField to 3..7,
-			::trainersBlockEarlyWonderGuard.javaField to 3..7,
+			::doubleBattleMode.javaField to 3..HIGHEST_POKEMON_GEN,
+			::additionalRegularTrainerPokemon.javaField to 3..HIGHEST_POKEMON_GEN,
+			::additionalImportantTrainerPokemon.javaField to 3..HIGHEST_POKEMON_GEN,
+			::additionalBossTrainerPokemon.javaField to 3..HIGHEST_POKEMON_GEN,
+			::randomizeHeldItemsForRegularTrainerPokemon.javaField to 3..HIGHEST_POKEMON_GEN,
+			::randomizeHeldItemsForImportantTrainerPokemon.javaField to 3..HIGHEST_POKEMON_GEN,
+			::randomizeHeldItemsForBossTrainerPokemon.javaField to 3..HIGHEST_POKEMON_GEN,
+			::consumableItemsOnlyForTrainerPokemon.javaField to 3..HIGHEST_POKEMON_GEN,
+			::sensibleItemsOnlyForTrainerPokemon.javaField to 3..HIGHEST_POKEMON_GEN,
+			::highestLevelOnlyGetsItemsForTrainerPokemon.javaField to 3..HIGHEST_POKEMON_GEN,
+			::eliteFourUniquePokemonNumber.javaField to 3..HIGHEST_POKEMON_GEN,
+			::trainersBlockEarlyWonderGuard.javaField to 3..HIGHEST_POKEMON_GEN,
 			::shinyChance.javaField to 7..7,
-			::betterTrainerMovesets.javaField to 3..7,
-			::randomizeWildPokemonHeldItems.javaField to 2..7,
-			::banBadRandomWildPokemonHeldItems.javaField to 2..7,
+			::betterTrainerMovesets.javaField to 3..HIGHEST_POKEMON_GEN,
+			::randomizeWildPokemonHeldItems.javaField to 2..HIGHEST_POKEMON_GEN,
+			::banBadRandomWildPokemonHeldItems.javaField to 2..HIGHEST_POKEMON_GEN,
 			::balanceShakingGrass.javaField to 5..5,
 			::fullHMCompat.javaField to 1..6,
-			::randomizeMoveCategory.javaField to 4..7,
+			::randomizeMoveCategory.javaField to 4..HIGHEST_POKEMON_GEN,
 	)
 }

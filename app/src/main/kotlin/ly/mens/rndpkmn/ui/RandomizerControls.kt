@@ -72,11 +72,12 @@ fun SettingsList(category: SettingsCategory) {
 				Divider()
 			}
 			items(prefix.props.toList()) { (label, field) ->
-				if (RandomizerSettings.currentGen in (RandomizerSettings.generations[field]
-								?: 1..5)) {
-					field.SettingsComponent(prefix.strings[label] ?: label) {
-						dialogLabel.value = prefix.strings[label
-							.replace(".text", ".toolTipText")] ?: ""
+				with(RandomizerSettings) {
+					if (generations[field]?.contains(currentGen) != false) {
+						field.SettingsComponent(prefix.strings[label] ?: label) {
+							dialogLabel.value = prefix.strings[label
+									.replace(".text", ".toolTipText")] ?: ""
+						}
 					}
 				}
 			}
