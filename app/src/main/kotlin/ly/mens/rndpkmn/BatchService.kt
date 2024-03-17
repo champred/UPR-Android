@@ -90,6 +90,8 @@ class BatchService : Service() {
 					}
 					last = current
 					lock.release(current)
+				} else if (count.get() == len-1) {
+					manager.cancel(NOTIFICATION_ID)
 				}
 				val file = File(filesDir, Triple(
 						prefix,

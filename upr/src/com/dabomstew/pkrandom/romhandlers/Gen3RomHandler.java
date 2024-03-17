@@ -408,18 +408,21 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     @Override
     public void loadedRom() {
         actualCRC32 = FileFunctions.getCRC32(rom);
-        for (RomEntry re : roms) {
-            if (romCode(rom, re.romCode) && (rom[0xBC] & 0xFF) == re.version) {
-                romEntry = new RomEntry(re); // clone so we can modify
-                break;
-            }
-        }
+
         // Nat Dex support
         if (useNatDex) {
             loadROMInfo("end_offsets.ini");
             for (RomEntry re : roms) {
                 if (re.expectedCRC32 == actualCRC32) {
                     romEntry = new RomEntry(re);
+                    break;
+                }
+            }
+        } else {
+            loadROMInfo("gen3_offsets.ini");
+            for (RomEntry re : roms) {
+                if (romCode(rom, re.romCode) && (rom[0xBC] & 0xFF) == re.version) {
+                    romEntry = new RomEntry(re); // clone so we can modify
                     break;
                 }
             }
