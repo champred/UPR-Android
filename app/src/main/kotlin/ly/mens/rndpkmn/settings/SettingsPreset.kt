@@ -1,6 +1,8 @@
 package ly.mens.rndpkmn.settings
 
+import com.dabomstew.pkrandom.constants.Species
 import ly.mens.rndpkmn.BuildConfig
+import ly.mens.rndpkmn.makeTriple
 
 enum class SettingsPreset {
 	NONE {
@@ -10,7 +12,29 @@ enum class SettingsPreset {
 	ULTIMATE,
 	KAIZO,
 	SURVIVAL,
-	DOUBLES;
+	DOUBLES,
+	STARTERS {
+		override val preset: String? get() {
+			return with(RandomizerSettings) {
+				if (useNatDex) {
+					starters.shuffle()
+					currentStarters = makeTriple(*starters.map(handler!!.pokemon::get).toTypedArray())
+					BuildConfig.END_STARTERS
+				} else null
+			}
+		}
+		private val starters = intArrayOf(
+				Species.bulbasaur, Species.charmander, Species.squirtle,
+				Species.chikorita, Species.cyndaquil, Species.totodile,
+				Species.treecko, Species.torchic, Species.mudkip,
+				Species.turtwig, Species.chimchar, Species.piplup,
+				Species.snivy, Species.tepig, Species.oshawott,
+				Species.chespin, Species.fennekin, Species.froakie,
+				Species.rowlet, Species.litten, Species.popplio,
+				Species.grookey, Species.scorbunny, Species.sobble,
+				Species.sprigatito, Species.fuecoco, Species.quaxly,
+				)
+	};
 
 	open val preset: String? get() {
 		val name = RandomizerSettings.romName ?: return null

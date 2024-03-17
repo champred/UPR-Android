@@ -290,6 +290,8 @@ object RandomizerSettings : Settings() {
 		}
 		other.javaClass.declaredFields.forEach { fld ->
 			fld.isAccessible = true
+			if (fld == ::customStarters.javaField && currentStarters != Triple(null, null, null))
+				return@forEach
 			//don't copy null values
 			fld.get(other)?.let { fld.set(this, it) }
 		}

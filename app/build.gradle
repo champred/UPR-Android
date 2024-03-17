@@ -20,8 +20,8 @@ android {
         applicationId "ly.mens.rndpkmn"
         minSdkVersion 29
         targetSdkVersion 33
-        versionCode 28
-        versionName "0.4.1a"
+        versionCode 29
+        versionName "0.4.2a"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         //add properties to resources
@@ -81,6 +81,7 @@ android {
         buildConfigField "String", "END_KAIZO", '"321WRIEEjL8AP8AAgGRAAKeBhsECQEAFAASCQAuEgAAAAAABBiw7gTuAoYICTIGBAIyAAUYC0VtZXJhbGQgKFUpz+T6X+PDOIo="'
         buildConfigField "String", "END_SURVIVAL", '"321WRIEEjL8AP8AAgGRAAKeBhsEiAEAFAASCQAuEgAAAAAABBiw7gTuAoYICTIGBAIyEwUYC0VtZXJhbGQgKFUpLHk7FOPDOIo="'
         buildConfigField "String", "END_DOUBLES", '"321WRIEEjL8AP8AAgGRAAKeBhsECQEAFAASCQAuEgAAAAAABBiw7gTuApcJCTIGBAMyEQUYC0VtZXJhbGQgKFUpOPJ94+PDOIo="'
+        buildConfigField "String", "END_STARTERS", '"321WZMEGjEAAAAAAACRAAKjRAEECQMAFAASCQABEgAAAAAABBiw7gQyAoYICTIGBAIyAAUgC0VtZXJhbGQgKFUp3q5Bw+PDOIo="'
         //add berry counts to build config
         //used for banning "bad" items
         buildConfigField "int", "BERRY_COUNT_OLD", "54"
