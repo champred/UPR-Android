@@ -390,15 +390,13 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	var preset by rememberSaveable { mutableStateOf(SettingsPreset.NONE) }
 	val updatePreset: (SettingsPreset)->Unit = { pre ->
 		preset = pre
-		if (pre != SettingsPreset.NONE) {
-			settingsText = pre.preset ?: run {
-				scope.launch {
-					scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_no_preset))
-				}
-				settingsText
+		settingsText = pre.preset ?: run {
+			scope.launch {
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_no_preset))
 			}
-			updateSettings()
+			settingsText
 		}
+		updateSettings()
 	}
 	Text(stringResource(R.string.choose_preset))
 	Row(Modifier.horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically) {

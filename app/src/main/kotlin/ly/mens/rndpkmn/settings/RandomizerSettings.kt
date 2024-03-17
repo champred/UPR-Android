@@ -116,10 +116,10 @@ object RandomizerSettings : Settings() {
 		this::class.memberProperties.filterNot {
 			"MegaEvo" in it.name || "AltForme" in it.name
 		}.forEach { prop ->
-			val fld = prop.javaField
-			if (fld != null && fld.declaringClass == Settings::class.java) {
-				val type = fld.type
-				fld.isAccessible = true
+			val field = prop.javaField
+			if (field != null && field.declaringClass == Settings::class.java) {
+				val type = field.type
+				field.isAccessible = true
 				if (type.isPrimitive) {
 					val suffix = when (type.name) {
 						"boolean" -> "CheckBox"
@@ -127,13 +127,13 @@ object RandomizerSettings : Settings() {
 						else -> ""
 					}
 					for (pre in SettingsPrefix.entries) {
-						if (pre.search(fld, suffix)) break
+						if (pre.search(field, suffix)) break
 					}
 				} else if (type.enclosingClass == Settings::class.java) {
 					val prefix = type.getField("PREFIX").get(null) as String
 					type.enumConstants.forEach {
 						for (pre in SettingsPrefix.entries) {
-							if (prefix == pre.prefix && pre.searchEnum(fld, it as Enum<*>)) break
+							if (prefix == pre.prefix && pre.searchEnum(field, it as Enum<*>)) break
 						}
 					}
 				}
@@ -242,9 +242,13 @@ object RandomizerSettings : Settings() {
 		}
 	}
 
-	private fun createRomHandler(random: Random): RomHandler {
-		return romHandlerFactory.create(random).apply {
+	private fun createRomHandler(rand: Random): RomHandler {
+		return romHandlerFactory.create(rand).apply {
 			loadRom(inputFile.absolutePath)
+			if (SettingsPreset.STARTERS.selected) {
+				SettingsPreset.STARTERS.pickStarters(this, rand)
+				startersMod = StartersMod.UNCHANGED
+			}
 			if (!isRomValid) {
 				Log.i(TAG, "The loaded ROM is not valid.")
 			}
@@ -288,12 +292,12 @@ object RandomizerSettings : Settings() {
 		if (romName != other.romName) {
 			Log.i(TAG, "Settings string created for ${other.romName} but $romName is loaded.")
 		}
-		other.javaClass.declaredFields.forEach { fld ->
-			fld.isAccessible = true
-			if (fld == ::customStarters.javaField && currentStarters != Triple(null, null, null))
+		other.javaClass.declaredFields.forEach { field ->
+			field.isAccessible = true
+			if (field == ::customStarters.javaField && SettingsPreset.STARTERS.selected)
 				return@forEach
 			//don't copy null values
-			fld.get(other)?.let { fld.set(this, it) }
+			field.get(other)?.let { field.set(this, it) }
 		}
 		return true
 	}
