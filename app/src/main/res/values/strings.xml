@@ -45,6 +45,6 @@
     <string name="desc_batch">Shows progress of batch randomization.</string>
 
     <string name="status_batch_missing">Cannot show progress notification.</string>
-    <string name="status_batch_granted">See notification for progress.</string>
+    <string name="status_batch_granted">See notification for progress. Close dialog to cancel.</string>
     <string name="empty" />
 </resources>

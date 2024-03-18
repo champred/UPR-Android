@@ -36,6 +36,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
@@ -213,6 +215,7 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 				putExtra("uri", uri)
 				putExtra("suffix", name.substringAfterLast('.'))
 			}
+			ctx.stopService(service) //cancel if already running
 			ctx.startForegroundService(service)
 		}
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -231,10 +234,13 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 		}
 	}
 
-	Dialog({ openDialog.value = false }) {
+	Dialog({
+		openDialog.value = false
+		ctx.stopService(service) //cancel if still running
+	}) {
 		Column(Modifier
 				.background(MaterialTheme.colors.background)
-				.padding(8.dp)) {
+				.padding(8.dp,24.dp)) {
 			TextField(prefix,
 					{ prefix = it },
 					Modifier.fillMaxWidth(),
@@ -278,7 +284,7 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 				stateName?.let { Text(it) }
 			}
 			Button({ batchLauncher.launch(null) }) { Text(stringResource(R.string.action_choose_dir)) }
-			Text(stringResource(status))
+			Text(stringResource(status), textAlign = TextAlign.Center, overflow = TextOverflow.Visible)
 		}
 	}
 }

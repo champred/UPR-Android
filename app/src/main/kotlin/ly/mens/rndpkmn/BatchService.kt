@@ -77,6 +77,7 @@ class BatchService : Service() {
 			var last = 0
 
 			val saveRom = fun(_: Int) {
+				if (job.isCancelled) return lock.release() //don't run if cancelled
 				//update the progress notification
 				//only allow one thread to update it at a time
 				//make sure the progress is greater than the last update
@@ -85,23 +86,21 @@ class BatchService : Service() {
 					builder.setProgress(len, current - start + 1, false)
 					try {
 						manager.notify(NOTIFICATION_ID, builder.build())
-					} catch (_: SecurityException) {
-						Log.e(TAG, "Unable to display notification.")
+					} catch (e: SecurityException) {
+						Log.e(TAG, "Unable to display notification.", e)
 					}
 					last = current
 					lock.release(current)
-				} else if (count.get() == len-1) {
-					manager.cancel(NOTIFICATION_ID)
 				}
 				val file = File(filesDir, Triple(
 						prefix,
 						count.getAndIncrement().toString().padStart(4, '0'),
 						suffix
 				).fileName)
-				val fileUri = dir.createFile("application/octet-stream", file.name)?.uri ?: return
+				val fileUri = dir.createFile("application/octet-stream", file.name)?.uri ?: return lock.release()
 				val log = if (saveLog) ByteArrayOutputStream(1024 * 1024) else null
 				val logUri = log?.let { dir.createFile("text/plain", "${file.name}.log.txt")?.uri }
-				if (!RandomizerSettings.saveRom(file, RandomSource.pickSeed(), log)) return
+				if (!RandomizerSettings.saveRom(file, RandomSource.pickSeed(), log)) return lock.release()
 				saveToUri(fileUri, file)
 				//clean up temporary file
 				deleteFile(file.name)
