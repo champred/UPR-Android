@@ -1,12 +1,8 @@
 package ly.mens.rndpkmn.settings
 
 import com.dabomstew.pkrandom.RandomSource
-import com.dabomstew.pkrandom.constants.Species
-import com.dabomstew.pkrandom.pokemon.Pokemon
-import com.dabomstew.pkrandom.romhandlers.RomHandler
 import ly.mens.rndpkmn.BuildConfig
 import ly.mens.rndpkmn.makeTriple
-import java.util.Random
 
 enum class SettingsPreset {
 	NONE {
@@ -29,7 +25,10 @@ enum class SettingsPreset {
 					val starters = pickStarters(handler!!, RandomSource.instance())
 					currentStarters = makeTriple(*starters.toTypedArray())
 					BuildConfig.END_STARTERS
-				} else null
+				} else {
+					NONE.selected = true
+					null
+				}
 			}
 		}
 	};
@@ -67,22 +66,4 @@ enum class SettingsPreset {
 	override fun toString(): String {
 		return "${name}: $selected"
 	}
-
-	fun pickStarters(handler: RomHandler, rand: Random): List<Pokemon> {
-		val copy = starters.toMutableList().apply { shuffle(rand) }
-		handler.starters = copy.map(handler.pokemon::get).take(3)
-		return handler.starters
-	}
-
-	private val starters = intArrayOf(
-			Species.bulbasaur, Species.charmander, Species.squirtle,
-			Species.chikorita, Species.cyndaquil, Species.totodile,
-			Species.treecko, Species.torchic, Species.mudkip,
-			Species.turtwig, Species.chimchar, Species.piplup,
-			Species.snivy, Species.tepig, Species.oshawott,
-			Species.chespin, Species.fennekin, Species.froakie,
-			Species.rowlet, Species.litten, Species.popplio,
-			Species.grookey, Species.scorbunny, Species.sobble,
-			Species.sprigatito, Species.fuecoco, Species.quaxly,
-	)
 }

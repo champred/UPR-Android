@@ -391,6 +391,7 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	val updatePreset: (SettingsPreset)->Unit = { pre ->
 		preset = pre
 		settingsText = pre.preset ?: run {
+			preset = SettingsPreset.NONE
 			scope.launch {
 				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_no_preset))
 			}

@@ -246,7 +246,7 @@ object RandomizerSettings : Settings() {
 		return romHandlerFactory.create(rand).apply {
 			loadRom(inputFile.absolutePath)
 			if (SettingsPreset.STARTERS.selected) {
-				SettingsPreset.STARTERS.pickStarters(this, rand)
+				pickStarters(this, rand)
 				startersMod = StartersMod.UNCHANGED
 			}
 			if (!isRomValid) {
@@ -311,6 +311,24 @@ object RandomizerSettings : Settings() {
 			false
 		}
 	}
+
+	fun pickStarters(handler: RomHandler, rand: Random): List<Pokemon> {
+		val copy = starters.toMutableList().apply { shuffle(rand) }
+		handler.starters = copy.map(handler.pokemon::get).take(3)
+		return handler.starters
+	}
+
+	private val starters = intArrayOf(
+			Species.bulbasaur, Species.charmander, Species.squirtle,
+			Species.chikorita, Species.cyndaquil, Species.totodile,
+			Species.treecko, Species.torchic, Species.mudkip,
+			Species.turtwig, Species.chimchar, Species.piplup,
+			Species.snivy, Species.tepig, Species.oshawott,
+			Species.chespin, Species.fennekin, Species.froakie,
+			Species.rowlet, Species.litten, Species.popplio,
+			Species.grookey, Species.scorbunny, Species.sobble,
+			Species.sprigatito, Species.fuecoco, Species.quaxly,
+	)
 
 	val limits: Map<Field?, ClosedFloatingPointRange<Float>> = mapOf(
 			::staticLevelModifier.javaField to -50f..50f,
