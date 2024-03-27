@@ -2941,6 +2941,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                         }
                     }
                 }
+                if (useSmartAI) {
+                    trainer[12] |= 0b111;
+                }
 
                 int bytesNeeded = 6 * numPokes;
                 if (romEntry.romType != Gen4Constants.Type_DP) {

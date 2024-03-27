@@ -1993,6 +1993,9 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                     rom[trOffset + (entryLen - 16)] = 0x01;
                 }
             }
+            if (useSmartAI) {
+                rom[trOffset + (entryLen - 12)] |= 0b111;
+            }
 
             // now, do we need to repoint?
             int pointerToPokes;

@@ -1532,7 +1532,9 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 trainer[0] = (byte) tr.poketype;
                 int numPokes = tr.pokemon.size();
                 trainer[3] = (byte) numPokes;
-
+                if (useSmartAI) {
+                    trainer[12] |= 0b111;
+                }
                 if (doubleBattleMode) {
                     if (!tr.skipImportant()) {
                         if (trainer[2] == 0) {
