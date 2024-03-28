@@ -2039,6 +2039,9 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                         }
                     }
                 }
+                if (useSmartAI) {
+                    trainer[trainer.length - 8] |= 0b111;
+                }
 
                 int bytesNeeded = 8 * numPokes;
                 if (tr.pokemonHaveCustomMoves()) {
