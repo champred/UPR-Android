@@ -25,6 +25,7 @@ package com.dabomstew.pkrandom.constants;
 /*----------------------------------------------------------------------------*/
 
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -355,7 +356,7 @@ public class Gen3Constants {
             Gen3Items.petayaBerry, Gen3Items.apicotBerry, Gen3Items.lansatBerry, Gen3Items.starfBerry,
             Gen3Items.berryJuice, Gen3Items.whiteHerb, Gen3Items.mentalHerb));
 
-    public static final List<Integer> allHeldItems = setupAllHeldItems();
+    public static final Set<Integer> allHeldItems = new ConcurrentSkipListSet<>(setupAllHeldItems());
 
     private static List<Integer> setupAllHeldItems() {
         List<Integer> list = new ArrayList<>();
@@ -381,7 +382,7 @@ public class Gen3Constants {
             Gen3Items.whiteHerb, Gen3Items.mentalHerb
     ));
 
-    public static final List<Integer> generalPurposeItems = new ArrayList<>(Arrays.asList(
+    public static final Set<Integer> generalPurposeItems = new ConcurrentSkipListSet<>(Arrays.asList(
             Gen3Items.brightPowder, Gen3Items.quickClaw, Gen3Items.kingsRock, Gen3Items.focusBand, Gen3Items.scopeLens,
             Gen3Items.leftovers, Gen3Items.shellBell, Gen3Items.laxIncense
     ));

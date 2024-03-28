@@ -39,37 +39,6 @@ import com.dabomstew.pkrandom.pokemon.*;
 import compressors.DSDecmp;
 
 public class Gen3RomHandler extends AbstractGBRomHandler {
-
-    private void updateItems() {
-        if (useNatDex) {
-            Gen3Constants.allowedItems.unbanRange(Gen3Items.unknown99, 4);
-            Gen3Constants.allowedItems.unbanRange(Gen3Items.unknown226, 1);
-            Gen3Constants.nonBadItemsRSE.unbanRange(Gen3Items.oranBerry, 1);
-            Gen3Constants.nonBadItemsRSE.unbanRange(Gen3Items.figyBerry, 5);
-            Gen3Constants.nonBadItemsRSE.banRange(Gen3Items.tinyMushroom, 8);
-            if (romEntry.name.contains("1.1.0")) {
-                Gen3Constants.allHeldItems.add(Gen3Items.razorClaw);
-                Gen3Constants.allHeldItems.add(Gen3Items.razorFang);
-                Gen3Constants.generalPurposeItems.add(Gen3Items.razorClaw);
-                Gen3Constants.generalPurposeItems.add(Gen3Items.razorFang);
-                Gen3Constants.allowedItems.unbanRange(Gen3Items.dubiousDisc, 4);
-                Gen3Constants.nonBadItemsFRLG.banRange(Gen3Items.pearl, 6);
-            }
-        } else {
-            Gen3Constants.allowedItems.banRange(Gen3Items.unknown99, 4);
-            Gen3Constants.allowedItems.banRange(Gen3Items.unknown226, 28);
-            Gen3Constants.nonBadItemsRSE.banSingles(Gen3Items.oranBerry);
-            Gen3Constants.nonBadItemsRSE.banRange(Gen3Items.figyBerry, 33);
-            Gen3Constants.nonBadItemsRSE.unbanRange(Gen3Items.tinyMushroom, 8);
-            Gen3Constants.allHeldItems.remove((Integer) Gen3Items.razorClaw);
-            Gen3Constants.allHeldItems.remove((Integer) Gen3Items.razorFang);
-            Gen3Constants.generalPurposeItems.remove((Integer) Gen3Items.razorClaw);
-            Gen3Constants.generalPurposeItems.remove((Integer) Gen3Items.razorFang);
-            Gen3Constants.allowedItems.banRange(Gen3Items.dubiousDisc, 4);
-            Gen3Constants.nonBadItemsFRLG.unbanRange(Gen3Items.pearl, 6);
-        }
-    }
-
     public static class Factory extends RomHandler.Factory {
 
         @Override
@@ -457,7 +426,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 }
             }
         }
-        updateItems();
+
         tb = new String[256];
         d = new HashMap<>();
         isRomHack = false;
@@ -529,6 +498,32 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
         allowedItems = Gen3Constants.allowedItems.copy();
         nonBadItems = Gen3Constants.getNonBadItems(romEntry.romType).copy();
+        updateItems();
+    }
+
+    private void updateItems() {
+        if (useNatDex) {
+            allowedItems.unbanRange(Gen3Items.unknown99, 4);
+            allowedItems.unbanRange(Gen3Items.unknown226, 1);
+            nonBadItems.unbanRange(Gen3Items.figyBerry, 5);
+            if (romEntry.name.contains("1.1.0")) {
+                Gen3Constants.allHeldItems.add(Gen3Items.razorClaw);
+                Gen3Constants.allHeldItems.add(Gen3Items.razorFang);
+                Gen3Constants.generalPurposeItems.add(Gen3Items.razorClaw);
+                Gen3Constants.generalPurposeItems.add(Gen3Items.razorFang);
+                allowedItems.unbanRange(Gen3Items.dubiousDisc, 4);
+            }
+            if (romEntry.romType == Gen3Constants.RomType_Em) {
+                nonBadItems.banRange(Gen3Items.tinyMushroom, 8);
+            } else if (romEntry.romType == Gen3Constants.RomType_FRLG) {
+                nonBadItems.banRange(Gen3Items.pearl, 6);
+            }
+        } else {
+            Gen3Constants.allHeldItems.remove(Gen3Items.razorClaw);
+            Gen3Constants.allHeldItems.remove(Gen3Items.razorFang);
+            Gen3Constants.generalPurposeItems.remove(Gen3Items.razorClaw);
+            Gen3Constants.generalPurposeItems.remove(Gen3Items.razorFang);
+        }
     }
 
     private int findPointerPrefixAndSuffix(String prefix, String suffix) {
@@ -4489,7 +4484,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     @Override
     public List<Integer> getAllHeldItems() {
-        return Gen3Constants.allHeldItems;
+        return new ArrayList<>(Gen3Constants.allHeldItems);
     }
 
     @Override
@@ -4504,8 +4499,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     @Override
     public List<Integer> getSensibleHeldItemsFor(TrainerPokemon tp, boolean consumableOnly, List<Move> moves, int[] pokeMoves) {
-        List<Integer> items = new ArrayList<>();
-        items.addAll(Gen3Constants.generalPurposeConsumableItems);
+        List<Integer> items = new ArrayList<>(Gen3Constants.generalPurposeConsumableItems);
         if (!consumableOnly) {
             items.addAll(Gen3Constants.generalPurposeItems);
         }
