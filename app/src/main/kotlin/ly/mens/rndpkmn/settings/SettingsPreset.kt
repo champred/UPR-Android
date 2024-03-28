@@ -1,6 +1,7 @@
 package ly.mens.rndpkmn.settings
 
 import com.dabomstew.pkrandom.RandomSource
+import com.dabomstew.pkrandom.romhandlers.AbstractRomHandler
 import ly.mens.rndpkmn.BuildConfig
 import ly.mens.rndpkmn.makeTriple
 
@@ -8,6 +9,7 @@ enum class SettingsPreset {
 	NONE {
 		override val preset: String? get() {
 			selected = true
+			AbstractRomHandler.useSmartAI = false;
 			return null
 		}
 		override var selected = true
@@ -17,8 +19,10 @@ enum class SettingsPreset {
 	KAIZO,
 	SURVIVAL,
 	DOUBLES,
+	SUPER,
 	STARTERS {
 		override val preset: String? get() {
+			AbstractRomHandler.useSmartAI = false;
 			return with(RandomizerSettings) {
 				if (useNatDex) {
 					selected = true
@@ -60,6 +64,8 @@ enum class SettingsPreset {
 			NONE.selected = true
 			selected = false
 			null
+		} finally {
+			AbstractRomHandler.useSmartAI = this === SUPER
 		}
 	}
 
