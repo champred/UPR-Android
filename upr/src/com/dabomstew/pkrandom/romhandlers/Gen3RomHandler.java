@@ -40,6 +40,38 @@ import compressors.DSDecmp;
 
 public class Gen3RomHandler extends AbstractGBRomHandler {
 
+    private void updateItems() {
+        if (useNatDex) {
+            Gen3Constants.allowedItems.unbanRange(Gen3Items.unknown99, 4);
+            Gen3Constants.allowedItems.unbanRange(Gen3Items.unknown226, 1);
+            Gen3Constants.nonBadItemsRSE.unbanRange(Gen3Items.oranBerry, 1);
+            Gen3Constants.nonBadItemsRSE.unbanRange(Gen3Items.figyBerry, 5);
+            Gen3Constants.nonBadItemsRSE.banRange(Gen3Items.tinyMushroom, 8);
+            if (romEntry.name.contains("1.1.0")) {
+                Gen3Constants.allHeldItems.add(Gen3Items.razorClaw);
+                Gen3Constants.allHeldItems.add(Gen3Items.razorFang);
+                Gen3Constants.generalPurposeItems.add(Gen3Items.razorClaw);
+                Gen3Constants.generalPurposeItems.add(Gen3Items.razorFang);
+                Gen3Constants.allowedItems.unbanRange(Gen3Items.dubiousDisc, 4);
+                Gen3Constants.nonBadItemsFRLG.banRange(Gen3Items.pearl, 6);
+            }
+        } else {
+            Gen3Constants.allowedItems.banRange(Gen3Items.unknown99, 4);
+            Gen3Constants.allowedItems.banRange(Gen3Items.unknown226, 28);
+            Gen3Constants.nonBadItemsRSE.banSingles(Gen3Items.oranBerry);
+            Gen3Constants.nonBadItemsRSE.banRange(Gen3Items.figyBerry, 33);
+            Gen3Constants.nonBadItemsRSE.unbanRange(Gen3Items.tinyMushroom, 8);
+            if (romEntry.name.contains("1.1.0")) {
+                Gen3Constants.allHeldItems.remove((Integer) Gen3Items.razorClaw);
+                Gen3Constants.allHeldItems.remove((Integer) Gen3Items.razorFang);
+                Gen3Constants.generalPurposeItems.remove((Integer) Gen3Items.razorClaw);
+                Gen3Constants.generalPurposeItems.remove((Integer) Gen3Items.razorFang);
+                Gen3Constants.allowedItems.banRange(Gen3Items.dubiousDisc, 4);
+                Gen3Constants.nonBadItemsFRLG.unbanRange(Gen3Items.pearl, 6);
+            }
+        }
+    }
+
     public static class Factory extends RomHandler.Factory {
 
         @Override
@@ -408,7 +440,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     @Override
     public void loadedRom() {
         actualCRC32 = FileFunctions.getCRC32(rom);
-
+        updateItems();
         // Nat Dex support
         if (useNatDex) {
             loadROMInfo("end_offsets.ini");
@@ -1552,18 +1584,27 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             writeWord(baseOffset, starter0);
             writeWord(baseOffset + Gen3Constants.frlgStarterRepeatOffset, starter1);
 
-            writeWord(baseOffset + Gen3Constants.frlgStarter2Offset, starter1);
-            writeWord(baseOffset + Gen3Constants.frlgStarter2Offset + Gen3Constants.frlgStarterRepeatOffset, starter2);
+            int offset2 = baseOffset + Gen3Constants.frlgStarter2Offset;
+            if (useNatDex) offset2 -= 12;
+            writeWord(offset2, starter1);
+            writeWord(offset2 + Gen3Constants.frlgStarterRepeatOffset, starter2);
 
-            writeWord(baseOffset + Gen3Constants.frlgStarter3Offset, starter2);
-            writeWord(baseOffset + Gen3Constants.frlgStarter3Offset + Gen3Constants.frlgStarterRepeatOffset, starter0);
+            int offset3 = baseOffset + Gen3Constants.frlgStarter3Offset;
+            if (useNatDex) offset3 -= 12;
+            writeWord(offset3, starter2);
+            writeWord(offset3 + Gen3Constants.frlgStarterRepeatOffset, starter0);
 
             if (romEntry.romCode.charAt(3) != 'J' && romEntry.romCode.charAt(3) != 'B') {
                 // Update PROF. Oak's descriptions for each starter
                 // First result for each STARTERNAME is the text we need
-                List<Integer> bulbasaurFoundTexts = RomFunctions.search(rom, translateString(pokes[Gen3Constants.frlgBaseStarter1].name.toUpperCase()));
-                List<Integer> charmanderFoundTexts = RomFunctions.search(rom, translateString(pokes[Gen3Constants.frlgBaseStarter2].name.toUpperCase()));
-                List<Integer> squirtleFoundTexts = RomFunctions.search(rom, translateString(pokes[Gen3Constants.frlgBaseStarter3].name.toUpperCase()));
+                int begin = 0, end = rom.length;
+                if (useNatDex) {
+                    begin = 0xA000D0;
+                    end = 0xA7FFFF;
+                }
+                List<Integer> bulbasaurFoundTexts = RomFunctions.search(rom, begin, end, translateString(pokes[Gen3Constants.frlgBaseStarter1].name.toUpperCase()));
+                List<Integer> charmanderFoundTexts = RomFunctions.search(rom, begin, end, translateString(pokes[Gen3Constants.frlgBaseStarter2].name.toUpperCase()));
+                List<Integer> squirtleFoundTexts = RomFunctions.search(rom, begin, end, translateString(pokes[Gen3Constants.frlgBaseStarter3].name.toUpperCase()));
                 writeFRLGStarterText(bulbasaurFoundTexts, newStarters.get(0), "you want to go with\\nthe ");
                 writeFRLGStarterText(charmanderFoundTexts, newStarters.get(1), "you’re claiming the\\n");
                 writeFRLGStarterText(squirtleFoundTexts, newStarters.get(2), "you’ve decided on the\\n");
@@ -1598,8 +1639,9 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         List<Integer> sHeldItems = new ArrayList<>();
         if (romEntry.romType == Gen3Constants.RomType_FRLG) {
             // offset from normal starter offset as a word
-            int baseOffset = romEntry.getValue("StarterPokemon");
-            sHeldItems.add(readWord(baseOffset + Gen3Constants.frlgStarterItemsOffset));
+            int baseOffset = romEntry.getValue("StarterPokemon") + Gen3Constants.frlgStarterItemsOffset;
+            if (useNatDex) baseOffset -= 3;
+            sHeldItems.add(readWord(baseOffset));
         } else {
             int baseOffset = romEntry.getValue("StarterItems");
             int i1 = rom[baseOffset] & 0xFF;
@@ -1621,8 +1663,9 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         int item = items.get(0);
         if (romEntry.romType == Gen3Constants.RomType_FRLG) {
             // offset from normal starter offset as a word
-            int baseOffset = romEntry.getValue("StarterPokemon");
-            writeWord(baseOffset + Gen3Constants.frlgStarterItemsOffset, item);
+            int baseOffset = romEntry.getValue("StarterPokemon") + Gen3Constants.frlgStarterItemsOffset;
+            if (useNatDex) baseOffset -= 3;
+            writeWord(baseOffset, item);
         } else {
             int baseOffset = romEntry.getValue("StarterItems");
             if (item <= 0xFF) {
@@ -3073,7 +3116,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             }
         } else {
             // Find the original pokedex script
-            int pkDexOffset = find(Gen3Constants.ePokedexScriptIdentifier);
+            int pkDexOffset = find(useNatDex ? Gen3Constants.endPokedexScriptIdentifier : Gen3Constants.ePokedexScriptIdentifier);
             if (pkDexOffset < 0) {
                 log("Patch unsuccessful." + nl);
                 return;
@@ -3095,7 +3138,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             writePointer(pointerLocToScript, writeSpace);
             writeHexString(Gen3Constants.eNatDexScriptPart1, writeSpace);
             writePointer(writeSpace + 4, textPointer);
-            writeHexString(Gen3Constants.eNatDexScriptPart2, writeSpace + 8);
+            writeHexString(useNatDex ? Gen3Constants.endNatDexScriptPart2 : Gen3Constants.eNatDexScriptPart2, writeSpace + 8);
         }
         log("Patch successful!" + nl);
     }
@@ -3123,7 +3166,14 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             for (int j = 0; j < (useNatDex ? 8 : 5); j++) {
                 int method = readWord(evoOffset + j * 8);
                 int evolvingTo = readWord(evoOffset + j * 8 + 4);
-                if (method >= 1 && method <= Gen3Constants.evolutionMethodCount + (useNatDex ? 4 : 0) && evolvingTo >= 1
+                int methodCount = Gen3Constants.evolutionMethodCount;
+                if (useNatDex) {
+                    methodCount += 4;
+                    if (romEntry.name.contains("1.1.0")) {
+                        methodCount += 2;
+                    }
+                }
+                if (method >= 1 && method <= methodCount && evolvingTo >= 1
                         && evolvingTo <= numInternalPokes) {
                     int extraInfo = readWord(evoOffset + j * 8 + 2);
                     EvolutionType et = EvolutionType.fromIndex(3, method);
@@ -3659,6 +3709,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     public void randomizeIntroPokemon() {
         // FRLG
         if (romEntry.romType == Gen3Constants.RomType_FRLG) {
+            if (useNatDex) return;
             // intro sprites : first 255 only due to size
             Pokemon introPk = randomPokemonLimited(255, false);
             if (introPk == null) {
@@ -4098,6 +4149,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     @Override
     public int generationOfPokemon() {
+        if (useNatDex) return 9;
         return 3;
     }
 
@@ -4214,9 +4266,9 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         if (romEntry.getValue("CatchingTutorialOpponentMonOffset") > 0) {
             int oppOffset = romEntry.getValue("CatchingTutorialOpponentMonOffset");
             if (romEntry.romType == Gen3Constants.RomType_FRLG) {
+                if (useNatDex) return;
                 Pokemon opponent = randomPokemonLimited(255, true);
                 if (opponent != null) {
-
                     int oppValue = pokedexToInternal[opponent.number];
                     rom[oppOffset] = (byte) oppValue;
                     rom[oppOffset + 1] = Gen3Constants.gbaSetRxOpcode | Gen3Constants.gbaR1;

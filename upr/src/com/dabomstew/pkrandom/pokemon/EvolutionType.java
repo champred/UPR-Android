@@ -107,6 +107,8 @@ public enum EvolutionType {
             return super.toIndex(generation);
         }
     },
+    STONE_LOW_PV(-1, -1, 20, 11, 12, 12, 12),
+    STONE_HIGH_PV(-1, -1, 21, 12, 13, 13, 13),
     LEVEL_ITEM_DAY(-1, -1, -1, 18, 19, 19, 19),
     LEVEL_ITEM_NIGHT(-1, -1, -1, 19, 20, 20, 20),
     LEVEL_WITH_MOVE(-1, -1, -1, 20, 21, 21, 21),
@@ -231,7 +233,7 @@ public enum EvolutionType {
     private static EvolutionType[][] reverseIndexes;
 
     private static void init(int generation) {
-        reverseIndexes = new EvolutionType[8][50];
+        reverseIndexes = new EvolutionType[7][50];
         for (EvolutionType et : EvolutionType.values()) {
             //convert index numbers
             et.toIndex(generation);

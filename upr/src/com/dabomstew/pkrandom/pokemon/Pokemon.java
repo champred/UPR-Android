@@ -302,26 +302,45 @@ public class Pokemon implements Comparable<Pokemon> {
             Species.giratina, Species.arceus, Species.reshiram, Species.zekrom, Species.kyurem, Species.xerneas,
             Species.yveltal, Species.cosmog, Species.cosmoem, Species.solgaleo, Species.lunala));
 
-    private static final Set<Integer> natdexLegendaries = new HashSet<>(Arrays.asList(1024, 1026, 1028, Species.dragonite, Species.mew, 1035,
-            1036, 1037, Species.tyranitar, Species.celebi, Species.salamence, Species.metagross, Species.latias,
-            Species.latios, Species.jirachi, Species.deoxys, 1129, 1130, 1131, Species.garchomp, Species.heatran,
-            Species.manaphy, Species.darkrai, Species.shaymin, 1144, Species.victini, Species.hydreigon, Species.landorus,
-            1149, Species.meloetta, 1153, Species.genesect, Species.goodra, 1119, Species.zygarde, Species.diancie,
-            Species.hoopa, Species.volcanion, Species.kommoO, Species.necrozma, Species.magearna, Species.marshadow,
-            Species.zeraora, Species.melmetal, Species.dragapult, Species.zarude, Species.baxcalibur, 1033, 1034, 1030, 1042, 1062, 1162,
-            1018, 1060, 1021, 1039, 1040, 1045, 1019, 1020, 1041, 1029, 1154, 1174, Species.kyurem, Species.zacian,
-            Species.zamazenta, Species.slaking, Species.kyogre, Species.groudon, Species.regigigas, Species.koraidon, Species.miraidon, Species.mewtwo,
-            Species.lugia, Species.hoOh, Species.rayquaza, Species.dialga, 1141, Species.palkia, 1142, Species.giratina, 1143,
-            Species.reshiram, Species.zekrom, Species.xerneas, Species.yveltal, 1158, Species.solgaleo, Species.lunala, 1164,
-            1165, 1171, 1172, Species.eternatus, 1038, 1054, 1055, 1056, 1057, 1059, 1152, 1151, 1064, 1168, 1169, 1157,
-            Species.arceus, 1166, 1066, 1067, 1031, 1032, 1065));
+    private static final Set<Integer> natdexLegendaries = new HashSet<>(Arrays.asList(Species.alakazamMega, Species.gengarMega, Species.pinsirMega,
+            Species.dragonite, Species.mew, Species.scizorMega, Species.heracrossMega, Species.houndoomMega, Species.tyranitar,
+            Species.celebi, Species.salamence, Species.metagross, Species.latias, Species.latios, Species.jirachi, Species.deoxys,
+            Species.deoxysA, Species.deoxysD, Species.deoxysS, Species.garchomp, Species.heatran, Species.manaphy, Species.darkrai,
+            Species.shaymin, Species.shayminS, Species.victini, Species.hydreigon, Species.landorus, Species.landorusT, Species.meloetta,
+            Species.meloettaP, Species.genesect, Species.goodra, Species.goodraH, Species.zygarde, Species.diancie, Species.hoopa,
+            Species.volcanion, Species.kommoO, Species.necrozma, Species.magearna, Species.marshadow, Species.zeraora, Species.melmetal,
+            Species.dragapult, Species.zarude, Species.baxcalibur, Species.ampharosMega, Species.steelixMega, Species.aerodactylMega,
+            Species.gardevoirMega, Species.galladeMega, Species.wishiwashiS, Species.venusaurMega, Species.lucarioMega,
+            Species.blastoiseMega, Species.sceptileMega, Species.blazikenMega, Species.aggronMega, Species.charizardMegaX,
+            Species.charizardMegaY, Species.swampertMega, Species.gyaradosMega, Species.greninjaA, Species.palafinH, Species.kyurem,
+            Species.zacian, Species.zamazenta, Species.slaking, Species.kyogre, Species.groudon, Species.regigigas, Species.koraidon,
+            Species.miraidon, Species.mewtwo, Species.lugia, Species.hoOh, Species.rayquaza, Species.dialga, Species.dialgaO,
+            Species.palkia, Species.palkiaO, Species.giratina, Species.giratinaO, Species.reshiram, Species.zekrom, Species.xerneas,
+            Species.yveltal, Species.hoopaU, Species.solgaleo, Species.lunala, Species.necrozmaDM, Species.necrozmaDW, Species.calyrexI,
+            Species.calyrexS, Species.eternatus, Species.tyranitarMega, Species.salamenceMega, Species.metagrossMega, Species.latiasMega,
+            Species.latiosMega, Species.garchompMega, Species.kyuremB, Species.kyuremW, Species.diancieMega, Species.zacianC,
+            Species.zamazentaC, Species.zygardeC, Species.arceus, Species.necrozmaU, Species.kyogreP, Species.groudonP, Species.mewtwoMegaX,
+            Species.mewtwoMegaY, Species.rayquazaMega, Species.archaludon, Species.pecharunt, Species.terapagosT, Species.terapagosS,
+            Species.eternatusE));
 
-    private static final Set<Integer> natdexStrongLegendaries = new HashSet<>(Arrays.asList(Species.kyurem, Species.zacian,
-            Species.zamazenta, Species.kyogre, Species.groudon, Species.regigigas, Species.koraidon, Species.miraidon, Species.mewtwo,
-            Species.lugia, Species.hoOh, Species.rayquaza, Species.dialga, 1141, Species.palkia, 1142, Species.giratina, 1143,
-            Species.reshiram, Species.zekrom, Species.xerneas, Species.yveltal, 1158, Species.solgaleo, Species.lunala, 1164,
-            1165, 1171, 1172, Species.eternatus, 1056, 1057, 1152, 1151, 1064, 1168, 1169, 1157,
-            Species.arceus, 1166, 1066, 1067, 1031, 1032, 1065));
+    private static final Set<Integer> bst641Plus = new HashSet<>(Arrays.asList(Species.palafinH, Species.kyurem, Species.zacian, Species.zamazenta,
+            Species.slaking, Species.kyogre, Species.groudon, Species.regigigas, Species.koraidon, Species.miraidon, Species.mewtwo,
+            Species.lugia, Species.hoOh, Species.rayquaza, Species.dialga, Species.dialgaO, Species.palkia, Species.palkiaO,
+            Species.giratina, Species.giratinaO, Species.reshiram, Species.zekrom, Species.xerneas, Species.yveltal, Species.hoopaU,
+            Species.solgaleo, Species.lunala, Species.necrozmaDM, Species.necrozmaDW, Species.calyrexI, Species.calyrexS, Species.eternatus,
+            Species.tyranitarMega, Species.salamenceMega, Species.metagrossMega, Species.latiasMega, Species.latiosMega,
+            Species.garchompMega, Species.kyuremB, Species.kyuremW, Species.diancieMega, Species.zacianC, Species.zamazentaC,
+            Species.zygardeC, Species.arceus, Species.necrozmaU, Species.kyogreP, Species.groudonP, Species.mewtwoMegaX,
+            Species.mewtwoMegaY, Species.rayquazaMega, Species.terapagosS, Species.eternatusE));
+
+    private static final Set<Integer> natdexStrongLegendaries = new HashSet<>(Arrays.asList(Species.kyurem, Species.zacian, Species.zamazenta, Species.kyogre,
+            Species.groudon, Species.regigigas, Species.koraidon, Species.miraidon, Species.mewtwo, Species.lugia, Species.hoOh,
+            Species.rayquaza, Species.dialga, Species.dialgaO, Species.palkia, Species.palkiaO, Species.giratina, Species.giratinaO,
+            Species.reshiram, Species.zekrom, Species.xerneas, Species.yveltal, Species.hoopaU, Species.solgaleo, Species.lunala,
+            Species.necrozmaDM, Species.necrozmaDW, Species.calyrexI, Species.calyrexS, Species.eternatus, Species.latiasMega,
+            Species.latiosMega, Species.kyuremB, Species.kyuremW, Species.diancieMega, Species.zacianC, Species.zamazentaC,
+            Species.zygardeC, Species.arceus, Species.necrozmaU, Species.kyogreP, Species.groudonP, Species.mewtwoMegaX,
+            Species.mewtwoMegaY, Species.rayquazaMega, Species.terapagosS, Species.eternatusE));
 
     private static final List<Integer> ultraBeasts = Arrays.asList(Species.nihilego, Species.buzzwole, Species.pheromosa,
             Species.xurkitree, Species.celesteela, Species.kartana, Species.guzzlord, Species.poipole, Species.naganadel,
@@ -331,6 +350,10 @@ public class Pokemon implements Comparable<Pokemon> {
         if (Gen3RomHandler.useNatDex)
             return formeNumber == 0 ? natdexLegendaries.contains(this.number) : natdexLegendaries.contains(this.baseForme.number);
         return formeNumber == 0 ? legendaries.contains(this.number) : legendaries.contains(this.baseForme.number);
+    }
+
+    public boolean isBST641Plus() {
+        return formeNumber == 0 ? bst641Plus.contains(this.number) : legendaries.contains(this.baseForme.number);
     }
 
     public boolean isStrongLegendary() {

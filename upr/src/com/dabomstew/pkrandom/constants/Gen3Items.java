@@ -115,10 +115,10 @@ public class Gen3Items {
     public static final int repel = 86;
     public static final int unknown87 = 87;
     public static final int unknown88 = 88;
-    public static final int unknown89 = 89;
-    public static final int unknown90 = 90;
-    public static final int unknown91 = 91;
-    public static final int unknown92 = 92;
+    public static final int dubiousDisc = 89;
+    public static final int razorClaw = 90;
+    public static final int razorFang = 91;
+    public static final int linkingCord = 92;
     public static final int sunStone = 93;
     public static final int moonStone = 94;
     public static final int fireStone = 95;

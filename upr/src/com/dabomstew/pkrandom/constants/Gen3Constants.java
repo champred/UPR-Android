@@ -76,6 +76,9 @@ public class Gen3Constants {
     public static final int efrlgPokemonNamesPointer = 0x144, efrlgMoveNamesPointer = 0x148,
             efrlgAbilityNamesPointer = 0x1C0, efrlgItemDataPointer = 0x1C8, efrlgMoveDataPointer = 0x1CC,
             efrlgPokemonStatsPointer = 0x1BC, efrlgFrontSpritesPointer = 0x128, efrlgPokemonPalettesPointer = 0x130;
+    public static final int backSpritesPointer = 0x12c, shinyPalettesPointer = 0x134, iconSpritesPointer = 0x138, iconPaletteDataPointer = 0x13c;
+    public static final int frIconPalettes = 0x8ab40, emIconPalettes = 0xc4208;
+    public static final int[] sub400NoEvo = {Species.sableye,Species.mawile,Species.lickitung,Species.gloom,Species.yanma,Species.ariados,Species.ledian,Species.dustox,Species.beautifly,Species.beedrill,Species.butterfree,Species.corsola,Species.nosepass,Species.aipom,Species.farfetchd,Species.unown,Species.luvdisc,Species.delibird,Species.eevee,Species.clefairy,Species.pikachu,Species.vulpix,Species.ditto,Species.jigglypuff,Species.smeargle,Species.growlithe,Species.spinda,Species.nidorina,Species.nidorino,Species.delcatty,Species.nuzleaf,Species.lombre,Species.staryu,Species.exeggcute,Species.weepinbell,Species.skitty};
 
     public static final byte[] emptyPokemonSig = new byte[] { 0x32, (byte) 0x96, 0x32, (byte) 0x96, (byte) 0x96, 0x32,
             0x00, 0x00, 0x03, 0x01, (byte) 0xAA, 0x0A, 0x00, 0x00, 0x00, 0x00, (byte) 0xFF, 0x78, 0x00, 0x00, 0x0F,
@@ -158,10 +161,12 @@ public class Gen3Constants {
     public static final String frlgOakAideCheckPrefix = "00B5064800880028";
 
     public static final String ePokedexScriptIdentifier = "3229610825F00129E40816CD40010003";
+    public static final String endPokedexScriptIdentifier = "3229610825F00129E40816D540010003";
 
     public static final String eNatDexScriptPart1 = "31720167";
 
     public static final String eNatDexScriptPart2 = "3229610825F00129E40825F30116CD40010003";
+    public static final String endNatDexScriptPart2 = "3229610825F00129E40825F30116D540010003";
 
     public static final String friendshipValueForEvoLocator = "DB2900D8";
 
@@ -360,9 +365,10 @@ public class Gen3Constants {
                 Gen3Items.miracleSeed, Gen3Items.blackGlasses, Gen3Items.blackBelt, Gen3Items.magnet,
                 Gen3Items.mysticWater, Gen3Items.sharpBeak, Gen3Items.poisonBarb, Gen3Items.neverMeltIce,
                 Gen3Items.spellTag, Gen3Items.twistedSpoon, Gen3Items.charcoal, Gen3Items.dragonFang,
-                Gen3Items.silkScarf, Gen3Items.shellBell, Gen3Items.seaIncense, Gen3Items.laxIncense));
+                Gen3Items.silkScarf, Gen3Items.shellBell, Gen3Items.seaIncense, Gen3Items.laxIncense
+        ));
         list.addAll(consumableHeldItems);
-        return Collections.unmodifiableList(list);
+        return list;
     }
 
     public static final List<Integer> generalPurposeConsumableItems = Collections.unmodifiableList(Arrays.asList(
@@ -375,7 +381,7 @@ public class Gen3Constants {
             Gen3Items.whiteHerb, Gen3Items.mentalHerb
     ));
 
-    public static final List<Integer> generalPurposeItems = Collections.unmodifiableList(Arrays.asList(
+    public static final List<Integer> generalPurposeItems = new ArrayList<>(Arrays.asList(
             Gen3Items.brightPowder, Gen3Items.quickClaw, Gen3Items.kingsRock, Gen3Items.focusBand, Gen3Items.scopeLens,
             Gen3Items.leftovers, Gen3Items.shellBell, Gen3Items.laxIncense
     ));
@@ -384,24 +390,24 @@ public class Gen3Constants {
 
     private static Map<Type, List<Integer>> initializeTypeBoostingItems() {
         Map<Type, List<Integer>> map = new HashMap<>();
-        map.put(Type.BUG, Arrays.asList(Gen3Items.silverPowder));
-        map.put(Type.DARK, Arrays.asList(Gen3Items.blackGlasses));
-        map.put(Type.DRAGON, Arrays.asList(Gen3Items.dragonFang));
-        map.put(Type.ELECTRIC, Arrays.asList(Gen3Items.magnet));
-        map.put(Type.FIGHTING, Arrays.asList(Gen3Items.blackBelt));
-        map.put(Type.FIRE, Arrays.asList(Gen3Items.charcoal));
-        map.put(Type.FLYING, Arrays.asList(Gen3Items.sharpBeak));
-        map.put(Type.GHOST, Arrays.asList(Gen3Items.spellTag));
-        map.put(Type.GRASS, Arrays.asList(Gen3Items.miracleSeed));
-        map.put(Type.GROUND, Arrays.asList(Gen3Items.softSand));
-        map.put(Type.ICE, Arrays.asList(Gen3Items.neverMeltIce));
-        map.put(Type.NORMAL, Arrays.asList(Gen3Items.silkScarf));
-        map.put(Type.POISON, Arrays.asList(Gen3Items.poisonBarb));
-        map.put(Type.PSYCHIC, Arrays.asList(Gen3Items.twistedSpoon));
-        map.put(Type.ROCK, Arrays.asList(Gen3Items.hardStone));
-        map.put(Type.STEEL, Arrays.asList(Gen3Items.metalCoat));
+        map.put(Type.BUG, Collections.singletonList(Gen3Items.silverPowder));
+        map.put(Type.DARK, Collections.singletonList(Gen3Items.blackGlasses));
+        map.put(Type.DRAGON, Collections.singletonList(Gen3Items.dragonFang));
+        map.put(Type.ELECTRIC, Collections.singletonList(Gen3Items.magnet));
+        map.put(Type.FIGHTING, Collections.singletonList(Gen3Items.blackBelt));
+        map.put(Type.FIRE, Collections.singletonList(Gen3Items.charcoal));
+        map.put(Type.FLYING, Collections.singletonList(Gen3Items.sharpBeak));
+        map.put(Type.GHOST, Collections.singletonList(Gen3Items.spellTag));
+        map.put(Type.GRASS, Collections.singletonList(Gen3Items.miracleSeed));
+        map.put(Type.GROUND, Collections.singletonList(Gen3Items.softSand));
+        map.put(Type.ICE, Collections.singletonList(Gen3Items.neverMeltIce));
+        map.put(Type.NORMAL, Collections.singletonList(Gen3Items.silkScarf));
+        map.put(Type.POISON, Collections.singletonList(Gen3Items.poisonBarb));
+        map.put(Type.PSYCHIC, Collections.singletonList(Gen3Items.twistedSpoon));
+        map.put(Type.ROCK, Collections.singletonList(Gen3Items.hardStone));
+        map.put(Type.STEEL, Collections.singletonList(Gen3Items.metalCoat));
         map.put(Type.WATER, Arrays.asList(Gen3Items.mysticWater, Gen3Items.seaIncense));
-        map.put(Type.FAIRY, Arrays.asList(Gen3Items.fairyFeather));
+        map.put(Type.FAIRY, Collections.singletonList(Gen3Items.fairyFeather));
         map.put(null, Collections.emptyList()); // ??? type
         return Collections.unmodifiableMap(map);
     }
@@ -410,15 +416,15 @@ public class Gen3Constants {
 
     private static Map<Integer, List<Integer>> initializeSpeciesBoostingItems() {
         Map<Integer, List<Integer>> map = new HashMap<>();
-        map.put(Species.latias, Arrays.asList(Gen3Items.soulDew));
-        map.put(Species.latios, Arrays.asList(Gen3Items.soulDew));
+        map.put(Species.latias, Collections.singletonList(Gen3Items.soulDew));
+        map.put(Species.latios, Collections.singletonList(Gen3Items.soulDew));
         map.put(Species.clamperl, Arrays.asList(Gen3Items.deepSeaTooth, Gen3Items.deepSeaScale));
-        map.put(Species.pikachu, Arrays.asList(Gen3Items.lightBall));
-        map.put(Species.chansey, Arrays.asList(Gen3Items.luckyPunch));
-        map.put(Species.ditto, Arrays.asList(Gen3Items.metalPowder));
-        map.put(Species.cubone, Arrays.asList(Gen3Items.thickClub));
-        map.put(Species.marowak, Arrays.asList(Gen3Items.thickClub));
-        map.put(Species.farfetchd, Arrays.asList(Gen3Items.stick));
+        map.put(Species.pikachu, Collections.singletonList(Gen3Items.lightBall));
+        map.put(Species.chansey, Collections.singletonList(Gen3Items.luckyPunch));
+        map.put(Species.ditto, Collections.singletonList(Gen3Items.metalPowder));
+        map.put(Species.cubone, Collections.singletonList(Gen3Items.thickClub));
+        map.put(Species.marowak, Collections.singletonList(Gen3Items.thickClub));
+        map.put(Species.farfetchd, Collections.singletonList(Gen3Items.stick));
         return Collections.unmodifiableMap(map);
     }
 
@@ -1033,10 +1039,10 @@ public class Gen3Constants {
             {Gen3Items.repel, 35},
             {Gen3Items.unknown87, 0},
             {Gen3Items.unknown88, 0},
-            {Gen3Items.unknown89, 0},
-            {Gen3Items.unknown90, 0},
-            {Gen3Items.unknown91, 0},
-            {Gen3Items.unknown92, 0},
+            {Gen3Items.dubiousDisc, 300},
+            {Gen3Items.razorClaw, 300},
+            {Gen3Items.razorFang, 300},
+            {Gen3Items.linkingCord, 300},
             {Gen3Items.sunStone, 300},
             {Gen3Items.moonStone, 300},
             {Gen3Items.fireStone, 300},
