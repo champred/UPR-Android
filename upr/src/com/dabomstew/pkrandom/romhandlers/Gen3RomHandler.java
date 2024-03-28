@@ -61,14 +61,12 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             Gen3Constants.nonBadItemsRSE.banSingles(Gen3Items.oranBerry);
             Gen3Constants.nonBadItemsRSE.banRange(Gen3Items.figyBerry, 33);
             Gen3Constants.nonBadItemsRSE.unbanRange(Gen3Items.tinyMushroom, 8);
-            if (romEntry.name.contains("1.1.0")) {
-                Gen3Constants.allHeldItems.remove((Integer) Gen3Items.razorClaw);
-                Gen3Constants.allHeldItems.remove((Integer) Gen3Items.razorFang);
-                Gen3Constants.generalPurposeItems.remove((Integer) Gen3Items.razorClaw);
-                Gen3Constants.generalPurposeItems.remove((Integer) Gen3Items.razorFang);
-                Gen3Constants.allowedItems.banRange(Gen3Items.dubiousDisc, 4);
-                Gen3Constants.nonBadItemsFRLG.unbanRange(Gen3Items.pearl, 6);
-            }
+            Gen3Constants.allHeldItems.remove((Integer) Gen3Items.razorClaw);
+            Gen3Constants.allHeldItems.remove((Integer) Gen3Items.razorFang);
+            Gen3Constants.generalPurposeItems.remove((Integer) Gen3Items.razorClaw);
+            Gen3Constants.generalPurposeItems.remove((Integer) Gen3Items.razorFang);
+            Gen3Constants.allowedItems.banRange(Gen3Items.dubiousDisc, 4);
+            Gen3Constants.nonBadItemsFRLG.unbanRange(Gen3Items.pearl, 6);
         }
     }
 
@@ -397,7 +395,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     private int pickupItemsTableOffset;
     private long actualCRC32;
     private boolean effectivenessUpdated;
-    public static boolean useNatDex = false;
+    public static boolean useNatDex = true;
 
     @Override
     public boolean detectRom(byte[] rom) {
@@ -440,7 +438,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     @Override
     public void loadedRom() {
         actualCRC32 = FileFunctions.getCRC32(rom);
-        updateItems();
+
         // Nat Dex support
         if (useNatDex) {
             loadROMInfo("end_offsets.ini");
@@ -459,7 +457,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 }
             }
         }
-
+        updateItems();
         tb = new String[256];
         d = new HashMap<>();
         isRomHack = false;
