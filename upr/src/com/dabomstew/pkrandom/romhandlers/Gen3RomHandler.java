@@ -395,7 +395,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     private int pickupItemsTableOffset;
     private long actualCRC32;
     private boolean effectivenessUpdated;
-    public static boolean useNatDex = true;
+    public static boolean useNatDex = false;
 
     @Override
     public boolean detectRom(byte[] rom) {

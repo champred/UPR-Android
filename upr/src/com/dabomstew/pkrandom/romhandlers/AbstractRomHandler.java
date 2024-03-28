@@ -39,7 +39,7 @@ import com.dabomstew.pkrandom.pokemon.*;
 
 public abstract class AbstractRomHandler implements RomHandler {
 
-	public static boolean useSmartAI = true;
+	public static boolean useSmartAI = false;
 	private boolean restrictionsSet;
     protected List<Pokemon> mainPokemonList;
     protected List<Pokemon> mainPokemonListInclFormes;
