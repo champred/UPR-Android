@@ -371,7 +371,6 @@ object RandomizerSettings : Settings() {
 			::randomizeWildPokemonHeldItems.javaField to 2..HIGHEST_POKEMON_GEN,
 			::banBadRandomWildPokemonHeldItems.javaField to 2..HIGHEST_POKEMON_GEN,
 			::balanceShakingGrass.javaField to 5..5,
-			::fullHMCompat.javaField to 1..6,
 			::randomizeMoveCategory.javaField to 4..HIGHEST_POKEMON_GEN,
 	)
 }
