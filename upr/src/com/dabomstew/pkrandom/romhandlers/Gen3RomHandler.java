@@ -1540,6 +1540,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         } else {
             // do something else
             Pokemon starter1 = pokesInternal[readWord(baseOffset)];
+            if (useNatDex) baseOffset -= 12;
             Pokemon starter2 = pokesInternal[readWord(baseOffset + Gen3Constants.frlgStarter2Offset)];
             Pokemon starter3 = pokesInternal[readWord(baseOffset + Gen3Constants.frlgStarter3Offset)];
             starters.add(starter1);
