@@ -156,7 +156,7 @@ object RandomizerSettings : Settings() {
 			return false
 		}
 
-		currentStarters = makeTriple(*romHandler.starters.toTypedArray())
+		currentStarters = makeTriple(*(romHandler.starters?.toTypedArray() ?: arrayOfNulls(3)))
 		pokeTrie.clear()
 		for (i in 1 until romHandler.pokemon.size) {
 			pokeTrie.insert(romHandler.pokemon[i].name)
@@ -172,19 +172,19 @@ object RandomizerSettings : Settings() {
 			}
 		}
 
-		val baseStatGenerationNumbers = arrayOfNulls<Int>(4.coerceAtMost(GlobalConstants.HIGHEST_POKEMON_GEN - currentGen))
-		var j = 6.coerceAtLeast(currentGen + 1)
-		updateBaseStatsToGeneration = j
+		val baseStatGenerationNumbers = arrayOfNulls<Int>(4.coerceAtMost(HIGHEST_POKEMON_GEN - currentGen))
+		var gen = 6.coerceAtLeast(currentGen + 1)
+		updateBaseStatsToGeneration = gen
 		for (i in baseStatGenerationNumbers.indices) {
-			baseStatGenerationNumbers[i] = j++
+			baseStatGenerationNumbers[i] = gen++
 		}
 		selections[::updateBaseStats.javaField] = baseStatGenerationNumbers.filterNotNull()
 
-		val moveGenerationNumbers = arrayOfNulls<Int>(GlobalConstants.HIGHEST_POKEMON_GEN - currentGen)
-		j = currentGen + 1
-		updateMovesToGeneration = j
+		val moveGenerationNumbers = arrayOfNulls<Int>(HIGHEST_POKEMON_GEN - currentGen)
+		gen = currentGen + 1
+		updateMovesToGeneration = gen
 		for (i in moveGenerationNumbers.indices) {
-			moveGenerationNumbers[i] = j++
+			moveGenerationNumbers[i] = gen++
 		}
 		selections[::updateMoves.javaField] = moveGenerationNumbers.filterNotNull()
 
