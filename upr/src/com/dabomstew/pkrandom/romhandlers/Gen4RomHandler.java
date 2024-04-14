@@ -5822,10 +5822,23 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         }
 
         int ability = this.getAbilityForTrainerPokemon(tp);
-        if (ability == Abilities.levitate) {
-            items.removeAll(Arrays.asList(Items.shucaBerry));
-        }
-
+        List<Integer> nonSensible = new ArrayList<>();
+        //type-negating abilities
+        if (ability == Abilities.levitate) nonSensible.add(Items.shucaBerry);
+        if (ability == Abilities.drySkin || ability == Abilities.waterAbsorb) nonSensible.add(Items.passhoBerry);
+        if (ability == Abilities.flashFire) nonSensible.add(Items.occaBerry);
+        if (ability == Abilities.motorDrive || ability == Abilities.voltAbsorb) nonSensible.add(Items.wacanBerry);
+        //status-negating abilities/types
+        if (ability == Abilities.immunity || ability == Abilities.poisonHeal || tp.pokemon.primaryType == Type.POISON || tp.pokemon.secondaryType == Type.POISON || tp.pokemon.primaryType == Type.STEEL || tp.pokemon.secondaryType == Type.STEEL)
+                nonSensible.add(Items.pechaBerry);
+        if (ability == Abilities.waterVeil || tp.pokemon.primaryType == Type.FIRE || tp.pokemon.secondaryType == Type.FIRE)
+                nonSensible.add(Items.rawstBerry);
+        if (ability == Abilities.magmaArmor || tp.pokemon.primaryType == Type.ICE || tp.pokemon.secondaryType == Type.ICE)
+                nonSensible.add(Items.aspearBerry);
+        if (ability == Abilities.limber) nonSensible.add(Items.cheriBerry);
+        if (ability == Abilities.insomnia || ability == Abilities.vitalSpirit) nonSensible.add(Items.chestoBerry);
+        if (ability == Abilities.ownTempo) nonSensible.add(Items.persimBerry);
+        items.removeAll(nonSensible);
         if (!consumableOnly) {
             if (Gen4Constants.abilityBoostingItems.containsKey(ability)) {
                 items.addAll(Gen4Constants.abilityBoostingItems.get(ability));

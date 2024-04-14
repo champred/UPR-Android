@@ -4531,6 +4531,19 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 }
             }
         }
+        //don't include berries that are negated by typing/ability
+        int ability = this.getAbilityForTrainerPokemon(tp);
+        List<Integer> nonSensible = new ArrayList<>();
+        if (ability == Abilities.immunity || tp.pokemon.primaryType == Type.POISON || tp.pokemon.secondaryType == Type.POISON || tp.pokemon.primaryType == Type.STEEL || tp.pokemon.secondaryType == Type.STEEL)
+                nonSensible.add(Gen3Items.pechaBerry);
+        if (ability == Abilities.waterVeil || tp.pokemon.primaryType == Type.FIRE || tp.pokemon.secondaryType == Type.FIRE)
+                nonSensible.add(Gen3Items.rawstBerry);
+        if (ability == Abilities.magmaArmor || tp.pokemon.primaryType == Type.ICE || tp.pokemon.secondaryType == Type.ICE)
+                nonSensible.add(Gen3Items.aspearBerry);
+        if (ability == Abilities.limber) nonSensible.add(Gen3Items.cheriBerry);
+        if (ability == Abilities.insomnia || ability == Abilities.vitalSpirit) nonSensible.add(Gen3Items.chestoBerry);
+        if (ability == Abilities.ownTempo) nonSensible.add(Gen3Items.persimBerry);
+        items.removeAll(nonSensible);
         return items;
     }
 }
