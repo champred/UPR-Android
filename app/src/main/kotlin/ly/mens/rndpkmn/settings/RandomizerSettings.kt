@@ -205,22 +205,32 @@ object RandomizerSettings : Settings() {
 	}
 
 	fun saveRom(file: File, seed: Long, log: OutputStream? = null): Boolean {
+		val ps = PrintStream(log ?: emptyLog)
 		val handler = try {
 			createRomHandler(random.seed(seed))
 		} catch (e: Exception) {
 			Log.e(TAG, "Failed to create ROM handler.", e)
+			e.printStackTrace(ps)
 			return false
+		} finally {
+			ps.close()
 		}
-		return saveRom(file, seed, handler, PrintStream(log ?: emptyLog))
+		return saveRom(file, seed, handler, ps)
 	}
 
 	private fun saveRom(file: File, seed: Long, handler: RomHandler, log: PrintStream): Boolean {
 		return try {
 			handler.setLog(log)
-			Randomizer(this, handler, getBundle("com.dabomstew.pkrandom.newgui.Bundle"), false).randomize(file.absolutePath, log, seed)
+			Randomizer(
+				this,
+				handler,
+				getBundle("com.dabomstew.pkrandom.newgui.Bundle"),
+				false
+			).randomize(file.absolutePath, log, seed)
 			true
 		} catch (e: Exception) {
 			Log.e(TAG, "Failed to randomize ROM.", e)
+			e.printStackTrace(log)
 			false
 		} finally {
 			log.close()
