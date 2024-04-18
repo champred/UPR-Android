@@ -20,8 +20,8 @@ android {
         applicationId "ly.mens.rndpkmn"
         minSdkVersion 29
         targetSdkVersion 33
-        versionCode 31
-        versionName "0.5.0"
+        versionCode 32
+        versionName "0.5.1a"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         //add properties to resources
@@ -80,13 +80,18 @@ android {
         buildConfigField "String", "B2W2_ULTIMATE", '"321WRIEEgLvAfIB9QGRAAKeBhsECQEACQACCQAuEgAAAAAABHCI5ATkwYAICTIGBgIyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSkkLEYu48M4ig=="'
         buildConfigField "String", "B2W2_KAIZO", '"321WRIEEgLvAfIB9QGRAAKeBhsECQEACQACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyAAUYE1Bva2Vtb24gQmxhY2sgMiAoVSkCfDTI48M4ig=="'
         buildConfigField "String", "B2W2_SURVIVAL", '"321WRIEEgLvAfIB9QGRAAKeBhsEiAEACQACCQAuEgAAAAAABHCI5ATkwYYICTIGBgIyEwUYE1Bva2Vtb24gQmxhY2sgMiAoVSnSbcbe48M4ig=="'
-        //Emerald Nat Dex Hack
+        //NatDex
         buildConfigField "String", "END_ULTIMATE", '"321WRIEEjL8AP8AAgGRAAKeBhkECQEACQASCQAuEgAAAAAABBiw5ATkBIAICTIGBAIyAAUYC0VtZXJhbGQgKFUpsfdZEePDOIo="'
         buildConfigField "String", "END_KAIZO", '"321WRIEEjL8AP8AAgGRAAKeBhsECQEAFAASCQAuEgAAAAAABBiw7gTuAoYICTIGBAIyAAUYC0VtZXJhbGQgKFUpz+T6X+PDOIo="'
         buildConfigField "String", "END_SURVIVAL", '"321WRIEEjL8AP8AAgGRAAKeBhsEiAEAFAASCQAuEgAAAAAABBiw7gTuAoYICTIGBAIyEwUYC0VtZXJhbGQgKFUpLHk7FOPDOIo="'
         buildConfigField "String", "END_DOUBLES", '"321WRIEEjL8AP8AAgGRAAKeBhsECQEAFAASCQAuEgAAAAAABBiw7gTuApcJCTIGBAMyEQUYC0VtZXJhbGQgKFUpOPJ94+PDOIo="'
         buildConfigField "String", "END_STARTERS", '"321WZMEGjEAAAAAAACRAAKjRAEECQMAFAASCQABEgAAAAAABBiw7gQyAoYICTIGBAIyAAUgC0VtZXJhbGQgKFUp3q5Bw+PDOIo="'
         buildConfigField "String", "END_SUPER", '"321WRIEEjL8AP8AAgGRAAKeBhsECQEAFAACCQAuEgAAAAAABBCw7gTuAYoICTIGBAIyHwUYDEVtZXJhbGQgKE5EKVJU61LjwziK"'
+	buildConfigField "String", "FRND_ULTIMATE", '"321WRIEEjIBAAQABwCRAAKeBhsECQEACQACCQAuEgAAAAAABRgw5ATkAYAICTIGBAIyAAUYEEZpcmUgUmVkIChVKSAxLjGu7Al348M4ig=="'
+	buildConfigField "String", "FRND_KAIZO", '"321WRIEEjIBAAQABwCRAAKeBhsECQEAFAACCQAuEgAAAAAABRgw5ATkAYYICTIGBAIyAAUYEEZpcmUgUmVkIChVKSAxLjFgs9k248M4ig=="'
+	buildConfigField "String", "FRND_SURVIVAL", '"321WRIEEjIBAAQABwCRAAKeBhsEiAEAFAACCQAuEgAAAAAABRgw5ATkAYYICTIGBAIyEwUYEEZpcmUgUmVkIChVKSAxLjEB+bKB48M4ig=="'
+	buildConfigField "String", "FRND_DOUBLES", '"321WRIEEjIBAAQABwCRAAKeBhsECQEAFAACCQAuEgAAAAAABRgw5ATkAZcJCTIGBAMyAAUYEEZpcmUgUmVkIChVKSAxLjED/Yp648M4ig=="'
+	buildConfigField "String", "FRND_SUPER", '"321WRIEEjIBAAQABwCRAAKeBhsESQEACQACCQAuEgAAAAAABRgw5ATkAYgICTIGBAIyHwUYEEZpcmUgUmVkIChVKSAxLjGHqPPv48M4ig=="'
         //add berry counts to build config
         //used for banning "bad" items
         buildConfigField "int", "BERRY_COUNT_OLD", "54"

@@ -54,7 +54,7 @@ enum class SettingsPreset {
 			3 -> if ("Fire" in name || "Leaf" in name) "FRLG" else "RSE"
 			4 -> if ("Heart" in name || "Soul" in name) "HGSS" else "DPPT"
 			5 -> if ("2" in name) "B2W2" else "BW"
-			9 -> "END"
+			9 -> if ("Emerald" in name) "END" else "FRND"
 			else -> return null
 		}
 		return try {
