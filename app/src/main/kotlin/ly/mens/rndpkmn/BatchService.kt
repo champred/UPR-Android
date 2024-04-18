@@ -97,11 +97,14 @@ class BatchService : Service() {
 						count.getAndIncrement().toString().padStart(4, '0'),
 						suffix
 				).fileName)
-				val fileUri = dir.createFile("application/octet-stream", file.name)?.uri ?: return lock.release()
+				val fileDoc = dir.createFile("application/octet-stream", file.name)
 				val log = if (saveLog) ByteArrayOutputStream(1024 * 1024) else null
 				val logUri = log?.let { dir.createFile("text/plain", "${file.name}.log.txt")?.uri }
-				if (!RandomizerSettings.saveRom(file, RandomSource.pickSeed(), log)) return lock.release()
-				saveToUri(fileUri, file)
+				if (!RandomizerSettings.saveRom(file, RandomSource.pickSeed(), log)) {
+					fileDoc?.delete()
+				} else if (fileDoc != null) {
+					saveToUri(fileDoc.uri, file)
+				}
 				//clean up temporary file
 				deleteFile(file.name)
 				if (logUri != null) {

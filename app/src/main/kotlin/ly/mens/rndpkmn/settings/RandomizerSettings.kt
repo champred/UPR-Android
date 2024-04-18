@@ -91,6 +91,7 @@ object RandomizerSettings : Settings() {
 	var useNatDex = false
 		set(value) {
 			Gen3RomHandler.useNatDex = value
+			Gen3RomHandler.loadROMInfo(if (value) "nd_offsets.ini" else "gen3_offsets.ini")
 			field = value
 		}
 

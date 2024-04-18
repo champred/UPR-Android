@@ -128,12 +128,14 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     private static List<RomEntry> roms;
+    public static boolean useNatDex = false;
 
     static {
-        loadROMInfo("gen3_offsets.ini");
+        if (useNatDex) loadROMInfo("nd_offsets.ini");
+        else loadROMInfo("gen3_offsets.ini");
     }
 
-    private static void loadROMInfo(String filename) {
+    public static void loadROMInfo(String filename) {
         roms = new ArrayList<>();
         RomEntry current = new RomEntry();
         try {
@@ -364,7 +366,6 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     private int pickupItemsTableOffset;
     private long actualCRC32;
     private boolean effectivenessUpdated;
-    public static boolean useNatDex = false;
 
     @Override
     public boolean detectRom(byte[] rom) {
@@ -410,7 +411,6 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
         // Nat Dex support
         if (useNatDex) {
-            loadROMInfo("end_offsets.ini");
             for (RomEntry re : roms) {
                 if (re.expectedCRC32 == actualCRC32) {
                     romEntry = new RomEntry(re);
@@ -418,7 +418,6 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 }
             }
         } else {
-            loadROMInfo("gen3_offsets.ini");
             for (RomEntry re : roms) {
                 if (romCode(rom, re.romCode) && (rom[0xBC] & 0xFF) == re.version) {
                     romEntry = new RomEntry(re); // clone so we can modify
