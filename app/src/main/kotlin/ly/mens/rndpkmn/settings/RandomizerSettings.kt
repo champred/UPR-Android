@@ -228,7 +228,10 @@ object RandomizerSettings : Settings() {
 
 	private fun createRomHandler(rand: Random): RomHandler {
 		return romHandlerFactory.create(rand).apply {
-			loadRom(inputFile.absolutePath)
+			val loaded = loadRom(inputFile.absolutePath)
+			if (!loaded) {
+				throw Exception("Unable to load ROM")
+			}
 			if (SettingsPreset.STARTERS.selected) {
 				pickStarters(this, rand)
 				startersMod = StartersMod.UNCHANGED
