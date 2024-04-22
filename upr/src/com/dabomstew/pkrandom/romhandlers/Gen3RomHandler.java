@@ -908,6 +908,12 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             moves[i].makesContact = (flags & 1) != 0;
             moves[i].isSoundMove = Gen3Constants.soundMoves.contains(moves[i].number);
 
+            if (!useNatDex && flags > 63) {
+                int mask = (flags & 0b1100_0000) >> 6;
+                moves[i].category = MoveCategory.values()[mask - 1];
+                isRomHack = true;
+            }
+            
             if (i == Moves.swift) {
                 perfectAccuracy = (int)moves[i].hitratio;
             }
@@ -1293,7 +1299,17 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             }
             rom[offs + i * 0xC + 3] = (byte) hitratio;
             rom[offs + i * 0xC + 4] = (byte) moves[i].pp;
+            if (isRomHack) {
+                int mask = (moves[i].category.ordinal() + 1) << 6;
+                rom[offs + i * 0xC + 8] |= (byte) mask;
+            }
         }
+    }
+
+    @Override
+    public boolean hasPhysicalSpecialSplit() {
+        if (isRomHack) return moves[Moves.firePunch].category == MoveCategory.PHYSICAL;
+        return false; //check if categories were actually updated
     }
 
     public List<Move> getMoves() {
