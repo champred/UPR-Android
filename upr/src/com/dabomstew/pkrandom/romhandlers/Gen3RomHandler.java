@@ -132,6 +132,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     static {
         if (useNatDex) loadROMInfo("nd_offsets.ini");
+        else if (FileFunctions.configExists("custom_offsets.ini"))
+            loadROMInfo("custom_offsets.ini");
         else loadROMInfo("gen3_offsets.ini");
     }
 
