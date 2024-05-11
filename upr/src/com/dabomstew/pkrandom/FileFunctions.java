@@ -59,8 +59,13 @@ public class FileFunctions {
         return new File(absolutePath);
     }
 
-    private static List<String> overrideFiles = Arrays.asList(SysConstants.customNamesFile,
-            SysConstants.tclassesFile, SysConstants.tnamesFile, SysConstants.nnamesFile);
+    private static List<String> overrideFiles = Arrays.asList(
+        SysConstants.customNamesFile,
+        SysConstants.tclassesFile,
+        SysConstants.tnamesFile,
+        SysConstants.nnamesFile,
+        "custom_offsets.ini"
+    );
 
     public static boolean configExists(String filename) {
         if (overrideFiles.contains(filename)) {
