@@ -5,11 +5,15 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: rando
     steps:
     - uses: actions/checkout@v4
+      with:
+        path: 'rando'
+        repository: 'champred/UPR-Android'
     - name: set up JDK
       uses: actions/setup-java@v4
       with:
@@ -26,4 +30,4 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: JAR
-        path: upr/build/libs/upr.jar
+        path: rando/upr/build/libs/upr.jar
