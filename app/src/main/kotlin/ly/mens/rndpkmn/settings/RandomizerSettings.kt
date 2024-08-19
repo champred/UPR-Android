@@ -155,8 +155,12 @@ object RandomizerSettings : Settings() {
 		}
 
 		pokeTrie.clear()
-		for (i in 1 until romHandler.pokemon.size) {
-			pokeTrie.insert(romHandler.pokemon[i].name)
+		for (poke in romHandler.pokemon.drop(1)) {
+			pokeTrie.insert(poke.name)
+			if (romHandler.abilitiesPerPokemon() == 3 && poke.ability2 == 0) {
+				poke.ability2 = poke.ability3
+				poke.ability3 = 0
+			}
 		}
 
 		with (SettingsPrefix.STARTERS.props) {
