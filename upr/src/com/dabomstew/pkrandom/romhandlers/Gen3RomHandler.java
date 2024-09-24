@@ -3673,14 +3673,15 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     @Override
     public int highestAbilityIndex() {
-        return Gen3Constants.highestAbilityIndex;
+        int count = romEntry.getValue("AbilityCount");
+        return (count!=0) ? count : Gen3Constants.highestAbilityIndex;
     }
 
     private void loadAbilityNames() {
         int nameoffs = romEntry.getValue("AbilityNames");
         int namelen = romEntry.getValue("AbilityNameLength");
-        abilityNames = new String[Gen3Constants.highestAbilityIndex + 1];
-        for (int i = 0; i <= Gen3Constants.highestAbilityIndex; i++) {
+        abilityNames = new String[highestAbilityIndex() + 1];
+        for (int i = 0; i <= highestAbilityIndex(); i++) {
             abilityNames[i] = readFixedLengthString(nameoffs + namelen * i, namelen);
         }
     }
