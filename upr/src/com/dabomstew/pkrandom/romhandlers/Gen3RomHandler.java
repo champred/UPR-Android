@@ -396,7 +396,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             return false;
         }
         // Pokedex Order header
-        if (findMultiple(rom, useNatDex ? Gen3Constants.natdexOrderPointerPrefix : Gen3Constants.pokedexOrderPointerPrefix).size() != 3) {
+        if (!(findMultiple(rom, Gen3Constants.pokedexOrderPointerPrefix).size() != 3
+           || findMultiple(rom, Gen3Constants.natdexOrderPointerPrefix).size() != 3)) {
             return false;
         }
         for (RomEntry re : roms) {
@@ -434,7 +435,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         jamboMovesetHack = false;
 
         // Pokemon count stuff, needs to be available first
-        List<Integer> pokedexOrderPrefixes = findMultiple(rom, useNatDex ? Gen3Constants.natdexOrderPointerPrefix : Gen3Constants.pokedexOrderPointerPrefix);
+        List<Integer> pokedexOrderPrefixes = findMultiple(rom, Gen3Constants.pokedexOrderPointerPrefix);
+        pokedexOrderPrefixes.addAll(findMultiple(rom, Gen3Constants.natdexOrderPointerPrefix));
         romEntry.entries.put("PokedexOrder", readPointer(pokedexOrderPrefixes.get(1) + 16));
 
         // Pokemon names offset
