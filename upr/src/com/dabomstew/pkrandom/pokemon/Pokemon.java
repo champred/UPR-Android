@@ -323,16 +323,6 @@ public class Pokemon implements Comparable<Pokemon> {
             Species.mewtwoMegaY, Species.rayquazaMega, Species.archaludon, Species.pecharunt, Species.terapagosT, Species.terapagosS,
             Species.eternatusE));
 
-    private static final Set<Integer> bst641Plus = new HashSet<>(Arrays.asList(Species.palafinH, Species.kyurem, Species.zacian, Species.zamazenta,
-            Species.slaking, Species.kyogre, Species.groudon, Species.regigigas, Species.koraidon, Species.miraidon, Species.mewtwo,
-            Species.lugia, Species.hoOh, Species.rayquaza, Species.dialga, Species.dialgaO, Species.palkia, Species.palkiaO,
-            Species.giratina, Species.giratinaO, Species.reshiram, Species.zekrom, Species.xerneas, Species.yveltal, Species.hoopaU,
-            Species.solgaleo, Species.lunala, Species.necrozmaDM, Species.necrozmaDW, Species.calyrexI, Species.calyrexS, Species.eternatus,
-            Species.tyranitarMega, Species.salamenceMega, Species.metagrossMega, Species.latiasMega, Species.latiosMega,
-            Species.garchompMega, Species.kyuremB, Species.kyuremW, Species.diancieMega, Species.zacianC, Species.zamazentaC,
-            Species.zygardeC, Species.arceus, Species.necrozmaU, Species.kyogreP, Species.groudonP, Species.mewtwoMegaX,
-            Species.mewtwoMegaY, Species.rayquazaMega, Species.terapagosS, Species.eternatusE));
-
     private static final Set<Integer> natdexStrongLegendaries = new HashSet<>(Arrays.asList(Species.kyurem, Species.zacian, Species.zamazenta, Species.kyogre,
             Species.groudon, Species.regigigas, Species.koraidon, Species.miraidon, Species.mewtwo, Species.lugia, Species.hoOh,
             Species.rayquaza, Species.dialga, Species.dialgaO, Species.palkia, Species.palkiaO, Species.giratina, Species.giratinaO,
@@ -348,18 +338,14 @@ public class Pokemon implements Comparable<Pokemon> {
 
     public boolean isLegendary() {
         if (Gen3RomHandler.useNatDex)
-            return formeNumber == 0 ? natdexLegendaries.contains(this.number) : natdexLegendaries.contains(this.baseForme.number);
-        return formeNumber == 0 ? legendaries.contains(this.number) : legendaries.contains(this.baseForme.number);
-    }
-
-    public boolean isBST641Plus() {
-        return formeNumber == 0 ? bst641Plus.contains(this.number) : legendaries.contains(this.baseForme.number);
+            return natdexLegendaries.contains(formeNumber == 0 ? number : baseForme.number);
+        return bst()>=580 && evolutionsTo.isEmpty();
     }
 
     public boolean isStrongLegendary() {
         if (Gen3RomHandler.useNatDex)
-            return formeNumber == 0 ? natdexStrongLegendaries.contains(this.number) : natdexStrongLegendaries.contains(this.baseForme.number);
-        return formeNumber == 0 ? strongLegendaries.contains(this.number) : strongLegendaries.contains(this.baseForme.number);
+            return natdexStrongLegendaries.contains(formeNumber == 0 ? number : baseForme.number);
+        return bst()>=660 && evolutionsTo.isEmpty();
     }
 
     // This method can only be used in contexts where alt formes are NOT involved; otherwise, some alt formes

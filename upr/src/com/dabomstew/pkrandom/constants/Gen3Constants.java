@@ -79,7 +79,6 @@ public class Gen3Constants {
             efrlgPokemonStatsPointer = 0x1BC, efrlgFrontSpritesPointer = 0x128, efrlgPokemonPalettesPointer = 0x130;
     public static final int backSpritesPointer = 0x12c, shinyPalettesPointer = 0x134, iconSpritesPointer = 0x138, iconPaletteDataPointer = 0x13c;
     public static final int frIconPalettes = 0x8ab40, emIconPalettes = 0xc4208;
-    public static final int[] sub400NoEvo = {Species.sableye,Species.mawile,Species.lickitung,Species.gloom,Species.yanma,Species.ariados,Species.ledian,Species.dustox,Species.beautifly,Species.beedrill,Species.butterfree,Species.corsola,Species.nosepass,Species.aipom,Species.farfetchd,Species.unown,Species.luvdisc,Species.delibird,Species.eevee,Species.clefairy,Species.pikachu,Species.vulpix,Species.ditto,Species.jigglypuff,Species.smeargle,Species.growlithe,Species.spinda,Species.nidorina,Species.nidorino,Species.delcatty,Species.nuzleaf,Species.lombre,Species.staryu,Species.exeggcute,Species.weepinbell,Species.skitty};
 
     public static final byte[] emptyPokemonSig = new byte[] { 0x32, (byte) 0x96, 0x32, (byte) 0x96, (byte) 0x96, 0x32,
             0x00, 0x00, 0x03, 0x01, (byte) 0xAA, 0x0A, 0x00, 0x00, 0x00, 0x00, (byte) 0xFF, 0x78, 0x00, 0x00, 0x0F,
@@ -248,7 +247,7 @@ public class Gen3Constants {
 
     public static final List<Integer> frlgEarlyRequiredHMMoves = Collections.singletonList(Moves.cut);
 
-    private static List<String> rsShopNames = Arrays.asList(
+    private static final List<String> rsShopNames = Arrays.asList(
             "Slateport Vitamins",
             "Slateport TMs",
             "Oldale Poké Mart (Before Pokédex)",
@@ -275,7 +274,7 @@ public class Gen3Constants {
             "Pokémon League Poké Mart"
     );
 
-    private static List<String> frlgShopNames = Arrays.asList(
+    private static final List<String> frlgShopNames = Arrays.asList(
             "Trainer Tower Poké Mart",
             "Two Island Market Stall (Initial)",
             "Two Island Market Stall (After Saving Lostelle)",
@@ -301,7 +300,7 @@ public class Gen3Constants {
             "Six Island Poké Mart"
     );
 
-    private static List<String> emShopNames = Arrays.asList(
+    private static final List<String> emShopNames = Arrays.asList(
             "Slateport Vitamins",
             "Slateport TMs",
             "Oldale Poké Mart (Before Pokédex)",
