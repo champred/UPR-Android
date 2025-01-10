@@ -1,8 +1,10 @@
+//noinspection JavaPluginLanguageLevel
 apply plugin: 'java'
 
 java {
-    targetCompatibility = '1.8'
-    sourceCompatibility = '1.8'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
 }
 
 compileJava.options.encoding = 'utf-8'

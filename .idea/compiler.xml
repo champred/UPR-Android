@@ -3,6 +3,8 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.8">
       <module name="UPR-Android.app" target="17" />
+      <module name="UPR-Android.upr.main" target="8" />
+      <module name="UPR-Android.upr.test" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -20,8 +20,8 @@ android {
         applicationId "ly.mens.rndpkmn"
         minSdkVersion 29
         targetSdkVersion 33
-        versionCode 32
-        versionName "0.5.1a"
+        versionCode 33
+        versionName "0.5.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         //add properties to resources
