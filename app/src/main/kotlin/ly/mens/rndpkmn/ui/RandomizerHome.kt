@@ -135,7 +135,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	Row(verticalAlignment = Alignment.CenterVertically) {
 		Button({
 			romFileName.value = null
-			openLauncher.launch("application/octet-stream")
+			openLauncher.launch("*/*")
 			   }, Modifier.padding(8.dp)) {
 			Text(stringResource(R.string.action_open_rom))
 		}
