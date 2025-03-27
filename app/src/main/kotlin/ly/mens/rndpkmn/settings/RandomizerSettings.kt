@@ -209,6 +209,7 @@ object RandomizerSettings : Settings() {
 			createRomHandler(random.seed(seed))
 		} catch (e: Exception) {
 			Log.e(TAG, "Failed to create ROM handler.", e)
+			log?.close()
 			return false
 		}
 		return saveRom(file, seed, handler, PrintStream(log ?: emptyLog))
@@ -217,10 +218,12 @@ object RandomizerSettings : Settings() {
 	private fun saveRom(file: File, seed: Long, handler: RomHandler, log: PrintStream): Boolean {
 		return try {
 			handler.setLog(log)
-			Randomizer(this, handler, getBundle("com.dabomstew.pkrandom.newgui.Bundle"), false).randomize(file.absolutePath, log, seed)
+			Randomizer(this, handler, getBundle("com.dabomstew.pkrandom.newgui.Bundle"), false)
+				.randomize(file.absolutePath, log, seed)
 			true
 		} catch (e: Exception) {
 			Log.e(TAG, "Failed to randomize ROM.", e)
+			e.printStackTrace(log)
 			false
 		} finally {
 			log.close()

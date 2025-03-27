@@ -121,9 +121,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		}
 	}
 
-	if (showProgress) LinearProgressIndicator(Modifier
-			.fillMaxWidth()
-			.padding(vertical = 8.dp))
+	if (showProgress) LinearProgressIndicator(Modifier.fillMaxWidth().padding(vertical = 8.dp))
 	romFileName.value?.let { Text(stringResource(R.string.current_rom, it, RandomizerSettings.romName)) }
 
 	var dexCheckbox by remember { mutableStateOf(RandomizerSettings.useNatDex) }
@@ -138,20 +136,21 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		Button({
 			romFileName.value = null
 			openLauncher.launch("*/*")
-			   }, Modifier.padding(8.dp)) {
+		}, Modifier.padding(8.dp)) {
 			Text(stringResource(R.string.action_open_rom))
 		}
 		Text(stringResource(if (romFileName.value == null) R.string.rom_not_loaded else R.string.rom_loaded))
 	}
 	Row(verticalAlignment = Alignment.CenterVertically) {
-		Button({ saveRomLauncher.launch(romFileName.value) }, Modifier.padding(8.dp), romFileName.value != null) {
-			Text(stringResource(R.string.action_save_rom))
-		}
+		Button({ saveRomLauncher.launch(romFileName.value) },
+			Modifier.padding(8.dp),
+			romFileName.value != null
+		) { Text(stringResource(R.string.action_save_rom)) }
 		Text(stringResource(if (romSaved) R.string.rom_saved else R.string.rom_not_saved))
 	}
-	Button({ saveLogLauncher.launch("${romFileName.value!!.substringBefore('.')}.txt") }, Modifier.padding(8.dp), romSaved) {
-		Text(stringResource(R.string.action_save_log))
-	}
+	Button({ saveLogLauncher.launch("${romFileName.value!!.substringBefore('.')}.txt") },
+		Modifier.padding(8.dp)
+	) { Text(stringResource(R.string.action_save_log)) }
 }
 
 @Composable

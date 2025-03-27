@@ -7,6 +7,7 @@ import androidx.annotation.StringRes
 import androidx.core.text.parseAsHtml
 import com.dabomstew.pkrandom.Utils
 import java.io.File
+import java.io.FileNotFoundException
 import java.lang.reflect.Field
 
 val Field.id get() = name.replaceFirstChar { it.uppercase() }
@@ -20,6 +21,7 @@ val File.isRomFile: Boolean get() {
         Utils.validateRomFile(this)
         true
     } catch (e: Utils.InvalidROMException) {
+        e.printStackTrace()
         false
     }
 }
@@ -55,7 +57,12 @@ fun Context.loadFromUri(uri: Uri, file: File) {
 fun Context.saveToUri(uri: Uri, file: File) {
     //copy temporary file to selected path
     contentResolver.openOutputStream(uri).use {
-        val source = openFileInput(file.name)
+        val source = try {
+            openFileInput(file.name)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+            return
+        }
         if (it != null) {
             source.copyTo(it)
         }
