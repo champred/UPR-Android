@@ -36,7 +36,7 @@
     <string name="error_invalid_rom">Invalid ROM: %1$s</string>
     <string name="error_invalid_settings">Invalid Settings String</string>
     <string name="error_invalid_seed">Invalid Seed Number</string>
-    <string name="error_save_failed">Failed to save ROM. See log for details.</string>
+    <string name="error_save_failed">Failed to save ROM.</string>
     <string name="error_not_clean">The loaded ROM is not clean.</string>
     <string name="error_no_preset">No preset found for current ROM.</string>
 

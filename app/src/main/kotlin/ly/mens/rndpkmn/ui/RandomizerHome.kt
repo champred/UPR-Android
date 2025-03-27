@@ -92,15 +92,17 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	}
 	val saveRomLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
-		val doc = DocumentFile.fromSingleUri(ctx, uri)
-		romFileName.value = doc?.name?.substringAfter(':')
-		val file = File(ctx.filesDir, uri.lastPathSegment!!)
+		val name = DocumentFile.fromSingleUri(ctx, uri)!!.name ?: uri.lastPathSegment!!
+		romFileName.value = name.substringAfter(':')
+		val file = File(ctx.filesDir, name)
 		scope.launch(Dispatchers.IO) {
 			showProgress = true
 			if (!RandomizerSettings.saveRom(file)) {
 				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_save_failed))
-				doc?.delete()
-			} else ctx.saveToUri(uri, file)
+				showProgress = false
+				return@launch
+			}
+			ctx.saveToUri(uri, file)
 			//clean up temporary file
 			ctx.deleteFile(file.name)
 			RandomizerSettings.reloadRomHandler()
