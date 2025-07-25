@@ -5,7 +5,7 @@
     <option name="PROGRAM_PARAMETERS" value="please-use-the-launcher" />
     <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-    <option name="ALTERNATIVE_JRE_PATH" value="corretto-1.8" />
+    <option name="ALTERNATIVE_JRE_PATH" value="temurin-1.8" />
     <method v="2" />
   </configuration>
 </component>
