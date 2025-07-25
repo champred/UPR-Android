@@ -5,20 +5,19 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
@@ -44,6 +43,7 @@ import androidx.core.app.ActivityCompat
 import androidx.documentfile.provider.DocumentFile
 import com.dabomstew.pkrandom.RandomSource
 import com.dabomstew.pkrandom.SysConstants
+import com.dabomstew.pkrandom.romhandlers.Gen3RomHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ly.mens.rndpkmn.*
@@ -51,6 +51,7 @@ import ly.mens.rndpkmn.R
 import ly.mens.rndpkmn.settings.RandomizerSettings
 import ly.mens.rndpkmn.settings.SettingsPreset
 import java.io.File
+import java.io.IOException
 
 @Composable
 fun RandomizerHome(scaffold: ScaffoldState) {
@@ -124,13 +125,44 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	if (showProgress) LinearProgressIndicator(Modifier.fillMaxWidth().padding(vertical = 8.dp))
 	romFileName.value?.let { Text(stringResource(R.string.current_rom, it, RandomizerSettings.romName)) }
 
-	var dexCheckbox by remember { mutableStateOf(RandomizerSettings.useNatDex) }
+	var expandList by remember { mutableStateOf(false) }
+	var selectedIndex by rememberSaveable { mutableStateOf(-1) }
+	val items = try {
+		ctx.assets.list("roms") ?: arrayOf()
+	} catch (e: IOException) {
+		Log.e(LOG_TAG, "Failed to load assets.", e)
+		arrayOf()
+	}
 	Row(verticalAlignment = Alignment.CenterVertically) {
-		Checkbox(dexCheckbox, {
-			dexCheckbox = it
-			RandomizerSettings.useNatDex = it
-		})
-		Text(stringResource(R.string.nat_dex))
+		Text(stringResource(R.string.rom_hack))
+		Spacer(Modifier.width(5.dp))
+		Text(items.getOrElse(selectedIndex) { stringResource(R.string.none) })
+		IconButton({ expandList = true }) { Icon(Icons.Filled.ArrowDropDown, null) }
+		DropdownMenu(expandList, { expandList = false }, Modifier.fillMaxWidth()) {
+			DropdownMenuItem({
+				expandList = false
+				selectedIndex = -1
+				RandomizerSettings.useNatDex = false
+				Gen3RomHandler.loadROMInfo("gen3_offsets.ini")
+			}) { Text(stringResource(R.string.none)) }
+			items.forEachIndexed { index, s ->
+				DropdownMenuItem({
+					expandList = false
+					selectedIndex = index
+					try {
+						val input = ctx.assets.open(File("roms", s).path)
+						val output = ctx.openFileOutput("custom_offsets.ini", 0)
+						input.copyTo(output)
+						input.close()
+						output.close()
+						Gen3RomHandler.loadROMInfo("custom_offsets.ini")
+						RandomizerSettings.useNatDex = s.startsWith("NatDex")//messy
+					} catch (e: IOException) {
+						Log.e(LOG_TAG, "Failed to open file streams.", e)
+					}
+				}) { Text(s) }
+			}
+		}
 	}
 	Row(verticalAlignment = Alignment.CenterVertically) {
 		Button({

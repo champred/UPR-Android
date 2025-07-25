@@ -29,7 +29,8 @@
     <string name="random_starter">Random Starter</string>
     <string name="choose_preset">Choose Preset (scroll to see all):</string>
     <string name="allow_berries">Allow extra berries (gen 4)</string>
-    <string name="nat_dex">NatDex Hack Support</string>
+    <string name="rom_hack">GBA ROM Hack Support: </string>
+    <string name="none">None</string>
 
     <string name="error_invalid_dir">Invalid directory</string>
     <string name="error_no_roms">No ROMs in directory: %1$s</string>
