@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
 import androidx.documentfile.provider.DocumentFile
+import com.dabomstew.pkrandom.Settings
 import com.dabomstew.pkrandom.RandomSource
 import com.dabomstew.pkrandom.SysConstants
 import com.dabomstew.pkrandom.romhandlers.Gen3RomHandler
@@ -71,6 +72,9 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	val scope = rememberCoroutineScope()
 	var romSaved by remember { mutableStateOf(false) }
 	var showProgress by remember { mutableStateOf(false) }
+	var expandList by remember { mutableStateOf(false) }
+	var selectedIndex by rememberSaveable { mutableStateOf(-1) }
+	val romHacks = remember { ctx.assets.list("roms") ?: arrayOf() }
 
 	val openLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
@@ -84,6 +88,20 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 				romSaved = false
 				if (!RandomizerSettings.isValid) {
 					scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_not_clean))
+				}
+				if (selectedIndex >= 0) {
+					try {
+						val dir = File("rnqs", romHacks[selectedIndex])
+						ctx.assets.list(dir.path)?.forEach {
+							val input = ctx.assets.openFd(File(dir, it).path).createInputStream()
+							SettingsPreset.valueOf(it.substringAfter(' ')).custom = Settings.read(input)
+							input.close()
+						}
+					} catch (e: IOException) {
+						Log.i(LOG_TAG, "Settings not found.", e)
+					} catch (e: UnsupportedOperationException) {
+						Log.i(LOG_TAG, "Problem with settings file.", e)
+					}
 				}
 			} else {
 				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_invalid_rom, file.name))
@@ -124,32 +142,23 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 
 	if (showProgress) LinearProgressIndicator(Modifier.fillMaxWidth().padding(vertical = 8.dp))
 	romFileName.value?.let { Text(stringResource(R.string.current_rom, it, RandomizerSettings.romName)) }
-
-	var expandList by remember { mutableStateOf(false) }
-	var selectedIndex by rememberSaveable { mutableStateOf(-1) }
-	val items = try {
-		ctx.assets.list("roms") ?: arrayOf()
-	} catch (e: IOException) {
-		Log.e(LOG_TAG, "Failed to load assets.", e)
-		arrayOf()
-	}
 	Row(verticalAlignment = Alignment.CenterVertically) {
 		Text(stringResource(R.string.rom_hack))
 		Spacer(Modifier.width(5.dp))
-		Text(items.getOrElse(selectedIndex) { stringResource(R.string.none) })
+		Text(romHacks.getOrElse(selectedIndex) { stringResource(R.string.none) })
 		IconButton({ expandList = true }) { Icon(Icons.Filled.ArrowDropDown, null) }
 		DropdownMenu(expandList, { expandList = false }, Modifier.fillMaxWidth()) {
 			DropdownMenuItem({
 				expandList = false
 				selectedIndex = -1
 				RandomizerSettings.useNatDex = false
-				Gen3RomHandler.loadROMInfo("gen3_offsets.ini")
+				scope.launch(Dispatchers.IO) { Gen3RomHandler.loadROMInfo("gen3_offsets.ini") }
 			}) { Text(stringResource(R.string.none)) }
-			items.forEachIndexed { index, s ->
+			romHacks.forEachIndexed { index, s ->
 				DropdownMenuItem({
 					expandList = false
 					selectedIndex = index
-					try {
+					scope.launch(Dispatchers.IO) {
 						val input = ctx.assets.open(File("roms", s).path)
 						val output = ctx.openFileOutput("custom_offsets.ini", 0)
 						input.copyTo(output)
@@ -157,8 +166,6 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 						output.close()
 						Gen3RomHandler.loadROMInfo("custom_offsets.ini")
 						RandomizerSettings.useNatDex = s.startsWith("NatDex")//messy
-					} catch (e: IOException) {
-						Log.e(LOG_TAG, "Failed to open file streams.", e)
 					}
 				}) { Text(s) }
 			}

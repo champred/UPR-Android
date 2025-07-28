@@ -1,0 +1,138 @@
+[FireRed MAX]
+Game=BPRE
+Version=1
+Type=FRLG
+TableFile=gba_english
+FreeSpace=0xA80228
+PokemonCount=411
+PokemonNameLength=11
+PokemonMovesets=0x272628
+EggMoves=0x273DA0
+PokemonTMHMCompat=0x2655E8
+PokemonEvolutions=0x26E5C8
+BattleTrappersBanned=[55,56,57,58,59]
+StarterPokemon=0x1713BE
+TrainerData=0x24FAB4
+TrainerEntrySize=40
+TrainerCount=0x2E7
+TrainerClassNames=0x24F544
+TrainerClassCount=107
+TrainerClassNameLength=13
+TrainerNameLength=12
+DoublesTrainerClasses=[26, 40, 52, 53, 54, 92, 93, 94, 95, 96]
+EliteFourIndices=[410, 411, 412, 413, 438, 439, 440]
+ItemEntrySize=44
+ItemCount=374
+MoveCount=500
+AbilityCount=128
+MoveDescriptions=0x4ABA3C
+MoveNameLength=13
+AbilityNameLength=13
+TmMoves=0x47B9E8
+TmMovesDuplicate=0x47BC50
+MoveTutorData=0x47AFA4
+MoveTutorMoves=15
+ItemImages=0x3EA3A8
+TmPals=[0xEA5340, 0xEA52A0, 0xEA54F8, 0xEA5368, 0xEA5480, 0xEA54D0, 0xEA53B8, 0xEA54A8, 0xEA5430, 0xEA54A8, 0xEA53E0, 0xEA52F0, 0xEA53B8, 0xEA5458, 0xEA5318, 0xEA5390, 0xEA52C8, 0xEA5408, 0xEA5318]
+IntroCryOffset=0x136FF4
+IntroSpriteOffset=0x13845C
+IntroOtherOffset=0x138408
+ItemBallPic=92
+TradeTableOffset=0x281E80
+TradeTableSize=9
+TradesUnused=[]
+RunIndoorsTweakOffset=0xC4714
+TextSpeedValuesOffset=0x437A38
+InstantTextTweak=instant_text/fr_11_instant_text
+CatchingTutorialOpponentMonOffset=0x82884
+PCPotionOffset=0x41A82C
+PickupTableStartLocator=8B000F00850019008600230087002D
+PickupItemCount=16
+TypeEffectivenessOffset=0x2607A8
+DeoxysStatPrefix=7F002301FFFF
+StaticPokemonSupport=0
+StaticPokemon{}={Species=[0x173CDA, 0x173CDD, 0x173D1D, 0x173D51], Level=[0x173CDF]} // Eevee in Celadon Condominiums
+StaticPokemon{}={Species=[0x176474, 0x17647B], Level=[0x1764EE]} // Hitmonlee in Fighting Dojo
+StaticPokemon{}={Species=[0x1764BA, 0x1764C1], Level=[0x1764EE]} // Hitmonchan in Fighting Dojo
+StaticPokemon{}={Species=[0x16AFB6, 0x16AFBD], Level=[0x16AFB8]} // Electrode in The Power Plant
+StaticPokemon{}={Species=[0x16B014, 0x16B01B], Level=[0x16B016]} // Electrode in The Power Plant
+StaticPokemon{}={Species=[0x16AF42, 0x16AF49, 0x16AF9D], Level=[0x16AF44]} // Zapdos in The Power Plant
+StaticPokemon{}={Species=[0x16A936, 0x16A93D, 0x16A991, 0x177905, 0x177911], Level=[0x16A938]} // Articuno (Seafoam and Route 15 Gatehouse)
+StaticPokemon{}={Species=[0x16B2BD, 0x16B2C4, 0x16B318], Level=[0x16B2BF]} // Moltres in Mt.Ember
+StaticPokemon{}={Species=[0x169C80, 0x169C94, 0x169CDA], Level=[0x169C96]} // Mewtwo in Unk. Dungeon
+StaticPokemon{}={Species=[0x16F76B, 0x16F772, 0x168274, 0x16827A], Level=[0x16F76D]} // Snorlax (Route 12 and S.S. Anne)
+StaticPokemon{}={Species=[0x16F878, 0x16F87F], Level=[0x16F87A]} // Snorlax (Route 16)
+StaticPokemon{}={Species=[0x16B432, 0x16B438], Level=[0x16B43A]} // Hypno in Berry Forest
+StaticPokemon{}={Species=[0x16CA5E, 0x16CA6E, 0x16CAB8, 0x16CAC3], Level=[0x16CA73]} // Deoxys on Birth Island
+StaticPokemon{}={Species=[0x16C7B4, 0x16C7E3, 0x16C832, 0x16C83D], Level=[0x16C7E8]} // Ho-Oh on Navel Rock
+StaticPokemon{}={Species=[0x16C902, 0x16C90D, 0x16C957, 0x16C962], Level=[0x16C912]} // Lugia on Navel Rock
+StaticPokemon{}={Species=[0x17604D, 0x176051, 0x17605C, 0x175F4E], Level=[0x17605E]} // Old Amber
+StaticPokemon{}={Species=[0x175FC3, 0x175FC7, 0x175FD2, 0x175ED2], Level=[0x175FD4]} // Helix Fossil
+StaticPokemon{}={Species=[0x176008, 0x17600C, 0x176017, 0x175F10], Level=[0x176019]} // Dome Fossil
+StaticPokemon{}={Species=[0x169254, 0x169257, 0x169296, 0x1692C9], Level=[0x169259]} // Lapras in Silph. Co
+StaticPokemon{}={Species=[0x17702B, 0x17702E, 0x1770ED], Level=[0x177030]} // Magikarp in Mt.Moon Center
+StaticPokemon{}={Species=[0x174480, 0x1744FC], Level=[0x17453F]} // Abra
+StaticPokemon{}={Species=[0x174490, 0x174507], Level=[0x174554]} // Clefairy
+StaticPokemon{}={Species=[0x1744B0, 0x17451D], Level=[0x17457E]} // Scyther
+StaticPokemon{}={Species=[0x1744A0, 0x174512], Level=[0x174569]} // Dratini
+StaticPokemon{}={Species=[0x1744C0, 0x174528], Level=[0x174593]} // Porygon
+TMText[]=[3,7,5,3,0x2A,TM03 teaches [move].\pUse it on a worthy POKéMON!]
+TMText[]=[4,14,3,7,0x2A,TM04 is [move].]
+TMText[]=[6,11,3,7,0x91,Sealed within that TM06 lies [move]!\pIt is a secret technique dating back some four hundred years.]
+TMText[]=[16,10,5,2,0x316,TM16 contains [move].]
+TMText[]=[19,10,16,7,0x9E,TM19 contains [move].\pWouldn’t you agree that it’s a wonderful move?]
+TMText[]=[20,10,5,2,0x322,TM20 contains [move].]
+TMText[]=[26,5,1,8,0x9E,TM26 contains [move].\pIt is a powerful technique.\pI made it when I ran the GYM here, far too long ago…]
+TMText[]=[27,23,1,1,0x50,TM27 is a move called [move]…\pIf you treat your POKéMON good, it will return your love by working its hardest in battle.]
+TMText[]=[28,7,1,1,0x0D,Those miserable ROCKETS!\pLook what they’ve done to my house!\pThey stole a TM for teaching POKéMON how to [move]!\pThat cost me a bundle, it did!]
+TMText[]=[28,7,1,1,0x17,I figure what’s lost is lost.\pI decided to catch a POKéMON that could [move] without a TM.]
+TMText[]=[29,14,8,1,0x41,You already know, don’t you? TM29 is [move].]
+TMText[]=[33,10,5,2,0x32E,TM33 contains [move].]
+TMText[]=[34,9,6,1,0x9E,TM34 contains [move]!\pTeach it to your favorite POKéMON!]
+TMText[]=[38,12,0,8,0x2A,TM38 contains [move].\nTeach it to strong POKéMON.\pNecrozmaU would be ideal for that move.]
+TMText[]=[38,12,0,8,0x96,[move] is the ultimate\ntechnique.\pDon’t waste it on weak POKéMON.]
+TMText[]=[39,6,2,1,0x99,A TM, Technical Machine, contains a technique for POKéMON.\pUsing a TM teaches the move it contains to a POKéMON.\pA TM is good for only one use.\pSo, when you use one, pick the POKéMON carefully.\pAnyways… TM39 contains [move].]
+MoveTutorText[]=[0,3,22,5,0x0D,A hit of roaring ferocity!\pPacked with destructive power!\pWhen the chips are down, [move] is the ultimate attack! You agree, yes?\pNow! Let me teach it to your POKéMON!]
+MoveTutorText[]=[0,3,22,5,0x60,Now, we are comrades in the way of [move]!\pYou should go before you’re seen by the misguided fool who trains only silly moves over there.]
+MoveTutorText[]=[0,3,22,5,0x56,You’ll be back when you understand the worth of [move].]
+MoveTutorText[]=[1,3,17,1,0x0D,Not many people come out here.\pIf I train here, I’m convinced that I’ll get stronger and stronger.\pYep, stronger and stronger…\pHow would you like to learn a strong move? It’s [move].]
+MoveTutorText[]=[2,3,22,6,0x0D,A hit of brutal ferocity!\pPacked with destructive power!\pWhen you get right down to it, [move] is the ultimate attack! Don’t you agree?\pOkay! I’ll teach it to your POKéMON!]
+MoveTutorText[]=[2,3,22,6,0x60,Now, we are soul mates in the way of [move]!\pYou should run before you’re seen by the deluded nitwit who trains only simple moves over there.]
+MoveTutorText[]=[2,3,22,6,0x56,You’ll come crawling back when you realize the value of [move].]
+MoveTutorText[]=[3,35,3,1,0x0D,Ready? Boing!\pWe’re having a wrestling match to see who wimps out first.\pIf you were to join us, you’d be squashed like a bug, though…\pHow about I teach [move] to a POKéMON of yours instead?]
+MoveTutorText[]=[3,35,3,1,0x30,Which POKéMON wants to learn how to [move]?]
+MoveTutorText[]=[4,1,40,13,0x0D,You should be proud of yourself, having battled your way through VICTORY ROAD so courageously.\pIn recognition of your feat, I’ll teach you [move].\pWould you like me to teach that technique?]
+MoveTutorText[]=[4,1,40,13,0x30,Which POKéMON should I teach [move]?]
+MoveTutorText[]=[5,10,2,1,0x0D,Oh, hi! I finally finished POKéMON.\pNot done yet? How about I teach you a good move?\pThe move I have in mind is [move].]
+MoveTutorText[]=[5,10,2,1,0x30,Which POKéMON should I teach [move] to?]
+MoveTutorText[]=[5,10,2,1,0x60,Are you using that [move] move I taught your POKéMON?]
+MoveTutorText[]=[6,6,0,6,0x0D,The secrets of space… The mysteries of earth…\pThere are so many things about which we know so little.\pBut that should spur us to study harder, not toss in the towel.\pThe only thing you should toss…\pWell, how about [move]? Should I teach that to a POKéMON?]
+MoveTutorText[]=[6,6,0,6,0x30,Which POKéMON wants to learn [move]?]
+MoveTutorText[]=[7,14,1,4,0x0B,Oh wow! A POKé DOLL!\pFor me? Thank you!\pYou know what? I can teach the move [move].]
+MoveTutorText[]=[7,14,1,4,0x2E,I really love [move]! Who’s going to learn it?]
+MoveTutorText[]=[7,14,1,4,0x5B,Don’t you like [move]?]
+MoveTutorText[]=[8,12,3,1,0x0D,Tch-tch-tch! I’ll teach you a nifty move.\pTeach it to a POKéMON, and watch the fun unfold!\pIt’s a move called [move]. Does it strike your fancy?]
+MoveTutorText[]=[8,12,3,1,0x60,Tch-tch-tch! That’s the sound of a metronome.\pIt inspired me to start teaching [move] to interested trainers.]
+MoveTutorText[]=[9,3,6,7,0x0D,Hello, there!\pI’ve seen you about, but I never had a chance to chat.\pIt must be good luck that brought us together finally.\pI’d like to celebrate by teaching you the move [move].]
+MoveTutorText[]=[9,3,6,7,0x30,So, who’s the POKéMON that gets the chance to learn [move]?]
+MoveTutorText[]=[10,3,1,1,0x0D,Yawn! I must have dozed off in the sun.\pI had this weird dream about a DROWZEE eating my dream.\pAnd… I learned how to teach [move]…\pOogh, this is too spooky!\pLet me teach it to a POKéMON so I can forget about it!]
+MoveTutorText[]=[10,3,1,1,0x30,Which POKéMON wants to learn [move]?]
+MoveTutorText[]=[11,1,48,5,0x0D,Eeek! No! Stop! Help!\pOh, you’re not with TEAM ROCKET. I’m sorry, I thought…\pWill you forgive me if I teach you the [move] technique?]
+MoveTutorText[]=[11,1,48,5,0x30,Which POKéMON should I teach [move]?]
+MoveTutorText[]=[11,1,48,5,0x60,[move] is a useful move, but it might not work on some POKéMON.]
+MoveTutorText[]=[11,1,48,5,0x56,Oh… But [move] is convenient…]
+MoveTutorText[]=[12,1,97,1,0x0D,Can you imagine? If this volcano were to erupt?\pThe explosion would be the end of us. How terrifying is that?\pWhile we’re terrified, would you like me to teach [move]?]
+MoveTutorText[]=[12,1,97,1,0x30,You’re terribly brave!\pWhich POKéMON should I teach [move]?]
+MoveTutorText[]=[12,1,97,1,0x60,Using [move] while on this volcano…\pWhat a terrifying thrill!]
+MoveTutorText[]=[13,1,82,9,0x0D,When you’re up on a rocky mountain like this, rockslides are a threat.\pCan you imagine? Boulders tumbling down on you?\pThat’d be, like, waaaaaaaaaaah! Total terror!\pYou don’t seem to be scared. Want to try using [move]?]
+MoveTutorText[]=[13,1,82,9,0x30,Which POKéMON should I teach [move]?]
+MoveTutorText[]=[14,3,7,15,0x0D,Aww, I wish I was a KANGASKHAN baby.\pI’d love to be a substitute for the baby…\pAnd snuggle in the mother KANGASKHAN’s belly pouch.\pBut only POKéMON can do that…\pOn an unrelated note, want me to teach [move] to one of your POKéMON?]
+MoveTutorText[]=[14,3,7,15,0x30,Which POKéMON wants to learn [move]?]
+MoveTutorText[]=[14,3,7,15,0x56,Oh, really? [move] seems so fun…]
+SpecialMusicStatics=[144,145,146,150,249,250,386]
+NewIndexToMusicTweak=musicfix/fr_musicfix_11
+NewIndexToMusicPoolOffset=0xA80140
+ShopItemOffsets=[0x16C130, 0x16EDE0, 0x16EDF8, 0x16EE14, 0x16EE34, 0x171B00, 0x171F70, 0x172540, 0x172BF8, 0x172EF4, 0x1733A0, 0x1733DC, 0x173498, 0x1734EC, 0x173524, 0x174D80, 0x1762B0, 0x17635C, 0x176844, 0x1783C0, 0x17911C, 0x17953C, 0x1796F4]
+SkipShops=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 19, 20, 21, 22]
+MainGameShops=[12, 13, 14]
+CRC32=A3FFB990
