@@ -89,18 +89,21 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 				if (!RandomizerSettings.isValid) {
 					scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_not_clean))
 				}
-				if (selectedIndex >= 0) {
+				SettingsPreset.entries.forEach {
 					try {
 						val dir = File("rnqs", romHacks[selectedIndex])
-						ctx.assets.list(dir.path)?.forEach {
-							val input = ctx.assets.openFd(File(dir, it).path).createInputStream()
-							SettingsPreset.valueOf(it.substringAfter(' ')).custom = Settings.read(input)
-							input.close()
-						}
+						val prefix = if ("Fire" in RandomizerSettings.romName) "FR" else "EM"
+						val settings = ctx.assets.openFd(File(dir, "$prefix ${it.name}.rnqs").path)
+						it.custom = Settings.read(settings.createInputStream())
+						settings.close()
 					} catch (e: IOException) {
 						Log.i(LOG_TAG, "Settings not found.", e)
+						it.custom = null
 					} catch (e: UnsupportedOperationException) {
 						Log.i(LOG_TAG, "Problem with settings file.", e)
+						it.custom = null
+					} catch (e: IndexOutOfBoundsException) {
+						it.custom = null
 					}
 				}
 			} else {
