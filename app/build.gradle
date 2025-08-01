@@ -122,6 +122,9 @@ android {
     lint {
         checkReleaseBuilds false
     }
+    androidResources {
+        noCompress 'rnqs'
+    }
 }
 
 dependencies {
