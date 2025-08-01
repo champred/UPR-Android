@@ -97,9 +97,6 @@ android {
         buildConfigField "int", "BERRY_COUNT_OLD", "54"
         buildConfigField "int", "BERRY_COUNT_NEW", "25"
     }
-    aaptOptions {
-        noCompress 'rnqs'
-    }
     buildTypes {
         release {
             minifyEnabled true
@@ -124,6 +121,9 @@ android {
     }
     lint {
         checkReleaseBuilds false
+    }
+    androidResources {
+        noCompress 'rnqs'
     }
 }
 
