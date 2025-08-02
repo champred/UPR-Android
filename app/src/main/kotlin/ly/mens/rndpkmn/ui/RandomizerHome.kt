@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.documentfile.provider.DocumentFile
 import com.dabomstew.pkrandom.Settings
 import com.dabomstew.pkrandom.RandomSource
@@ -76,6 +77,13 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	var selectedIndex by rememberSaveable { mutableStateOf(-1) }
 	val romHacks = remember { ctx.assets.list("roms") ?: arrayOf() }
 
+	val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+		if (!granted) {
+			scope.launch {
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.status_notif_missing))
+			}
+		}
+	}
 	val openLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
 		val name = DocumentFile.fromSingleUri(ctx, uri)!!.name ?: uri.lastPathSegment!!
@@ -130,6 +138,14 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			RandomizerSettings.reloadRomHandler()
 			romSaved = true
 			showProgress = false
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+				ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) !=
+				PackageManager.PERMISSION_GRANTED) {
+			permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+		}
+		with(OverwriteService) {
+			NotificationManagerCompat.from(ctx).notify(NOTIFICATION_ID, createNotification(ctx, uri))
 		}
 	}
 	val saveLogLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
@@ -231,7 +247,7 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 	val service = Intent(ctx, BatchService::class.java)
 
 	val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-		status = if (granted) R.string.status_batch_granted else R.string.status_batch_missing
+		status = if (granted) R.string.status_batch_granted else R.string.status_notif_missing
 	}
 
 	val batchLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->

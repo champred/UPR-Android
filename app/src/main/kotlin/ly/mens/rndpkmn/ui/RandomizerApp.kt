@@ -23,7 +23,8 @@ import ly.mens.rndpkmn.settings.SettingsCategory
 
 const val START_ROUTE = "GENERAL"
 const val MISC_ROUTE = "MISC"
-const val CHANNEL_ID = "BATCH_RANDO"
+const val CHANNEL_BATCH = "BATCH_RANDO"
+const val CHANNEL_LAST = "LAST_RANDO"
 const val LOG_TAG = "Randomizer"
 
 @Composable
@@ -131,5 +132,6 @@ fun RandomizerDrawerItem(label: String, isCurrent: Boolean, onClick: ()->Unit) {
 			.padding(8.dp),
 			style = MaterialTheme.typography.h5
 	)
+	Divider(thickness = 3.dp)
 }
 
