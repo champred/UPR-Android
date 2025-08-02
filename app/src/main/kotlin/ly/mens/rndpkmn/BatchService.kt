@@ -4,13 +4,7 @@ import android.app.Notification
 import android.app.Service
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.IBinder
-import android.os.Looper
-import android.os.Message
-import android.os.Process
+import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -21,7 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import ly.mens.rndpkmn.settings.RandomizerSettings
-import ly.mens.rndpkmn.ui.CHANNEL_ID
+import ly.mens.rndpkmn.ui.CHANNEL_BATCH
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.Semaphore
@@ -141,7 +135,7 @@ class BatchService : Service() {
 			serviceHandler = ServiceHandler(looper)
 		}
 		manager = NotificationManagerCompat.from(this)
-		builder = NotificationCompat.Builder(this, CHANNEL_ID).apply {
+		builder = NotificationCompat.Builder(this, CHANNEL_BATCH).apply {
 			setSmallIcon(R.drawable.ic_batch_save)
 			setContentTitle(getString(R.string.action_batch_random))
 			setContentText(getString(R.string.desc_batch))
