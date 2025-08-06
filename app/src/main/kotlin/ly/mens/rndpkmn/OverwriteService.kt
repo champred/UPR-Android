@@ -7,7 +7,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.*
+import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.documentfile.provider.DocumentFile
 import com.dabomstew.pkrandom.RandomSource
 import ly.mens.rndpkmn.settings.RandomizerSettings
@@ -31,6 +33,12 @@ class OverwriteService : Service() {
 				deleteFile(file.name)
 			}
 			stopForeground(STOP_FOREGROUND_DETACH)
+			try {
+				NotificationManagerCompat.from(this@OverwriteService)
+						.notify(NOTIFICATION_ID, createNotification(this@OverwriteService, uri))
+			} catch (e: SecurityException) {
+				Log.e(TAG, "Unable to display notification.", e)
+			}
 			stopSelf(msg.arg1)
 		}
 	}
@@ -45,7 +53,7 @@ class OverwriteService : Service() {
 	}
 
 	override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-		startForeground(NOTIFICATION_ID, createNotification(this, intent?.data))
+		startForeground(NOTIFICATION_ID, createNotification(this, intent?.data, true))
 		serviceHandler.obtainMessage().also { msg ->
 			msg.arg1 = startId
 			msg.obj = intent?.data
@@ -66,7 +74,8 @@ class OverwriteService : Service() {
 	companion object {
 		private const val TAG = "OverwriteService"
 		const val NOTIFICATION_ID = 420_69
-		fun createNotification(ctx: Context, uri: Uri?): Notification {
+		var runs = 0
+		fun createNotification(ctx: Context, uri: Uri?, running: Boolean = false): Notification {
 			val notifyIntent = Intent(ctx, OverwriteService::class.java).apply {
 				flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 				data = uri
@@ -80,6 +89,11 @@ class OverwriteService : Service() {
 				addAction(R.drawable.ic_batch_save, ctx.getString(R.string.action_save_rom), notifyPendingIntent)
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 					foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
+				}
+				if (running) {
+					runs++
+					setNumber(runs)
+					setProgress(runs, 0, true)
 				}
 			}
 			return builder.build()

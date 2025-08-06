@@ -123,6 +123,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
 		}
 		with(OverwriteService) {
+			runs = 0
 			NotificationManagerCompat.from(ctx).notify(NOTIFICATION_ID, createNotification(ctx, uri))
 		}
 	}
