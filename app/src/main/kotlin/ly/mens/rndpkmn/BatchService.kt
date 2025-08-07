@@ -36,12 +36,8 @@ class BatchService : Service() {
 			val end = msg.data.getInt("end", 10)
 			val saveLog = msg.data.getBoolean("saveLog")
 			val stateName = msg.data.getString("stateName")
-			val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-				msg.data.getParcelable("uri", Uri::class.java)
-			} else {
-				msg.data.getParcelable("uri")
-			}
-			val dir = DocumentFile.fromTreeUri(this@BatchService, uri!!)!!
+			val uri = msg.obj as? Uri
+			val dir = uri?.let { DocumentFile.fromTreeUri(this@BatchService, it) } ?: return stopSelf(msg.arg1)
 			val len = end - start + 1
 			val scope = CoroutineScope(job)
 
@@ -151,6 +147,7 @@ class BatchService : Service() {
 		serviceHandler.obtainMessage().also { msg ->
 			msg.arg1 = startId
 			msg.data = intent?.extras
+			msg.obj = intent?.data
 			serviceHandler.sendMessage(msg)
 		}
 		return START_NOT_STICKY

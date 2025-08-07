@@ -203,7 +203,7 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 	val scope = rememberCoroutineScope()
 
 	val ctx = LocalContext.current
-	val service = Intent(ctx, BatchService::class.java)
+	val service = remember { Intent(ctx, BatchService::class.java) }
 
 	val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
 		status = if (granted) R.string.status_batch_granted else R.string.status_notif_missing
@@ -228,8 +228,11 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 				putExtra("end", end)
 				putExtra("saveLog", saveLog)
 				putExtra("stateName", stateName)
-				putExtra("uri", uri)
+				data = uri
 				putExtra("suffix", name.substringAfterLast('.'))
+				addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+				addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+				addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
 			}
 			ctx.stopService(service) //cancel if already running
 			ctx.startForegroundService(service)

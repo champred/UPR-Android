@@ -78,7 +78,7 @@ class OverwriteService : Service() {
 		fun createNotification(ctx: Context, uri: Uri?, running: Boolean = false): Notification {
 			val notifyIntent = Intent(ctx, OverwriteService::class.java).apply {
 				flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-				data = uri
+				setDataAndType(uri, "application/octet-stream")
 			}
 			val notifyPendingIntent = PendingIntent.getService(ctx, 0, notifyIntent,
 					PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
