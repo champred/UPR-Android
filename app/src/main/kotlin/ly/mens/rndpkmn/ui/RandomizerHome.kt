@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
@@ -55,9 +56,7 @@ import java.io.File
 @Composable
 fun RandomizerHome(scaffold: ScaffoldState) {
 	val romName = rememberSaveable { mutableStateOf<String?>(null) }
-	Column(Modifier
-			.fillMaxWidth()
-			.verticalScroll(rememberScrollState())) {
+	Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
 		RomButtons(scaffold, romName)
 		DialogButtons(romName)
 		if (romName.value != null) ConfigFields(scaffold, romName)
@@ -237,9 +236,11 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 		openDialog.value = false
 		ctx.stopService(service) //cancel if still running
 	}) {
-		Column(Modifier
-				.background(MaterialTheme.colors.background)
-				.padding(8.dp,24.dp)) {
+		Column(Modifier.background(MaterialTheme.colors.background).padding(8.dp, 0.dp, 8.dp, 24.dp)) {
+			IconButton({
+				openDialog.value = false
+				ctx.stopService(service)
+			}, Modifier.align(Alignment.End)) { Icon(Icons.Filled.Close, null) }
 			TextField(prefix,
 					{ prefix = it },
 					Modifier.fillMaxWidth(),
@@ -294,9 +295,8 @@ fun NamesDialog(openDialog: MutableState<Boolean>, label: String, names: Mutable
 	val scope = rememberCoroutineScope()
 	var text by rememberSaveable { mutableStateOf(names.joinToString("\n")) }
 	Dialog({ openDialog.value = false }) {
-		Column(Modifier
-				.background(MaterialTheme.colors.background)
-				.padding(8.dp)) {
+		Column(Modifier.background(MaterialTheme.colors.background).padding(8.dp)) {
+			IconButton({ openDialog.value = false }, Modifier.align(Alignment.End)) { Icon(Icons.Filled.Close, null )}
 			TextField(text, { text = it }, label = { Text(label) }, maxLines = 10)
 			Button({
 				names.clear()
@@ -315,9 +315,8 @@ fun NamesDialog(openDialog: MutableState<Boolean>, label: String, names: Mutable
 @Composable
 fun LimitDialog(openDialog: MutableState<Boolean>) {
 	Dialog({ openDialog.value = false }) {
-		Column(Modifier
-				.background(MaterialTheme.colors.background)
-				.padding(8.dp)) {
+		Column(Modifier.background(MaterialTheme.colors.background).padding(8.dp)) {
+			IconButton({ openDialog.value = false }, Modifier.align(Alignment.End)) { Icon(Icons.Filled.Close, null )}
 			Text(stringResource(R.string.GenerationLimitDialog_includePokemonHeader))
 			with(RandomizerSettings.currentRestrictions) {
 				for (i in 1..RandomizerSettings.currentGen) {
