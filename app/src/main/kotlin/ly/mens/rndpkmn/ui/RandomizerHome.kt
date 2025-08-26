@@ -5,20 +5,19 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
@@ -42,8 +41,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
 import androidx.documentfile.provider.DocumentFile
+import com.dabomstew.pkrandom.Settings
 import com.dabomstew.pkrandom.RandomSource
 import com.dabomstew.pkrandom.SysConstants
+import com.dabomstew.pkrandom.romhandlers.Gen3RomHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ly.mens.rndpkmn.*
@@ -51,6 +52,7 @@ import ly.mens.rndpkmn.R
 import ly.mens.rndpkmn.settings.RandomizerSettings
 import ly.mens.rndpkmn.settings.SettingsPreset
 import java.io.File
+import java.io.IOException
 
 @Composable
 fun RandomizerHome(scaffold: ScaffoldState) {
@@ -70,6 +72,9 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	val scope = rememberCoroutineScope()
 	var romSaved by remember { mutableStateOf(false) }
 	var showProgress by remember { mutableStateOf(false) }
+	var expandList by remember { mutableStateOf(false) }
+	var selectedIndex by rememberSaveable { mutableStateOf(-1) }
+	val romHacks = remember { ctx.assets.list("roms") ?: arrayOf() }
 
 	val openLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
@@ -83,6 +88,23 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 				romSaved = false
 				if (!RandomizerSettings.isValid) {
 					scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_not_clean))
+				}
+				SettingsPreset.entries.forEach {
+					try {
+						val dir = File("rnqs", romHacks[selectedIndex])
+						val prefix = if ("Fire" in RandomizerSettings.romName) "FR" else "EM"
+						val settings = ctx.assets.openFd(File(dir, "$prefix ${it.name}.rnqs").path)
+						it.custom = Settings.read(settings.createInputStream())
+						settings.close()
+					} catch (e: IOException) {
+						Log.i(LOG_TAG, "Settings not found.", e)
+						it.custom = null
+					} catch (e: UnsupportedOperationException) {
+						Log.i(LOG_TAG, "Problem with settings file.", e)
+						it.custom = null
+					} catch (e: IndexOutOfBoundsException) {
+						it.custom = null
+					}
 				}
 			} else {
 				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_invalid_rom, file.name))
@@ -123,14 +145,34 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 
 	if (showProgress) LinearProgressIndicator(Modifier.fillMaxWidth().padding(vertical = 8.dp))
 	romFileName.value?.let { Text(stringResource(R.string.current_rom, it, RandomizerSettings.romName)) }
-
-	var dexCheckbox by remember { mutableStateOf(RandomizerSettings.useNatDex) }
 	Row(verticalAlignment = Alignment.CenterVertically) {
-		Checkbox(dexCheckbox, {
-			dexCheckbox = it
-			RandomizerSettings.useNatDex = it
-		})
-		Text(stringResource(R.string.nat_dex))
+		Text(stringResource(R.string.rom_hack))
+		Spacer(Modifier.width(5.dp))
+		Text(romHacks.getOrElse(selectedIndex) { stringResource(R.string.none) })
+		IconButton({ expandList = true }) { Icon(Icons.Filled.ArrowDropDown, null) }
+		DropdownMenu(expandList, { expandList = false }, Modifier.fillMaxWidth()) {
+			DropdownMenuItem({
+				expandList = false
+				selectedIndex = -1
+				RandomizerSettings.useNatDex = false
+				scope.launch(Dispatchers.IO) { Gen3RomHandler.loadROMInfo("gen3_offsets.ini") }
+			}) { Text(stringResource(R.string.none)) }
+			romHacks.forEachIndexed { index, s ->
+				DropdownMenuItem({
+					expandList = false
+					selectedIndex = index
+					scope.launch(Dispatchers.IO) {
+						val input = ctx.assets.open(File("roms", s).path)
+						val output = ctx.openFileOutput("custom_offsets.ini", 0)
+						input.copyTo(output)
+						input.close()
+						output.close()
+						Gen3RomHandler.loadROMInfo("custom_offsets.ini")
+						RandomizerSettings.useNatDex = s.startsWith("NatDex")//messy
+					}
+				}) { Text(s) }
+			}
+		}
 	}
 	Row(verticalAlignment = Alignment.CenterVertically) {
 		Button({

@@ -1,6 +1,8 @@
 package ly.mens.rndpkmn.settings
 
 import com.dabomstew.pkrandom.RandomSource
+import com.dabomstew.pkrandom.Settings
+import com.dabomstew.pkrandom.Version.VERSION
 import com.dabomstew.pkrandom.romhandlers.AbstractRomHandler
 import ly.mens.rndpkmn.BuildConfig
 import ly.mens.rndpkmn.makeTriple
@@ -47,6 +49,11 @@ enum class SettingsPreset {
 			field = value
 		}
 	open val preset: String? get() {
+		if (custom != null) {
+			AbstractRomHandler.useSmartAI = this === SUPER
+			selected = true
+			return "$VERSION$custom"
+		}
 		val name = RandomizerSettings.romName ?: return null
 		val prefix: String = when (RandomizerSettings.currentGen) {
 			1 -> "RBY"
@@ -68,6 +75,7 @@ enum class SettingsPreset {
 			AbstractRomHandler.useSmartAI = this === SUPER
 		}
 	}
+	var custom: Settings? = null
 
 	override fun toString(): String {
 		return "${name}: $selected"
