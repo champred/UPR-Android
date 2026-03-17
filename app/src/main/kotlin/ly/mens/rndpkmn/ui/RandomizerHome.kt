@@ -87,6 +87,9 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			showProgress = true
 			ctx.loadFromUri(uri, file)
 			if (file.isRomFile && RandomizerSettings.loadRom(file)) {
+				//make a copy of the ROM so it can be easily accessed for re-randomizing
+				val latestDir = ctx.getDir(".latest", Context.MODE_PRIVATE)
+				file.copyTo(File(latestDir, "rom"), overwrite = true)
 				romFileName.value = RandomizerSettings.romFileName
 				romSaved = false
 				if (!RandomizerSettings.isValid) {
@@ -113,6 +116,9 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			ctx.saveToUri(uri, file)
 			//clean up temporary file
 			ctx.deleteFile(file.name)
+			//make a copy of the settings so it can be easily accessed for re-randomizing
+			val latestDir = ctx.getDir(".latest", Context.MODE_PRIVATE)
+			File(latestDir, "settings").writeText(RandomizerSettings.versionString)
 			RandomizerSettings.reloadRomHandler()
 			romSaved = true
 			showProgress = false
