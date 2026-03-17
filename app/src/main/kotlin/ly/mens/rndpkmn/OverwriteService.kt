@@ -19,16 +19,51 @@ import java.io.File
 class OverwriteService : Service() {
 	private lateinit var serviceLooper: Looper
 	private lateinit var serviceHandler: Handler
+	private lateinit var serviceMessenger: Messenger
 
 	private inner class ServiceHandler(looper: Looper): Handler(looper) {
+		//allocate space to write ROM data in shared memory for sending to other processes
+		private val sharedMemory = SharedMemory.create("rom_data", 32*1024*1024)
 		override fun handleMessage(msg: Message) {
 			val uri = msg.obj as? Uri
+			Log.d(TAG, "Handling message for $uri")
 			if (uri != null) {
 				val name = DocumentFile.fromSingleUri(this@OverwriteService, uri)!!.name
 						?: uri.lastPathSegment!!
 				val file = File(filesDir, name)
+				//do initialization if app is not currently in memory
+				if (RandomizerSettings.handler == null) {
+					Log.d(TAG, "Loading latest configuration.")
+					val latestDir = getDir(".latest", Context.MODE_PRIVATE)
+					if (latestDir.list().isNullOrEmpty()) {
+						Log.d(TAG, "Latest directory is empty!")
+						toast(R.string.rom_not_loaded)
+					} else {
+						RandomizerSettings.loadRom(File(latestDir, "rom"))
+						RandomizerSettings.updateFromString(File(latestDir, "settings").readText())
+					}
+				}
 				if (RandomizerSettings.saveRom(file, RandomSource.pickSeed())) {
-					saveToUri(uri, file)
+					val romData = file.readBytes()
+					//check if the message expects to receive data in response
+					if (msg.replyTo == null) {
+						Log.d(TAG, "Saving to $file")
+						saveToUri(uri, file)
+						toast(R.string.rom_saved)
+					} else if (romData.size <= sharedMemory.size) {
+						Log.d(TAG, "Sending reply to ${msg.sendingUid}")
+						val buffer = sharedMemory.mapReadWrite()
+						buffer.put(romData)
+						val reply = Message.obtain().apply {
+							obj = sharedMemory
+							arg1 = romData.size
+						}
+						msg.replyTo.send(reply)
+						toast(R.string.rom_loaded)
+					} else {
+						Log.d(TAG, "Unable to send ROM data.")
+						toast(R.string.rom_not_saved)
+					}
 				}
 				deleteFile(file.name)
 			}
@@ -63,12 +98,10 @@ class OverwriteService : Service() {
 	}
 
 	override fun onBind(intent: Intent): IBinder? {
-		return null
-	}
-
-	override fun onDestroy() {
-		toast(R.string.rom_saved)
-		super.onDestroy()
+		if (!::serviceMessenger.isInitialized) {
+			serviceMessenger = Messenger(serviceHandler)
+		}
+		return serviceMessenger.binder
 	}
 
 	companion object {
@@ -80,7 +113,7 @@ class OverwriteService : Service() {
 				flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 				setDataAndType(uri, "application/octet-stream")
 			}
-			val notifyPendingIntent = PendingIntent.getService(ctx, 0, notifyIntent,
+			val notifyPendingIntent = PendingIntent.getForegroundService(ctx, 0, notifyIntent,
 					PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 			val builder = NotificationCompat.Builder(ctx, CHANNEL_LAST).apply {
 				setSmallIcon(R.drawable.ic_overwrite_last)
