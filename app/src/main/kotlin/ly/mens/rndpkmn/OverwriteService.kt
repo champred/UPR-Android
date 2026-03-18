@@ -50,6 +50,12 @@ class OverwriteService : Service() {
 						Log.d(TAG, "Saving to $file")
 						saveToUri(uri, file)
 						toast(R.string.rom_saved)
+						try {
+							NotificationManagerCompat.from(this@OverwriteService)
+							.notify(NOTIFICATION_ID, createNotification(this@OverwriteService, uri))
+						} catch (e: SecurityException) {
+							Log.e(TAG, "Unable to display notification.", e)
+						}
 					} else if (romData.size <= sharedMemory.size) {
 						Log.d(TAG, "Sending reply to ${msg.sendingUid}")
 						val buffer = sharedMemory.mapReadWrite()
@@ -64,17 +70,13 @@ class OverwriteService : Service() {
 						Log.d(TAG, "Unable to send ROM data.")
 						toast(R.string.rom_not_saved)
 					}
-				}
+				} else toast(R.string.error_save_failed)
 				deleteFile(file.name)
 			}
-			stopForeground(STOP_FOREGROUND_DETACH)
-			try {
-				NotificationManagerCompat.from(this@OverwriteService)
-						.notify(NOTIFICATION_ID, createNotification(this@OverwriteService, uri))
-			} catch (e: SecurityException) {
-				Log.e(TAG, "Unable to display notification.", e)
+			if (msg.replyTo == null) {//service not bound
+				stopForeground(STOP_FOREGROUND_DETACH)
+				stopSelf(msg.arg1)
 			}
-			stopSelf(msg.arg1)
 		}
 	}
 
