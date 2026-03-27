@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.documentfile.provider.DocumentFile
 import com.dabomstew.pkrandom.RandomSource
 import com.dabomstew.pkrandom.SysConstants
@@ -71,6 +72,13 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	var romSaved by remember { mutableStateOf(false) }
 	var showProgress by remember { mutableStateOf(false) }
 
+	val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+		if (!granted) {
+			scope.launch {
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.status_notif_missing))
+			}
+		}
+	}
 	val openLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
 		val name = DocumentFile.fromSingleUri(ctx, uri)!!.name ?: uri.lastPathSegment!!
@@ -79,6 +87,9 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			showProgress = true
 			ctx.loadFromUri(uri, file)
 			if (file.isRomFile && RandomizerSettings.loadRom(file)) {
+				//make a copy of the ROM so it can be easily accessed for re-randomizing
+				val latestDir = ctx.getDir(".latest", Context.MODE_PRIVATE)
+				file.copyTo(File(latestDir, "rom"), overwrite = true)
 				romFileName.value = RandomizerSettings.romFileName
 				romSaved = false
 				if (!RandomizerSettings.isValid) {
@@ -105,9 +116,21 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			ctx.saveToUri(uri, file)
 			//clean up temporary file
 			ctx.deleteFile(file.name)
+			//make a copy of the settings so it can be easily accessed for re-randomizing
+			val latestDir = ctx.getDir(".latest", Context.MODE_PRIVATE)
+			File(latestDir, "settings").writeText(RandomizerSettings.versionString)
 			RandomizerSettings.reloadRomHandler()
 			romSaved = true
 			showProgress = false
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+				ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) !=
+				PackageManager.PERMISSION_GRANTED) {
+			permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+		}
+		with(OverwriteService) {
+			runs = 0
+			NotificationManagerCompat.from(ctx).notify(NOTIFICATION_ID, createNotification(ctx, uri))
 		}
 	}
 	val saveLogLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
@@ -186,10 +209,10 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 	val scope = rememberCoroutineScope()
 
 	val ctx = LocalContext.current
-	val service = Intent(ctx, BatchService::class.java)
+	val service = remember { Intent(ctx, BatchService::class.java) }
 
 	val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-		status = if (granted) R.string.status_batch_granted else R.string.status_batch_missing
+		status = if (granted) R.string.status_batch_granted else R.string.status_notif_missing
 	}
 
 	val batchLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
@@ -211,8 +234,11 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 				putExtra("end", end)
 				putExtra("saveLog", saveLog)
 				putExtra("stateName", stateName)
-				putExtra("uri", uri)
+				data = uri
 				putExtra("suffix", name.substringAfterLast('.'))
+				addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+				addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+				addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
 			}
 			ctx.stopService(service) //cancel if already running
 			ctx.startForegroundService(service)
