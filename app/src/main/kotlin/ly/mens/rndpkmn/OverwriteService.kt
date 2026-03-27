@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.net.Uri
 import android.os.*
 import android.util.Log
@@ -95,7 +96,8 @@ class OverwriteService : Service() {
 	}
 
 	override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-		startForeground(NOTIFICATION_ID, createNotification(this, intent?.data, true))
+		val notify = createNotification(this, intent?.data, true)
+		startForeground(NOTIFICATION_ID, notify, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
 		serviceHandler.obtainMessage().also { msg ->
 			msg.arg1 = startId
 			msg.obj = intent?.data

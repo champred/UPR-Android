@@ -3,6 +3,7 @@ package ly.mens.rndpkmn
 import android.app.Notification
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.net.Uri
 import android.os.*
 import android.util.Log
@@ -13,6 +14,7 @@ import com.dabomstew.pkrandom.RandomSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import ly.mens.rndpkmn.settings.RandomizerSettings
 import ly.mens.rndpkmn.ui.CHANNEL_BATCH
@@ -142,8 +144,17 @@ class BatchService : Service() {
 		}
 	}
 
+	override fun onTimeout(startId: Int) {
+		super.onTimeout(startId)
+		job.cancel("Service timed out!")
+		stopForeground(STOP_FOREGROUND_REMOVE)
+		stopSelf(startId)
+	}
+
 	override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-		startForeground(NOTIFICATION_ID, builder.build())
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+			startForeground(NOTIFICATION_ID, builder.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE)
+		} else startForeground(NOTIFICATION_ID, builder.build())
 		serviceHandler.obtainMessage().also { msg ->
 			msg.arg1 = startId
 			msg.data = intent?.extras

@@ -14,14 +14,13 @@ Properties groupStrings = importStrings.groupBy {
 }
 
 android {
-    compileSdk 33
-    buildToolsVersion = "30.0.3"
+    compileSdk 34
     defaultConfig {
         applicationId "ly.mens.rndpkmn"
         minSdkVersion 29
-        targetSdkVersion 33
-        versionCode 34
-        versionName "0.6.0"
+        targetSdkVersion 34
+        versionCode 35
+        versionName "0.6.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         //add properties to resources
@@ -107,6 +106,7 @@ android {
     namespace 'ly.mens.rndpkmn'
     buildFeatures {
         compose true
+        buildConfig true
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
