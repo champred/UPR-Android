@@ -64,8 +64,13 @@ class OverwriteService : Service() {
 							obj = sharedMemory
 							arg1 = romData.size
 						}
-						msg.replyTo.send(reply)
-						toast(R.string.rom_loaded)
+						try {
+							msg.replyTo.send(reply)
+							toast(R.string.rom_loaded)
+						} catch (e: RemoteException) {
+							Log.d(TAG, "Unable to send ROM data.", e)
+							toast(R.string.rom_not_saved)
+						}
 					} else {
 						Log.d(TAG, "Unable to send ROM data.")
 						toast(R.string.rom_not_saved)
