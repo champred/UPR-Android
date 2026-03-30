@@ -53,6 +53,7 @@ import ly.mens.rndpkmn.R
 import ly.mens.rndpkmn.settings.RandomizerSettings
 import ly.mens.rndpkmn.settings.SettingsPreset
 import java.io.File
+import java.io.FileNotFoundException
 
 @Composable
 fun RandomizerHome(scaffold: ScaffoldState) {
@@ -84,7 +85,13 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		val file = File(ctx.filesDir, name)
 		scope.launch(Dispatchers.IO) {
 			showProgress = true
-			ctx.loadFromUri(uri, file)
+			try {
+				ctx.loadFromUri(uri, file)
+			} catch (e: FileNotFoundException) {
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_load_failed))
+				showProgress = false
+				return@launch
+			}
 			if (file.isRomFile && RandomizerSettings.loadRom(file)) {
 				//make a copy of the ROM so it can be easily accessed for re-randomizing
 				val latestDir = ctx.getDir(".latest", Context.MODE_PRIVATE)
@@ -112,12 +119,17 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 				showProgress = false
 				return@launch
 			}
-			ctx.saveToUri(uri, file)
+			try {
+				ctx.saveToUri(uri, file)
+			} catch (e: FileNotFoundException) {
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_save_failed))
+			}
 			//clean up temporary file
 			ctx.deleteFile(file.name)
 			//make a copy of the settings so it can be easily accessed for re-randomizing
 			val latestDir = ctx.getDir(".latest", Context.MODE_PRIVATE)
 			File(latestDir, "settings").writeText(RandomizerSettings.versionString)
+			File(latestDir, "name").writeText(file.name)
 			RandomizerSettings.reloadRomHandler()
 			romSaved = true
 			showProgress = false
@@ -170,7 +182,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		) { Text(stringResource(R.string.action_save_rom)) }
 		Text(stringResource(if (romSaved) R.string.rom_saved else R.string.rom_not_saved))
 	}
-	Button({ saveLogLauncher.launch("${romFileName.value!!.substringBefore('.')}.txt") },
+	Button({ saveLogLauncher.launch("${romFileName.value?.substringBefore('.') ?: "log"}.txt") },
 		Modifier.padding(8.dp)
 	) { Text(stringResource(R.string.action_save_log)) }
 }
@@ -254,7 +266,11 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 		stateName = DocumentFile.fromSingleUri(ctx, uri)!!.name ?: uri.lastPathSegment!!
 		val stateFile = File(ctx.filesDir, stateName!!)
 		scope.launch(Dispatchers.IO) {
-			ctx.loadFromUri(uri, stateFile)
+			try {
+				ctx.loadFromUri(uri, stateFile)
+			} catch (e: FileNotFoundException) {
+				ctx.toast(R.string.error_load_failed)
+			}
 		}
 	}
 

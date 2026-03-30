@@ -41,31 +41,38 @@ fun Context.toast(text: String, length: Int = Toast.LENGTH_LONG) {
 fun Context.renderText(@StringRes resId: Int) = renderText(getString(resId))
 fun renderText(text: String) = text.parseAsHtml()
 
+@Throws(FileNotFoundException::class)
 fun Context.loadFromUri(uri: Uri, file: File) {
     //copy selected file to app directory
     if (!file.exists()) {
-        openFileOutput(file.name, Context.MODE_PRIVATE).use {
-            val source = contentResolver.openInputStream(uri)
-            if (source != null) {
-                source.copyTo(it)
-                source.close()
+        try {
+            openFileOutput(file.name, Context.MODE_PRIVATE).use {
+                val source = contentResolver.openInputStream(uri)
+                if (source != null) {
+                    source.copyTo(it)
+                    source.close()
+                }
             }
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+            throw e
         }
     }
 }
 
+@Throws(FileNotFoundException::class)
 fun Context.saveToUri(uri: Uri, file: File) {
     //copy temporary file to selected path
-    contentResolver.openOutputStream(uri).use {
-        val source = try {
-            openFileInput(file.name)
-        } catch (e: FileNotFoundException) {
-            e.printStackTrace()
-            return
+    try {
+        contentResolver.openOutputStream(uri).use {
+            val source = openFileInput(file.name)
+            if (it != null) {
+                source.copyTo(it)
+            }
+            source.close()
         }
-        if (it != null) {
-            source.copyTo(it)
-        }
-        source.close()
+    } catch (e: FileNotFoundException) {
+        e.printStackTrace()
+        throw e
     }
 }

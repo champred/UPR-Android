@@ -20,6 +20,7 @@ import ly.mens.rndpkmn.settings.RandomizerSettings
 import ly.mens.rndpkmn.ui.CHANNEL_BATCH
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileNotFoundException
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -54,8 +55,14 @@ class BatchService : Service() {
 								stateName.substringAfter('.')
 						).fileName
 						val copyUri = dir.createFile("application/octet-stream", copyName)?.uri
-								?: return@launch
-						saveToUri(copyUri, stateFile)
+						try {
+							if (copyUri != null) {
+								saveToUri(copyUri, stateFile)
+							}
+						} catch (e: FileNotFoundException) {
+							toast(R.string.error_save_failed)
+							break
+						}
 					}
 				}
 			}
@@ -91,23 +98,28 @@ class BatchService : Service() {
 				).fileName)
 				val fileDoc = dir.createFile("application/octet-stream", file.name)
 				val log = if (saveLog) ByteArrayOutputStream(1024 * 1024) else null
-				val logUri = log?.let { dir.createFile("text/plain", "${file.name}.log.txt")?.uri }
-				if (!RandomizerSettings.saveRom(file, RandomSource.pickSeed(), log)) {
-					fileDoc?.delete()
-				} else if (fileDoc != null) {
-					saveToUri(fileDoc.uri, file)
-				}
-				//clean up temporary file
-				deleteFile(file.name)
-				if (logUri != null) {
-					contentResolver.openOutputStream(logUri).use {
-						if (it != null) {
-							log.writeTo(it)
+				val logUri = log?.let { dir.createFile("text/plain", "${file.name}.txt")?.uri }
+				try {
+					if (!RandomizerSettings.saveRom(file, RandomSource.pickSeed(), log)) {
+						fileDoc?.delete()
+					} else if (fileDoc != null) {
+						saveToUri(fileDoc.uri, file)
+					}
+					//clean up temporary file
+					deleteFile(file.name)
+					if (logUri != null) {
+						contentResolver.openOutputStream(logUri).use {
+							if (it != null) {
+								log.writeTo(it)
+							}
 						}
 					}
+				} catch (e: FileNotFoundException) {
+					toast(R.string.error_save_failed)
+				} finally {
+					//we can use this to synchronize on the number of ROMs saved
+					lock.release()
 				}
-				//we can use this to synchronize on the number of ROMs saved
-				lock.release()
 			}
 
 			if (numHandlers > 1) {

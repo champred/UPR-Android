@@ -16,6 +16,7 @@ import com.dabomstew.pkrandom.RandomSource
 import ly.mens.rndpkmn.settings.RandomizerSettings
 import ly.mens.rndpkmn.ui.CHANNEL_LAST
 import java.io.File
+import java.io.FileNotFoundException
 
 class OverwriteService : Service() {
 	private lateinit var serviceLooper: Looper
@@ -49,11 +50,14 @@ class OverwriteService : Service() {
 					//check if the message expects to receive data in response
 					if (msg.replyTo == null) {
 						Log.d(TAG, "Saving to $file")
-						saveToUri(uri, file)
-						toast(R.string.rom_saved)
 						try {
+							saveToUri(uri, file)
+							toast(R.string.rom_saved)
 							NotificationManagerCompat.from(this@OverwriteService)
-							.notify(NOTIFICATION_ID, createNotification(this@OverwriteService, uri))
+								.notify(NOTIFICATION_ID, createNotification(this@OverwriteService, uri))
+						} catch (e: FileNotFoundException) {
+							Log.e(TAG, "Failed to save!", e)
+							toast(R.string.rom_not_saved)
 						} catch (e: SecurityException) {
 							Log.e(TAG, "Unable to display notification.", e)
 						}
