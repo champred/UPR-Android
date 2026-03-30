@@ -49,5 +49,6 @@
 
     <string name="status_notif_missing">Cannot show notification.</string>
     <string name="status_batch_granted">See notification for progress. Close dialog to cancel.</string>
+    <string name="cannot_access_settings">Cannot access latest settings. Please randomize a ROM in the main screen.</string>
     <string name="empty" />
 </resources>
