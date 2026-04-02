@@ -32,7 +32,7 @@ object RandomizerSettings : Settings() {
 	)
 	private lateinit var romHandlerFactory: RomHandler.Factory
 	private lateinit var romHandler: RomHandler
-	val handler: RomHandler? get() = if (RandomizerSettings::romHandler.isInitialized) romHandler else null
+	val handler: RomHandler? get() = if (::romHandler.isInitialized) romHandler else null
 	private lateinit var inputFile: File
 	//allocate enough space to accommodate large logs
 	val outputLog = ByteArrayOutputStream(1024 * 1024)
@@ -51,21 +51,17 @@ object RandomizerSettings : Settings() {
 		val mem = rt.maxMemory() - (rt.totalMemory() - rt.freeMemory())
 		return (mem / inputFile.length() / 3L).toInt().coerceAtLeast(1)
 	}
-	val currentGen: Int
-		get() {
-			return if (RandomizerSettings::romHandler.isInitialized) {
-				if (useNatDex) 9
-				else romHandler.generationOfPokemon()
-			} else 0
-		}
-	val isValid: Boolean get() = if (RandomizerSettings::romHandler.isInitialized) romHandler.isRomValid else false
+	val currentGen get() = if (useNatDex) 9 else if (::romHandler.isInitialized) romHandler.generationOfPokemon() else 1
+	val isValid: Boolean get() = if (::romHandler.isInitialized) romHandler.isRomValid else false
 	var currentStarters: Triple<Pokemon?, Pokemon?, Pokemon?> = Triple(null, null, null)
 		set(value) {
 			val (first, second, third) = value
+			val getNum: Pokemon.()->Int = { number + 1 }
+			val index = (currentGen-1)*3
 			customStarters = intArrayOf(
-					first?.number?.plus(1) ?: 1,
-					second?.number?.plus(1) ?: 1,
-					third?.number?.plus(1) ?: 1
+					first?.getNum() ?: starters[index],
+					second?.getNum() ?: starters[index+1],
+					third?.getNum() ?: starters[index+2]
 			)
 			field = value
 		}
@@ -152,15 +148,19 @@ object RandomizerSettings : Settings() {
 			romHandlerFactory = romHandlerFactories.first { it.isLoadable(file.absolutePath) }
 			romHandler = createRomHandler(RandomSource.instance())
 			romName = romHandler.romName
+			currentStarters = makeTriple(*romHandler.starters.toTypedArray())
 		} catch (e: Exception) {
 			Log.e(TAG, "${file.name} cannot be loaded.", e)
 			return false
 		}
 
-		currentStarters = makeTriple(*(romHandler.starters?.toTypedArray() ?: arrayOfNulls(3)))
 		pokeTrie.clear()
-		for (i in 1 until romHandler.pokemon.size) {
-			pokeTrie.insert(romHandler.pokemon[i].name)
+		for (poke in romHandler.pokemon.drop(1)) {
+			pokeTrie.insert(poke.name)
+			if (romHandler.abilitiesPerPokemon() == 3 && poke.ability2 == 0) {
+				poke.ability2 = poke.ability3
+				poke.ability3 = 0
+			}
 		}
 
 		with (SettingsPrefix.STARTERS.props) {
