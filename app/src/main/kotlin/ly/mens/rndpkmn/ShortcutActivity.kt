@@ -8,22 +8,35 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.io.File
 
 class ShortcutActivity : ComponentActivity() {
 	private lateinit var launcher: ActivityResultLauncher<String>
+	private var selectedRom by mutableStateOf<String?>(null)
+	private var isDropdownExpanded by mutableStateOf(false)
+	private var romFilesList by mutableStateOf<List<String>>(emptyList())
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		val latestDir = getDir(".latest", MODE_PRIVATE)
+		
 		setContent {
 			// A surface container using the 'background' color from the theme
 			Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
@@ -34,13 +47,46 @@ class ShortcutActivity : ComponentActivity() {
 								MaterialTheme.colors.primary, 24.sp,
 								textAlign = TextAlign.Center)
 					} else {
-						Button(::chooseRomToSave, Modifier.align(Alignment.Center)) {
-							Text(getString(R.string.action_save_rom))
+						Column(
+							modifier = Modifier.align(Alignment.Center),
+							horizontalAlignment = Alignment.CenterHorizontally
+						) {
+							// Dropdown menu for ROM selection
+							Box {
+								Button(onClick = { isDropdownExpanded = true }) {
+									Text(selectedRom ?: getString(R.string.action_save_rom))
+								}
+								DropdownMenu(
+									expanded = isDropdownExpanded,
+									onDismissRequest = { isDropdownExpanded = false }
+								) {
+									romFilesList.forEach { romFile ->
+										DropdownMenuItem(onClick = {
+											selectedRom = romFile
+											isDropdownExpanded = false
+										}) {
+											Text(romFile)
+										}
+									}
+								}
+							}
+							
+							// Save button (only enabled when a ROM is selected)
+							Button(
+								onClick = { chooseRomToSave() },
+								enabled = selectedRom != null,
+								modifier = Modifier.padding(top = 16.dp)
+							) {
+								Text(getString(R.string.action_save_rom))
+							}
 						}
 					}
 				}
 			}
 		}
+		
+		// Load ROM files from the latest directory
+		romFilesList = latestDir.listFiles()?.map { it.name } ?: emptyList()
 	}
 
 	override fun onStart() {
@@ -60,9 +106,8 @@ class ShortcutActivity : ComponentActivity() {
 	}
 
 	private fun chooseRomToSave() {
-		val latestDir = getDir(".latest", MODE_PRIVATE)
-		val nameFile = File(latestDir, "name")
-		launcher.launch(nameFile.readText())
+		if (selectedRom != null) {
+			launcher.launch(selectedRom!!)
+		}
 	}
 }
-
