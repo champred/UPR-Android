@@ -40,6 +40,7 @@ fun Context.toast(text: String, length: Int = Toast.LENGTH_LONG) {
 
 fun Context.renderText(@StringRes resId: Int) = renderText(getString(resId))
 fun renderText(text: String) = text.parseAsHtml()
+val Context.quickloadDir: File get() = getDir(".quickload", Context.MODE_PRIVATE)
 
 @Throws(FileNotFoundException::class)
 fun Context.loadFromUri(uri: Uri, file: File) {

@@ -93,10 +93,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 				return@launch
 			}
 			if (file.isRomFile && RandomizerSettings.loadRom(file)) {
-				//make a copy of the ROM so it can be easily accessed for re-randomizing
-				val latestDir = ctx.getDir(".latest", Context.MODE_PRIVATE)
-				file.copyTo(File(latestDir, "rom"), overwrite = true)
-				romFileName.value = RandomizerSettings.romFileName
+				romFileName.value = RandomizerSettings.currentRom.fileName
 				romSaved = false
 				if (!RandomizerSettings.isValid) {
 					scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_not_clean))
@@ -111,7 +108,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		if (uri == null) return@rememberLauncherForActivityResult
 		val name = DocumentFile.fromSingleUri(ctx, uri)!!.name ?: uri.lastPathSegment!!
 		romFileName.value = name.substringAfter(':')
-		val file = File(ctx.filesDir, name)
+		val file = File(ctx.filesDir, romFileName.value!!)
 		scope.launch(Dispatchers.IO) {
 			showProgress = true
 			if (!RandomizerSettings.saveRom(file)) {
@@ -127,9 +124,9 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			//clean up temporary file
 			ctx.deleteFile(file.name)
 			//make a copy of the settings so it can be easily accessed for re-randomizing
-			val latestDir = ctx.getDir(".latest", Context.MODE_PRIVATE)
-			File(latestDir, "settings").writeText(RandomizerSettings.versionString)
-			File(latestDir, "name").writeText(file.name)
+			val quickloadFile = File(ctx.quickloadDir, name)
+			quickloadFile.writeText(RandomizerSettings.versionString)
+			quickloadFile.appendText("\n${RandomizerSettings.currentRom.first}.${file.extension}\n")
 			RandomizerSettings.reloadRomHandler()
 			romSaved = true
 			showProgress = false
@@ -466,15 +463,11 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	var seedText by rememberSaveable { mutableStateOf(RandomizerSettings.currentSeed.toString(16)) }
 	var seedBase by rememberSaveable { mutableStateOf(16) }
 	val updateName: ()->Unit = {
-		val name = RandomizerSettings.romFileName.let {
-			Triple(
-					it.substringBeforeLast('-'),
-					seedText,
-					it.substringAfterLast('.')
-			).fileName
+		val name = RandomizerSettings.currentRom.let { (base, _, ext) ->
+			Triple(base, seedText, ext)
 		}
-		RandomizerSettings.romFileName = name
-		romFileName.value = name
+		RandomizerSettings.currentRom = name
+		romFileName.value = name.fileName
 	}
 	val updateSeed: ()->Unit = {
 		keyCon?.hide()

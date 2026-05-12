@@ -35,14 +35,15 @@ class OverwriteService : Service() {
 				val file = File(filesDir, name)
 				//do initialization if app is not currently in memory
 				if (RandomizerSettings.handler == null) {
-					Log.d(TAG, "Loading latest configuration.")
-					val latestDir = getDir(".latest", Context.MODE_PRIVATE)
-					if (latestDir.list().isNullOrEmpty()) {
-						Log.d(TAG, "Latest directory is empty!")
+					Log.d(TAG, "Loading quickload configuration.")
+					val quickloadFile = File(quickloadDir, name)
+					if (!quickloadFile.exists()) {
+						Log.d(TAG, "Quickload file not found!")
 						toast(R.string.rom_not_loaded)
 					} else {
-						RandomizerSettings.loadRom(File(latestDir, "rom"))
-						RandomizerSettings.updateFromString(File(latestDir, "settings").readText())
+						val (settings, rom) = quickloadFile.readLines()
+						RandomizerSettings.loadRom(File(filesDir, rom))
+						RandomizerSettings.updateFromString(settings)
 					}
 				}
 				if (RandomizerSettings.saveRom(file, RandomSource.pickSeed())) {
