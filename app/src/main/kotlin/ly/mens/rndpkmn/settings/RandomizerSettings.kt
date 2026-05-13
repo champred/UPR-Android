@@ -91,11 +91,10 @@ object RandomizerSettings : Settings() {
 	var useNatDex = false
 		set(value) {
 			Gen3RomHandler.useNatDex = value
-			Gen3RomHandler.loadROMInfo(if (value) "nd_offsets.ini" else "gen3_offsets.ini")
 			field = value
 		}
 
-	private const val TAG = "Settings"
+	private const val TAG = "RandomizerSettings"
 
 	init {
 		this::class.memberProperties.filterNot {

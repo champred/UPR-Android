@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
                     it.deleteRecursively()
                 }
             }
+            deleteFile("custom_offsets.ini")
         }
         super.onDestroy()
     }
