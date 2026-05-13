@@ -130,7 +130,8 @@ fun Field.SettingsComponent(label: String, index: Int = -1, selectedIndex: Mutab
 								?: emptyList()
 						var selected by rememberSaveable { mutableStateOf(toggle?.get(RandomizerSettings).toString()) }
 						var expanded by remember { mutableStateOf(false) }
-						val width = (options.maxOf { it.toString().length } * MaterialTheme.typography.body2.fontSize.value).coerceAtLeast(48f)
+						val length = options.maxOfOrNull { it.toString().length } ?: return@Row
+						val width = (length * MaterialTheme.typography.body2.fontSize.value).coerceAtLeast(48f)
 						ExposedDropdownMenuBox(expanded, { expanded = !expanded }) {
 							TextField(selected, {}, Modifier.width(width.dp).offset(x = 2.dp), readOnly = true)
 							ExposedDropdownMenu(expanded, { expanded = false }) {
