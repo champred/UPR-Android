@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.documentfile.provider.DocumentFile
 import com.dabomstew.pkrandom.Settings
 import com.dabomstew.pkrandom.RandomSource
@@ -53,13 +55,12 @@ import ly.mens.rndpkmn.settings.RandomizerSettings
 import ly.mens.rndpkmn.settings.SettingsPreset
 import java.io.File
 import java.io.IOException
+import java.io.FileNotFoundException
 
 @Composable
 fun RandomizerHome(scaffold: ScaffoldState) {
 	val romName = rememberSaveable { mutableStateOf<String?>(null) }
-	Column(Modifier
-			.fillMaxWidth()
-			.verticalScroll(rememberScrollState())) {
+	Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
 		RomButtons(scaffold, romName)
 		DialogButtons(romName)
 		if (romName.value != null) ConfigFields(scaffold, romName)
@@ -76,15 +77,28 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	var selectedIndex by rememberSaveable { mutableStateOf(-1) }
 	val romHacks = remember { ctx.assets.list("roms") ?: arrayOf() }
 
+	val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+		if (!granted) {
+			scope.launch {
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.status_notif_missing))
+			}
+		}
+	}
 	val openLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
 		if (uri == null) return@rememberLauncherForActivityResult
 		val name = DocumentFile.fromSingleUri(ctx, uri)!!.name ?: uri.lastPathSegment!!
 		val file = File(ctx.filesDir, name)
 		scope.launch(Dispatchers.IO) {
 			showProgress = true
-			ctx.loadFromUri(uri, file)
+			try {
+				ctx.loadFromUri(uri, file)
+			} catch (e: FileNotFoundException) {
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_load_failed, file.name))
+				showProgress = false
+				return@launch
+			}
 			if (file.isRomFile && RandomizerSettings.loadRom(file)) {
-				romFileName.value = RandomizerSettings.romFileName
+				romFileName.value = RandomizerSettings.currentRom.fileName
 				romSaved = false
 				if (!RandomizerSettings.isValid) {
 					scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_not_clean))
@@ -116,20 +130,37 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		if (uri == null) return@rememberLauncherForActivityResult
 		val name = DocumentFile.fromSingleUri(ctx, uri)!!.name ?: uri.lastPathSegment!!
 		romFileName.value = name.substringAfter(':')
-		val file = File(ctx.filesDir, name)
+		val file = File(ctx.filesDir, romFileName.value!!)
 		scope.launch(Dispatchers.IO) {
 			showProgress = true
 			if (!RandomizerSettings.saveRom(file)) {
-				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_save_failed))
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_save_failed, file.name))
 				showProgress = false
 				return@launch
 			}
-			ctx.saveToUri(uri, file)
+			try {
+				ctx.saveToUri(uri, file)
+			} catch (e: FileNotFoundException) {
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_save_failed, file.name))
+			}
 			//clean up temporary file
 			ctx.deleteFile(file.name)
+			//make a copy of the settings so it can be easily accessed for re-randomizing
+			val quickloadFile = File(ctx.quickloadDir, name)
+			quickloadFile.writeText(RandomizerSettings.versionString)
+			quickloadFile.appendText("\n${RandomizerSettings.currentRom.first}.${file.extension}\n")
 			RandomizerSettings.reloadRomHandler()
 			romSaved = true
 			showProgress = false
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+				ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) !=
+				PackageManager.PERMISSION_GRANTED) {
+			permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+		}
+		with(OverwriteService) {
+			runs = 0
+			NotificationManagerCompat.from(ctx).notify(NOTIFICATION_ID, createNotification(ctx, uri))
 		}
 	}
 	val saveLogLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
@@ -190,7 +221,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		) { Text(stringResource(R.string.action_save_rom)) }
 		Text(stringResource(if (romSaved) R.string.rom_saved else R.string.rom_not_saved))
 	}
-	Button({ saveLogLauncher.launch("${romFileName.value!!.substringBefore('.')}.txt") },
+	Button({ saveLogLauncher.launch("${romFileName.value?.substringBefore('.') ?: "log"}.txt") },
 		Modifier.padding(8.dp)
 	) { Text(stringResource(R.string.action_save_log)) }
 }
@@ -228,10 +259,10 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 	val scope = rememberCoroutineScope()
 
 	val ctx = LocalContext.current
-	val service = Intent(ctx, BatchService::class.java)
+	val service = remember { Intent(ctx, BatchService::class.java) }
 
 	val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-		status = if (granted) R.string.status_batch_granted else R.string.status_batch_missing
+		status = if (granted) R.string.status_batch_granted else R.string.status_notif_missing
 	}
 
 	val batchLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
@@ -253,8 +284,11 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 				putExtra("end", end)
 				putExtra("saveLog", saveLog)
 				putExtra("stateName", stateName)
-				putExtra("uri", uri)
+				data = uri
 				putExtra("suffix", name.substringAfterLast('.'))
+				addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+				addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+				addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
 			}
 			ctx.stopService(service) //cancel if already running
 			ctx.startForegroundService(service)
@@ -271,7 +305,11 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 		stateName = DocumentFile.fromSingleUri(ctx, uri)!!.name ?: uri.lastPathSegment!!
 		val stateFile = File(ctx.filesDir, stateName!!)
 		scope.launch(Dispatchers.IO) {
-			ctx.loadFromUri(uri, stateFile)
+			try {
+				ctx.loadFromUri(uri, stateFile)
+			} catch (e: FileNotFoundException) {
+				ctx.toast(R.string.error_load_failed, stateFile.name)
+			}
 		}
 	}
 
@@ -279,9 +317,11 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 		openDialog.value = false
 		ctx.stopService(service) //cancel if still running
 	}) {
-		Column(Modifier
-				.background(MaterialTheme.colors.background)
-				.padding(8.dp,24.dp)) {
+		Column(Modifier.background(MaterialTheme.colors.background).padding(8.dp, 0.dp, 8.dp, 24.dp)) {
+			IconButton({
+				openDialog.value = false
+				ctx.stopService(service)
+			}, Modifier.align(Alignment.End)) { Icon(Icons.Filled.Close, null) }
 			TextField(prefix,
 					{ prefix = it },
 					Modifier.fillMaxWidth(),
@@ -336,9 +376,8 @@ fun NamesDialog(openDialog: MutableState<Boolean>, label: String, names: Mutable
 	val scope = rememberCoroutineScope()
 	var text by rememberSaveable { mutableStateOf(names.joinToString("\n")) }
 	Dialog({ openDialog.value = false }) {
-		Column(Modifier
-				.background(MaterialTheme.colors.background)
-				.padding(8.dp)) {
+		Column(Modifier.background(MaterialTheme.colors.background).padding(8.dp)) {
+			IconButton({ openDialog.value = false }, Modifier.align(Alignment.End)) { Icon(Icons.Filled.Close, null )}
 			TextField(text, { text = it }, label = { Text(label) }, maxLines = 10)
 			Button({
 				names.clear()
@@ -357,9 +396,8 @@ fun NamesDialog(openDialog: MutableState<Boolean>, label: String, names: Mutable
 @Composable
 fun LimitDialog(openDialog: MutableState<Boolean>) {
 	Dialog({ openDialog.value = false }) {
-		Column(Modifier
-				.background(MaterialTheme.colors.background)
-				.padding(8.dp)) {
+		Column(Modifier.background(MaterialTheme.colors.background).padding(8.dp)) {
+			IconButton({ openDialog.value = false }, Modifier.align(Alignment.End)) { Icon(Icons.Filled.Close, null )}
 			Text(stringResource(R.string.GenerationLimitDialog_includePokemonHeader))
 			with(RandomizerSettings.currentRestrictions) {
 				for (i in 1..RandomizerSettings.currentGen) {
@@ -467,15 +505,11 @@ fun ConfigFields(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 	var seedText by rememberSaveable { mutableStateOf(RandomizerSettings.currentSeed.toString(16)) }
 	var seedBase by rememberSaveable { mutableStateOf(16) }
 	val updateName: ()->Unit = {
-		val name = RandomizerSettings.romFileName.let {
-			Triple(
-					it.substringBeforeLast('-'),
-					seedText,
-					it.substringAfterLast('.')
-			).fileName
+		val name = RandomizerSettings.currentRom.let { (base, _, ext) ->
+			Triple(base, seedText, ext)
 		}
-		RandomizerSettings.romFileName = name
-		romFileName.value = name
+		RandomizerSettings.currentRom = name
+		romFileName.value = name.fileName
 	}
 	val updateSeed: ()->Unit = {
 		keyCon?.hide()

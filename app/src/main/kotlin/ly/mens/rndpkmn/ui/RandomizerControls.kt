@@ -1,18 +1,18 @@
 package ly.mens.rndpkmn.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,9 +23,7 @@ import com.dabomstew.pkrandom.MiscTweak
 import com.dabomstew.pkrandom.Settings
 import ly.mens.rndpkmn.R
 import ly.mens.rndpkmn.renderText
-import ly.mens.rndpkmn.settings.RandomizerSettings
-import ly.mens.rndpkmn.settings.SettingsCategory
-import ly.mens.rndpkmn.settings.SettingsPrefix
+import ly.mens.rndpkmn.settings.*
 import java.lang.reflect.Field
 
 @Composable
@@ -106,10 +104,10 @@ fun SettingsGroup(prefix: SettingsPrefix, subtitle: String, group: MutableMap<St
 @Composable
 fun HintDialog(text: MutableState<String>) {
 	Dialog({ text.value = "" }) {
-		Text(renderText(text.value).toString(), Modifier
-			.background(MaterialTheme.colors.background)
-			.padding(8.dp)
-		)
+		Column(Modifier.background(MaterialTheme.colors.background).padding(8.dp)) {
+			IconButton({ text.value = "" }, Modifier.align(Alignment.End)) { Icon(Icons.Filled.Close, null) }
+			Text(renderText(text.value).toString())
+		}
 	}
 }
 

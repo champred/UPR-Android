@@ -6,7 +6,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.dabomstew.pkrandom.Utils.testForRequiredConfigs
-import ly.mens.rndpkmn.ui.CHANNEL_ID
+import ly.mens.rndpkmn.ui.CHANNEL_BATCH
+import ly.mens.rndpkmn.ui.CHANNEL_LAST
 import ly.mens.rndpkmn.ui.RandomizerApp
 
 class MainActivity : ComponentActivity() {
@@ -17,16 +18,23 @@ class MainActivity : ComponentActivity() {
         if (BuildConfig.DEBUG) {
             testForRequiredConfigs()
         }
-        val channel = NotificationChannel(
-                CHANNEL_ID,
-                getString(R.string.action_batch_random),
-                NotificationManager.IMPORTANCE_LOW
-        ).apply {
-            description = getString(R.string.desc_batch)
+        with(getSystemService(NOTIFICATION_SERVICE) as NotificationManager) {
+            createNotificationChannel(NotificationChannel(
+                    CHANNEL_BATCH,
+                    getString(R.string.action_batch_random),
+                    NotificationManager.IMPORTANCE_LOW
+            ).apply {
+                description = getString(R.string.desc_batch)
+            })
+            createNotificationChannel(NotificationChannel(
+                    CHANNEL_LAST,
+                    getString(R.string.action_overwrite_rom),
+                    NotificationManager.IMPORTANCE_LOW
+            ).apply {
+                description = getString(R.string.desc_overwrite)
+            })
+            deleteNotificationChannel("69420") //leftover from something
         }
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
-        notificationManager.deleteNotificationChannel("69420")
         setContent { RandomizerApp() }
     }
 

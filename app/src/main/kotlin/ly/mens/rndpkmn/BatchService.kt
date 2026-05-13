@@ -3,14 +3,9 @@ package ly.mens.rndpkmn
 import android.app.Notification
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.net.Uri
-import android.os.Build
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.IBinder
-import android.os.Looper
-import android.os.Message
-import android.os.Process
+import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -19,11 +14,13 @@ import com.dabomstew.pkrandom.RandomSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import ly.mens.rndpkmn.settings.RandomizerSettings
-import ly.mens.rndpkmn.ui.CHANNEL_ID
+import ly.mens.rndpkmn.ui.CHANNEL_BATCH
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileNotFoundException
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -42,12 +39,8 @@ class BatchService : Service() {
 			val end = msg.data.getInt("end", 10)
 			val saveLog = msg.data.getBoolean("saveLog")
 			val stateName = msg.data.getString("stateName")
-			val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-				msg.data.getParcelable("uri", Uri::class.java)
-			} else {
-				msg.data.getParcelable("uri")
-			}
-			val dir = DocumentFile.fromTreeUri(this@BatchService, uri!!)!!
+			val uri = msg.obj as? Uri
+			val dir = uri?.let { DocumentFile.fromTreeUri(this@BatchService, it) } ?: return stopSelf(msg.arg1)
 			val len = end - start + 1
 			val scope = CoroutineScope(job)
 
@@ -62,8 +55,14 @@ class BatchService : Service() {
 								stateName.substringAfter('.')
 						).fileName
 						val copyUri = dir.createFile("application/octet-stream", copyName)?.uri
-								?: return@launch
-						saveToUri(copyUri, stateFile)
+						try {
+							if (copyUri != null) {
+								saveToUri(copyUri, stateFile)
+							}
+						} catch (e: FileNotFoundException) {
+							toast(R.string.error_save_failed, copyName)
+							break
+						}
 					}
 				}
 			}
@@ -99,23 +98,28 @@ class BatchService : Service() {
 				).fileName)
 				val fileDoc = dir.createFile("application/octet-stream", file.name)
 				val log = if (saveLog) ByteArrayOutputStream(1024 * 1024) else null
-				val logUri = log?.let { dir.createFile("text/plain", "${file.name}.log.txt")?.uri }
-				if (!RandomizerSettings.saveRom(file, RandomSource.pickSeed(), log)) {
-					fileDoc?.delete()
-				} else if (fileDoc != null) {
-					saveToUri(fileDoc.uri, file)
-				}
-				//clean up temporary file
-				deleteFile(file.name)
-				if (logUri != null) {
-					contentResolver.openOutputStream(logUri).use {
-						if (it != null) {
-							log.writeTo(it)
+				val logUri = log?.let { dir.createFile("text/plain", "${file.name}.txt")?.uri }
+				try {
+					if (!RandomizerSettings.saveRom(file, RandomSource.pickSeed(), log)) {
+						fileDoc?.delete()
+					} else if (fileDoc != null) {
+						saveToUri(fileDoc.uri, file)
+					}
+					//clean up temporary file
+					deleteFile(file.name)
+					if (logUri != null) {
+						contentResolver.openOutputStream(logUri).use {
+							if (it != null) {
+								log.writeTo(it)
+							}
 						}
 					}
+				} catch (e: FileNotFoundException) {
+					toast(R.string.error_save_failed, file.name)
+				} finally {
+					//we can use this to synchronize on the number of ROMs saved
+					lock.release()
 				}
-				//we can use this to synchronize on the number of ROMs saved
-				lock.release()
 			}
 
 			if (numHandlers > 1) {
@@ -141,7 +145,7 @@ class BatchService : Service() {
 			serviceHandler = ServiceHandler(looper)
 		}
 		manager = NotificationManagerCompat.from(this)
-		builder = NotificationCompat.Builder(this, CHANNEL_ID).apply {
+		builder = NotificationCompat.Builder(this, CHANNEL_BATCH).apply {
 			setSmallIcon(R.drawable.ic_batch_save)
 			setContentTitle(getString(R.string.action_batch_random))
 			setContentText(getString(R.string.desc_batch))
@@ -152,11 +156,21 @@ class BatchService : Service() {
 		}
 	}
 
+	override fun onTimeout(startId: Int) {
+		super.onTimeout(startId)
+		job.cancel("Service timed out!")
+		stopForeground(STOP_FOREGROUND_REMOVE)
+		stopSelf(startId)
+	}
+
 	override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-		startForeground(NOTIFICATION_ID, builder.build())
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+			startForeground(NOTIFICATION_ID, builder.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE)
+		} else startForeground(NOTIFICATION_ID, builder.build())
 		serviceHandler.obtainMessage().also { msg ->
 			msg.arg1 = startId
 			msg.data = intent?.extras
+			msg.obj = intent?.data
 			serviceHandler.sendMessage(msg)
 		}
 		return START_NOT_STICKY

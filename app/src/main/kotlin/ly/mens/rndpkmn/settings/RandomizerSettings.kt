@@ -71,7 +71,7 @@ object RandomizerSettings : Settings() {
 		}
 	val pokeTrie = Trie()
 	var currentSeed by Delegates.notNull<Long>()
-	lateinit var romFileName: String
+	lateinit var currentRom: Triple<String, String, String>
 	val versionString: String get() = "$VERSION$this"
 	val selections: MutableMap<Field?, List<Any>> = mutableMapOf()
 	val nameLists: List<Pair<String, MutableList<String>>>
@@ -142,11 +142,11 @@ object RandomizerSettings : Settings() {
 	fun loadRom(file: File): Boolean {
 		inputFile = file
 		currentSeed = RandomSource.pickSeed()
-		romFileName = Triple(
+		currentRom = Triple(
 				file.nameWithoutExtension.substringAfter(':'),
 				currentSeed.toString(16),
 				file.extension
-		).fileName
+		)
 		try {
 			romHandlerFactory = romHandlerFactories.first { it.isLoadable(file.absolutePath) }
 			romHandler = createRomHandler(RandomSource.instance())
@@ -230,6 +230,7 @@ object RandomizerSettings : Settings() {
 	}
 
 	private fun createRomHandler(rand: Random): RomHandler {
+		if (!::romHandlerFactory.isInitialized) throw Exception("Factory not initialized!")
 		return romHandlerFactory.create(rand).apply {
 			val loaded = loadRom(inputFile.absolutePath)
 			if (!loaded) {
