@@ -231,6 +231,7 @@ object RandomizerSettings : Settings() {
 	}
 
 	private fun createRomHandler(rand: Random): RomHandler {
+		if (!::romHandlerFactory.isInitialized) throw Exception("Factory not initialized!")
 		return romHandlerFactory.create(rand).apply {
 			val loaded = loadRom(inputFile.absolutePath)
 			if (!loaded) {

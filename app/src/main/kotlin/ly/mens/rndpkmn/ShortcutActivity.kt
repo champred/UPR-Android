@@ -35,16 +35,15 @@ class ShortcutActivity : ComponentActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		val latestDir = getDir(".latest", MODE_PRIVATE)
-		
+
 		setContent {
 			// A surface container using the 'background' color from the theme
 			Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
 				Box {
-					if (latestDir.list().isNullOrEmpty()) {
-						Text(getString(R.string.cannot_access_settings),
+					if (quickloadDir.list().isNullOrEmpty()) {
+						Text(getString(R.string.quickload_warning),
 								Modifier.align(Alignment.Center),
-								MaterialTheme.colors.primary, 24.sp,
+								MaterialTheme.colors.error, 24.sp,
 								textAlign = TextAlign.Center)
 					} else {
 						Column(
@@ -54,7 +53,7 @@ class ShortcutActivity : ComponentActivity() {
 							// Dropdown menu for ROM selection
 							Box {
 								Button(onClick = { isDropdownExpanded = true }) {
-									Text(selectedRom ?: getString(R.string.action_save_rom))
+									Text(selectedRom ?: getString(R.string.action_overwrite_rom))
 								}
 								DropdownMenu(
 									expanded = isDropdownExpanded,
@@ -70,23 +69,27 @@ class ShortcutActivity : ComponentActivity() {
 									}
 								}
 							}
-							
+
 							// Save button (only enabled when a ROM is selected)
 							Button(
-								onClick = { chooseRomToSave() },
+								onClick = { launcher.launch(selectedRom ?: "") },
 								enabled = selectedRom != null,
 								modifier = Modifier.padding(top = 16.dp)
 							) {
 								Text(getString(R.string.action_save_rom))
 							}
+							Text(getString(R.string.quickload_info),
+									color = MaterialTheme.colors.primary,
+									fontSize = 24.sp,
+									textAlign = TextAlign.Center)
 						}
 					}
 				}
 			}
 		}
-		
+
 		// Load ROM files from the latest directory
-		romFilesList = latestDir.listFiles()?.map { it.name } ?: emptyList()
+		romFilesList = quickloadDir.listFiles()?.map { it.name } ?: emptyList()
 	}
 
 	override fun onStart() {
@@ -105,9 +108,4 @@ class ShortcutActivity : ComponentActivity() {
 		super.onDestroy()
 	}
 
-	private fun chooseRomToSave() {
-		if (selectedRom != null) {
-			launcher.launch(selectedRom!!)
-		}
-	}
 }

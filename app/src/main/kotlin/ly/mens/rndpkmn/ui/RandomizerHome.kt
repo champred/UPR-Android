@@ -88,7 +88,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			try {
 				ctx.loadFromUri(uri, file)
 			} catch (e: FileNotFoundException) {
-				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_load_failed))
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_load_failed, file.name))
 				showProgress = false
 				return@launch
 			}
@@ -112,14 +112,14 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 		scope.launch(Dispatchers.IO) {
 			showProgress = true
 			if (!RandomizerSettings.saveRom(file)) {
-				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_save_failed))
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_save_failed, file.name))
 				showProgress = false
 				return@launch
 			}
 			try {
 				ctx.saveToUri(uri, file)
 			} catch (e: FileNotFoundException) {
-				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_save_failed))
+				scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_save_failed, file.name))
 			}
 			//clean up temporary file
 			ctx.deleteFile(file.name)
@@ -266,7 +266,7 @@ fun BatchDialog(openDialog: MutableState<Boolean>, romFileName: MutableState<Str
 			try {
 				ctx.loadFromUri(uri, stateFile)
 			} catch (e: FileNotFoundException) {
-				ctx.toast(R.string.error_load_failed)
+				ctx.toast(R.string.error_load_failed, stateFile.name)
 			}
 		}
 	}

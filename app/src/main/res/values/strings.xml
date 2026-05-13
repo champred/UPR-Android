@@ -37,8 +37,8 @@
     <string name="error_invalid_rom">Invalid ROM: %1$s</string>
     <string name="error_invalid_settings">Invalid Settings String</string>
     <string name="error_invalid_seed">Invalid Seed Number</string>
-    <string name="error_save_failed">Unable to save file.</string>
-    <string name="error_load_failed">Unable to load file.</string>
+    <string name="error_save_failed">Unable to save %1$s. Please check the name.</string>
+    <string name="error_load_failed">Unable to load %1$s. Please check the name.</string>
     <string name="error_not_clean">The loaded ROM is not clean.</string>
     <string name="error_no_preset">No preset found for current ROM.</string>
 
@@ -49,6 +49,7 @@
 
     <string name="status_notif_missing">Cannot show notification.</string>
     <string name="status_batch_granted">See notification for progress. Close dialog to cancel.</string>
-    <string name="cannot_access_settings">Cannot access latest settings. Please randomize a ROM in the main screen.</string>
+    <string name="quickload_warning">Cannot access quickload settings. Please set it up first.</string>
+    <string name="quickload_info">Android may attempt to append a numeric suffix to the filename. To get around this, you must manually select the file in the browser before saving.</string>
     <string name="empty" />
 </resources>

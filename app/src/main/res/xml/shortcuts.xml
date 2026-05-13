@@ -7,7 +7,7 @@
 		 android:icon="@drawable/ic_shortcut_foreground"
 	     android:shortcutShortLabel="@string/action_overwrite_rom"
 	     android:shortcutLongLabel="@string/desc_overwrite"
-	     android:shortcutDisabledMessage="@string/cannot_access_settings">
+	     android:shortcutDisabledMessage="@string/quickload_warning">
 	     <intent
 	         android:action="android.intent.action.VIEW"
 	         android:targetClass="ly.mens.rndpkmn.ShortcutActivity"

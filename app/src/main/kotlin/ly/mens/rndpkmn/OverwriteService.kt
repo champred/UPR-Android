@@ -30,7 +30,7 @@ class OverwriteService : Service() {
 			val uri = msg.obj as? Uri
 			Log.d(TAG, "Handling message for $uri")
 			if (uri != null) {
-				val name = DocumentFile.fromSingleUri(this@OverwriteService, uri)!!.name
+				var name = DocumentFile.fromSingleUri(this@OverwriteService, uri)!!.name
 						?: uri.lastPathSegment!!
 				val file = File(filesDir, name)
 				//do initialization if app is not currently in memory
@@ -39,11 +39,12 @@ class OverwriteService : Service() {
 					val quickloadFile = File(quickloadDir, name)
 					if (!quickloadFile.exists()) {
 						Log.d(TAG, "Quickload file not found!")
-						toast(R.string.rom_not_loaded)
+						toast(R.string.quickload_warning)
 					} else {
 						val (settings, rom) = quickloadFile.readLines()
 						RandomizerSettings.loadRom(File(filesDir, rom))
 						RandomizerSettings.updateFromString(settings)
+						name = rom
 					}
 				}
 				if (RandomizerSettings.saveRom(file, RandomSource.pickSeed())) {
@@ -75,13 +76,13 @@ class OverwriteService : Service() {
 							toast(R.string.rom_loaded)
 						} catch (e: RemoteException) {
 							Log.d(TAG, "Unable to send ROM data.", e)
-							toast(R.string.rom_not_saved)
+							toast(R.string.rom_not_loaded)
 						}
 					} else {
 						Log.d(TAG, "Unable to send ROM data.")
-						toast(R.string.rom_not_saved)
+						toast(R.string.error_load_failed, name)
 					}
-				} else toast(R.string.error_save_failed)
+				} else toast(R.string.error_save_failed, file.name)
 				deleteFile(file.name)
 			}
 			if (msg.replyTo == null) {//service not bound

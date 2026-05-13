@@ -60,7 +60,7 @@ class BatchService : Service() {
 								saveToUri(copyUri, stateFile)
 							}
 						} catch (e: FileNotFoundException) {
-							toast(R.string.error_save_failed)
+							toast(R.string.error_save_failed, copyName)
 							break
 						}
 					}
@@ -115,7 +115,7 @@ class BatchService : Service() {
 						}
 					}
 				} catch (e: FileNotFoundException) {
-					toast(R.string.error_save_failed)
+					toast(R.string.error_save_failed, file.name)
 				} finally {
 					//we can use this to synchronize on the number of ROMs saved
 					lock.release()
