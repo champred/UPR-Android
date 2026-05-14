@@ -52,6 +52,7 @@ fun Context.loadCustomOffsets(hack: String) {
     input.copyTo(output)
     input.close()
     output.close()
+    System.setProperty("pkrandom.root", filesDir.path)
     Gen3RomHandler.loadROMInfo("custom_offsets.ini")
     RandomizerSettings.hackName = hack
 }

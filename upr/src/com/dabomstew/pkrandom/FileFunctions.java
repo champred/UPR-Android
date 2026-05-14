@@ -69,7 +69,7 @@ public class FileFunctions {
 
     public static boolean configExists(String filename) {
         if (overrideFiles.contains(filename)) {
-            File fh = new File(SysConstants.ROOT_PATH + filename);
+            File fh = new File(SysConstants.getRootPath() + filename);
             if (fh.exists() && fh.canRead()) {
                 return true;
             }
@@ -83,7 +83,7 @@ public class FileFunctions {
 
     public static InputStream openConfig(String filename) throws FileNotFoundException {
         if (overrideFiles.contains(filename)) {
-            File fh = new File(SysConstants.ROOT_PATH + filename);
+            File fh = new File(SysConstants.getRootPath() + filename);
             if (fh.exists() && fh.canRead()) {
                 return new FileInputStream(fh);
             }

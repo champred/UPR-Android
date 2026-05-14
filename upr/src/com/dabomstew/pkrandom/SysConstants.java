@@ -45,7 +45,7 @@ public class SysConstants {
     public static final String tclassesFile = "trainerclasses.txt";
     public static final String nnamesFile = "nicknames.txt";
 
-    private static String getRootPath() {
+    static String getRootPath() {
         String customRoot = System.getProperty("pkrandom.root");
         if (customRoot != null) {
             return customRoot + File.separator;

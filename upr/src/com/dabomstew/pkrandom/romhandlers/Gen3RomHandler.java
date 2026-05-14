@@ -131,8 +131,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     public static boolean useNatDex = false;
 
     static {
-        if (useNatDex) loadROMInfo("nd_offsets.ini");
-        else if (FileFunctions.configExists("custom_offsets.ini"))
+        if (FileFunctions.configExists("custom_offsets.ini"))
             loadROMInfo("custom_offsets.ini");
         else loadROMInfo("gen3_offsets.ini");
     }
@@ -917,7 +916,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 moves[i].category = MoveCategory.values()[mask - 1];
                 isRomHack = true;
             }
-            
+
             if (i == Moves.swift) {
                 perfectAccuracy = (int)moves[i].hitratio;
             }
