@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -32,6 +33,8 @@ class ShortcutActivity : ComponentActivity() {
 	private var selectedRom by mutableStateOf<String?>(null)
 	private var isDropdownExpanded by mutableStateOf(false)
 	private var romFilesList by mutableStateOf<List<String>>(emptyList())
+	private var showDeleteDialog by mutableStateOf(false)
+	private var showClearDialog by mutableStateOf(false)
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -78,11 +81,79 @@ class ShortcutActivity : ComponentActivity() {
 							) {
 								Text(getString(R.string.action_save_rom))
 							}
+
+							// Delete selected profile button
+							Button(
+								onClick = { showDeleteDialog = true },
+								enabled = selectedRom != null,
+								modifier = Modifier.padding(top = 8.dp)
+							) {
+								Text(getString(R.string.action_delete_profile))
+							}
+
+							// Clear all configurations button
+							Button(
+								onClick = { showClearDialog = true },
+								enabled = romFilesList.isNotEmpty(),
+								modifier = Modifier.padding(top = 8.dp)
+							) {
+								Text(getString(R.string.action_clear_all))
+							}
+
 							Text(getString(R.string.quickload_info),
 									color = MaterialTheme.colors.primary,
 									fontSize = 24.sp,
-									textAlign = TextAlign.Center)
+									textAlign = TextAlign.Center,
+									modifier = Modifier.padding(top = 16.dp))
 						}
+					}
+
+					// Delete confirmation dialog
+					if (showDeleteDialog) {
+						AlertDialog(
+							onDismissRequest = { showDeleteDialog = false },
+							title = { Text(getString(R.string.confirm_delete_title)) },
+							text = { Text(getString(R.string.confirm_delete_profile, selectedRom ?: "")) },
+							confirmButton = {
+								Button(onClick = {
+									selectedRom?.let { deleteProfile(it) }
+									showDeleteDialog = false
+									selectedRom = null
+									romFilesList = quickloadDir.listFiles()?.map { it.name } ?: emptyList()
+								}) {
+									Text(getString(R.string.action_delete))
+								}
+							},
+							dismissButton = {
+								Button(onClick = { showDeleteDialog = false }) {
+									Text(getString(R.string.action_cancel))
+								}
+							}
+						)
+					}
+
+					// Clear all confirmation dialog
+					if (showClearDialog) {
+						AlertDialog(
+							onDismissRequest = { showClearDialog = false },
+							title = { Text(getString(R.string.confirm_clear_title)) },
+							text = { Text(getString(R.string.confirm_clear_message)) },
+							confirmButton = {
+								Button(onClick = {
+									clearAllProfiles()
+									showClearDialog = false
+									selectedRom = null
+									romFilesList = emptyList()
+								}) {
+									Text(getString(R.string.action_clear))
+								}
+							},
+							dismissButton = {
+								Button(onClick = { showClearDialog = false }) {
+									Text(getString(R.string.action_cancel))
+								}
+							}
+						)
 					}
 				}
 			}
@@ -90,6 +161,21 @@ class ShortcutActivity : ComponentActivity() {
 
 		// Load ROM files from the latest directory
 		romFilesList = quickloadDir.listFiles()?.map { it.name } ?: emptyList()
+	}
+
+	private fun deleteProfile(profileName: String) {
+		val file = File(quickloadDir, profileName)
+		if (file.exists()) {
+			file.delete()
+		}
+	}
+
+	private fun clearAllProfiles() {
+		quickloadDir.listFiles()?.forEach { file ->
+			if (file.isFile) {
+				file.delete()
+			}
+		}
 	}
 
 	override fun onStart() {
