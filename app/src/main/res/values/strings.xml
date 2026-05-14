@@ -11,6 +11,11 @@
     <string name="action_choose_dir">Choose Directory</string>
     <string name="action_choose_state">Choose Savestate</string>
     <string name="action_overwrite_rom">Overwrite ROM</string>
+    <string name="action_delete_profile">Delete Profile</string>
+    <string name="action_clear_all">Clear All Configurations</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_clear">Clear</string>
 
     <string name="rom_loaded">ROM Loaded</string>
     <string name="rom_not_loaded">ROM Not Loaded</string>
@@ -52,5 +57,11 @@
     <string name="status_batch_granted">See notification for progress. Close dialog to cancel.</string>
     <string name="quickload_warning">Cannot access quickload settings. Please set it up first.</string>
     <string name="quickload_info">Android may attempt to append a numeric suffix to the filename. To get around this, you must manually select the file in the browser before saving.</string>
+    
+    <string name="confirm_delete_title">Delete Profile</string>
+    <string name="confirm_delete_profile">Delete profile "%1$s"? This action cannot be undone.</string>
+    <string name="confirm_clear_title">Clear All Configurations</string>
+    <string name="confirm_clear_message">Delete all profiles and configurations? This action cannot be undone.</string>
+    
     <string name="empty" />
 </resources>
