@@ -6,8 +6,11 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.text.parseAsHtml
 import com.dabomstew.pkrandom.Utils
+import com.dabomstew.pkrandom.romhandlers.Gen3RomHandler
+import ly.mens.rndpkmn.settings.RandomizerSettings
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.IOException
 import java.lang.reflect.Field
 
 val Field.id get() = name.replaceFirstChar { it.uppercase() }
@@ -42,7 +45,18 @@ fun Context.renderText(@StringRes resId: Int) = renderText(getString(resId))
 fun renderText(text: String) = text.parseAsHtml()
 val Context.quickloadDir: File get() = getDir(".quickload", Context.MODE_PRIVATE)
 
-@Throws(FileNotFoundException::class)
+@Throws(IOException::class)
+fun Context.loadCustomOffsets(hack: String) {
+    val input = assets.open(File("roms", hack).path)
+    val output = openFileOutput("custom_offsets.ini", 0)
+    input.copyTo(output)
+    input.close()
+    output.close()
+    Gen3RomHandler.loadROMInfo("custom_offsets.ini")
+    RandomizerSettings.hackName = hack
+}
+
+@Throws(IOException::class)
 fun Context.loadFromUri(uri: Uri, file: File) {
     //copy selected file to app directory
     if (!file.exists()) {
@@ -61,7 +75,7 @@ fun Context.loadFromUri(uri: Uri, file: File) {
     }
 }
 
-@Throws(FileNotFoundException::class)
+@Throws(IOException::class)
 fun Context.saveToUri(uri: Uri, file: File) {
     //copy temporary file to selected path
     try {

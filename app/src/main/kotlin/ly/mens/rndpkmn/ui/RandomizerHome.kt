@@ -149,6 +149,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			val quickloadFile = File(ctx.quickloadDir, name)
 			quickloadFile.writeText(RandomizerSettings.versionString)
 			quickloadFile.appendText("\n${RandomizerSettings.currentRom.first}.${file.extension}\n")
+			RandomizerSettings.hackName?.let { quickloadFile.appendText(it) }
 			RandomizerSettings.reloadRomHandler()
 			romSaved = true
 			showProgress = false
@@ -185,23 +186,15 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 			DropdownMenuItem({
 				expandList = false
 				selectedIndex = -1
-				RandomizerSettings.useNatDex = false
+				RandomizerSettings.hackName = null
 				scope.launch(Dispatchers.IO) { Gen3RomHandler.loadROMInfo("gen3_offsets.ini") }
 			}) { Text(stringResource(R.string.none)) }
-			romHacks.forEachIndexed { index, s ->
+			romHacks.forEachIndexed { index, name ->
 				DropdownMenuItem({
 					expandList = false
 					selectedIndex = index
-					scope.launch(Dispatchers.IO) {
-						val input = ctx.assets.open(File("roms", s).path)
-						val output = ctx.openFileOutput("custom_offsets.ini", 0)
-						input.copyTo(output)
-						input.close()
-						output.close()
-						Gen3RomHandler.loadROMInfo("custom_offsets.ini")
-						RandomizerSettings.useNatDex = s.startsWith("NatDex")//messy
-					}
-				}) { Text(s) }
+					scope.launch(Dispatchers.IO) { ctx.loadCustomOffsets(name) }
+				}) { Text(name) }
 			}
 		}
 	}

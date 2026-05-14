@@ -41,7 +41,8 @@ class OverwriteService : Service() {
 						Log.d(TAG, "Quickload file not found!")
 						toast(R.string.quickload_warning)
 					} else {
-						val (settings, rom) = quickloadFile.readLines()
+						val (settings, rom, hack) = quickloadFile.readText().split('\n')
+						if (hack.isNotBlank()) loadCustomOffsets(hack)
 						RandomizerSettings.loadRom(File(filesDir, rom))
 						RandomizerSettings.updateFromString(settings)
 						name = rom

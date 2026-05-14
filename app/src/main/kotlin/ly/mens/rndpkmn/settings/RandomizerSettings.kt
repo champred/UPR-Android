@@ -10,7 +10,6 @@ import com.dabomstew.pkrandom.pokemon.Pokemon
 import com.dabomstew.pkrandom.romhandlers.*
 import ly.mens.rndpkmn.BuildConfig
 import ly.mens.rndpkmn.Trie
-import ly.mens.rndpkmn.fileName
 import ly.mens.rndpkmn.makeTriple
 import java.io.*
 import java.lang.NumberFormatException
@@ -54,7 +53,7 @@ object RandomizerSettings : Settings() {
 	val currentGen: Int
 		get() {
 			return if (RandomizerSettings::romHandler.isInitialized) {
-				if (useNatDex) 9
+				if (Gen3RomHandler.useNatDex) 9
 				else romHandler.generationOfPokemon()
 			} else 0
 		}
@@ -88,9 +87,9 @@ object RandomizerSettings : Settings() {
 		}
 		field = value
 	}
-	var useNatDex = false
+	var hackName: String? = null
 		set(value) {
-			Gen3RomHandler.useNatDex = value
+			Gen3RomHandler.useNatDex = value?.startsWith("NatDex") ?: false
 			field = value
 		}
 

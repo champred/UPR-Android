@@ -26,7 +26,7 @@ enum class SettingsPreset {
 		override val preset: String? get() {
 			AbstractRomHandler.useSmartAI = false;
 			return with(RandomizerSettings) {
-				if (useNatDex) {
+				if (currentGen == 9) {
 					selected = true
 					val starters = pickStarters(handler!!, RandomSource.instance())
 					currentStarters = makeTriple(*starters.toTypedArray())
