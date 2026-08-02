@@ -103,7 +103,7 @@ fun RomButtons(scaffold: ScaffoldState, romFileName: MutableState<String?>) {
 				if (!RandomizerSettings.isValid) {
 					scaffold.snackbarHostState.showSnackbar(ctx.getString(R.string.error_not_clean))
 				}
-				SettingsPreset.entries.forEach {
+				SettingsPreset.entries.drop(1).forEach {
 					try {
 						val dir = File("rnqs", romHacks[selectedIndex])
 						val prefix = if ("Fire" in RandomizerSettings.romName) "FR" else "EM"

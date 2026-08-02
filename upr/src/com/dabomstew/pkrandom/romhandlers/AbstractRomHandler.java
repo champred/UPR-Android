@@ -3438,7 +3438,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                 // Roost 5 PP
                 updateMovePP(moves, Moves.roost, 5);
             }
-            
+
             if (generationOfPokemon() >= 7) {
                 // Shore Up 5 PP
                 updateMovePP(moves, Moves.shoreUp, 5);
@@ -3781,7 +3781,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         allBanned.addAll(this.getIllegalMoves());
 
         for (Move mv : allMoves) {
-            if (mv != null && !GlobalConstants.bannedRandomMoves[mv.number] && !allBanned.contains(mv.number) && mv.valid) {
+            if (mv != null && !GlobalConstants.bannedRandomMoves[mv.number] && !allBanned.contains(mv.number) && mv.valid && mv.pp > 0) {
                 validMoves.add(mv);
                 if (mv.type != null) {
                     if (!validTypeMoves.containsKey(mv.type)) {
@@ -3840,7 +3840,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                         .filter(mv -> mv.power * mv.hitCount > finalAvgPowerForType)
                         .collect(Collectors.toList());
                 if (strongerThanAvgTypeMoves.isEmpty()) break;
-                if (alreadyPicked.containsAll(strongerThanAvgTypeMoves)) {
+                if (new HashSet<>(alreadyPicked).containsAll(strongerThanAvgTypeMoves)) {
                     alreadyPicked = new ArrayList<>();
                 } else {
                     strongerThanAvgTypeMoves.removeAll(alreadyPicked);
@@ -3860,7 +3860,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                         .filter(mv -> mv.power * mv.hitCount < finalAvgPowerForType)
                         .collect(Collectors.toList());
                 if (weakerThanAvgTypeMoves.isEmpty()) break;
-                if (alreadyPicked.containsAll(weakerThanAvgTypeMoves)) {
+                if (new HashSet<>(alreadyPicked).containsAll(weakerThanAvgTypeMoves)) {
                     alreadyPicked = new ArrayList<>();
                 } else {
                     weakerThanAvgTypeMoves.removeAll(alreadyPicked);
@@ -5696,7 +5696,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                         }
                     }
 
-                    if (!alreadyPicked.containsAll(replacements) && !similarStrength) {
+                    if (!new HashSet<>(alreadyPicked).containsAll(replacements) && !similarStrength) {
                         replacements.removeAll(alreadyPicked);
                     }
 

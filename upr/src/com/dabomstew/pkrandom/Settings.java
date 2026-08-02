@@ -250,9 +250,6 @@ public class Settings {
         if (((version >> 24) & 0xFF) > 0 && ((version >> 24) & 0xFF) <= 172) {
             throw new UnsupportedOperationException("The settings file is too old to update and cannot be loaded.");
         }
-        if (version > VERSION) {
-            throw new UnsupportedOperationException("Cannot read settings from a newer version of the randomizer.");
-        }
         nread = in.read(lengthBytes);
         if (nread < 4) {
             throw new UnsupportedOperationException("Error reading settings length from settings string.");

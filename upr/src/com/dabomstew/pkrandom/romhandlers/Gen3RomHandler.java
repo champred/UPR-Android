@@ -821,6 +821,10 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         int numInternalPokes = romEntry.getValue("PokemonCount");
         pokesInternal = new Pokemon[numInternalPokes + 1];
         int offs = romEntry.getValue("PokemonStats");
+        int sz = Gen3Constants.baseStatsEntrySize;
+        if (useNatDex && romEntry.name.contains("1.2")) { // struct is larger
+            sz += 8;
+        }
         for (int i = 1; i <= numInternalPokes; i++) {
             Pokemon pk = new Pokemon();
             pk.name = pokeNames[i];
@@ -829,8 +833,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 pokes[pk.number] = pk;
             }
             pokesInternal[i] = pk;
-            int pkoffs = offs + i * Gen3Constants.baseStatsEntrySize;
-            loadBasicPokeStats(pk, pkoffs);
+            loadBasicPokeStats(pk, offs + i * sz);
         }
 
         // In these games, the alternate formes of Deoxys have hardcoded stats that are used 99% of the time;
@@ -858,11 +861,15 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         int nameLen = romEntry.getValue("PokemonNameLength");
         int offs2 = romEntry.getValue("PokemonStats");
         int numInternalPokes = romEntry.getValue("PokemonCount");
+        int sz = Gen3Constants.baseStatsEntrySize;
+        if (useNatDex && romEntry.name.contains("1.2")) { // struct is larger
+            sz += 8;
+        }
         for (int i = 1; i <= numInternalPokes; i++) {
             Pokemon pk = pokesInternal[i];
             int stringOffset = offs + i * nameLen;
             writeFixedLengthString(pk.name, stringOffset, nameLen);
-            saveBasicPokeStats(pk, offs2 + i * Gen3Constants.baseStatsEntrySize);
+            saveBasicPokeStats(pk, offs2 + i * sz);
         }
 
         // Make sure to write to the hardcoded Deoxys stat location, since otherwise it will just have vanilla
@@ -897,6 +904,9 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             moves[i].number = i;
             moves[i].internalId = i;
             moves[i].effectIndex = rom[offs + i * 0xC] & 0xFF;
+//            if (useNatDex && romEntry.name.contains("1.2")) { // index is 2 bytes
+//                moves[i].effectIndex = readWord(offs + i * 0xC + 10);
+//            }
             moves[i].hitratio = ((rom[offs + i * 0xC + 3] & 0xFF));
             moves[i].power = rom[offs + i * 0xC + 1] & 0xFF;
             moves[i].pp = rom[offs + i * 0xC + 4] & 0xFF;
@@ -1290,6 +1300,9 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         int moveCount = romEntry.getValue("MoveCount");
         int offs = romEntry.getValue("MoveData");
         for (int i = 1; i <= moveCount; i++) {
+//            if (useNatDex && romEntry.name.contains("1.2")) { // index is 2 bytes
+//                writeWord(offs + i * 0xC + 10, moves[i].effectIndex);
+//            }
             rom[offs + i * 0xC] = (byte) moves[i].effectIndex;
             rom[offs + i * 0xC + 1] = (byte) moves[i].power;
             rom[offs + i * 0xC + 2] = Gen3Constants.typeToByte(moves[i].type);
@@ -1338,6 +1351,10 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         // Abilities
         pkmn.ability1 = rom[offset + Gen3Constants.bsAbility1Offset] & 0xFF;
         pkmn.ability2 = rom[offset + Gen3Constants.bsAbility2Offset] & 0xFF;
+        if (useNatDex && romEntry.name.contains("1.2")) { // abilities are 2 bytes
+            pkmn.ability1 = readWord(offset + Gen3Constants.bsAbility1Offset);
+            pkmn.ability2 = readWord(offset + Gen3Constants.bsAbility2Offset + 1);
+        }
 
         // Held Items?
         int item1 = readWord(offset + Gen3Constants.bsCommonHeldItemOffset);
@@ -1375,11 +1392,11 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         rom[offset + Gen3Constants.bsGrowthCurveOffset] = pkmn.growthCurve.toByte();
 
         rom[offset + Gen3Constants.bsAbility1Offset] = (byte) pkmn.ability1;
-        if (pkmn.ability2 == 0) {
-            // required to not break evos with random ability
-            rom[offset + Gen3Constants.bsAbility2Offset] = (byte) pkmn.ability1;
-        } else {
-            rom[offset + Gen3Constants.bsAbility2Offset] = (byte) pkmn.ability2;
+        int secondAbility = (pkmn.ability2 == 0) ? pkmn.ability1 : pkmn.ability2;
+        rom[offset + Gen3Constants.bsAbility2Offset] = (byte) secondAbility;
+        if (useNatDex && romEntry.name.contains("1.2")) { // abilities are 2 bytes
+            writeWord(offset + Gen3Constants.bsAbility1Offset, pkmn.ability1);
+            writeWord(offset + Gen3Constants.bsAbility2Offset + 1, secondAbility);
         }
 
         // Held items
@@ -1914,7 +1931,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 for (int poke = 0; poke < numPokes; poke++) {
                     TrainerPokemon thisPoke = new TrainerPokemon();
                     thisPoke.IVs = ((readWord(pointerToPokes + poke * 8) & 0xFF) * 31) / 255;
-                    thisPoke.level = readWord(pointerToPokes + poke * 8 + 2);
+                    thisPoke.level = readWord(pointerToPokes + poke * 8 + 2) & 0xff;
+                    thisPoke.abilitySlot = (readWord(pointerToPokes + poke * 8 + 3) & 0x03);
                     thisPoke.pokemon = pokesInternal[readWord(pointerToPokes + poke * 8 + 4)];
                     tr.pokemon.add(thisPoke);
                 }
@@ -1923,7 +1941,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 for (int poke = 0; poke < numPokes; poke++) {
                     TrainerPokemon thisPoke = new TrainerPokemon();
                     thisPoke.IVs = ((readWord(pointerToPokes + poke * 8) & 0xFF) * 31) / 255;
-                    thisPoke.level = readWord(pointerToPokes + poke * 8 + 2);
+                    thisPoke.level = readWord(pointerToPokes + poke * 8 + 2) & 0xff;
+                    thisPoke.abilitySlot = (readWord(pointerToPokes + poke * 8 + 3) & 0x03);
                     thisPoke.pokemon = pokesInternal[readWord(pointerToPokes + poke * 8 + 4)];
                     thisPoke.heldItem = readWord(pointerToPokes + poke * 8 + 6);
                     tr.pokemon.add(thisPoke);
@@ -1933,7 +1952,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 for (int poke = 0; poke < numPokes; poke++) {
                     TrainerPokemon thisPoke = new TrainerPokemon();
                     thisPoke.IVs = ((readWord(pointerToPokes + poke * 16) & 0xFF) * 31) / 255;
-                    thisPoke.level = readWord(pointerToPokes + poke * 16 + 2);
+                    thisPoke.level = readWord(pointerToPokes + poke * 16 + 2) & 0xff;
+                    thisPoke.abilitySlot = (readWord(pointerToPokes + poke * 16 + 3) & 0x03);
                     thisPoke.pokemon = pokesInternal[readWord(pointerToPokes + poke * 16 + 4)];
                     for (int move = 0; move < 4; move++) {
                         thisPoke.moves[move] = readWord(pointerToPokes + poke * 16 + 6 + (move*2));
@@ -1945,7 +1965,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 for (int poke = 0; poke < numPokes; poke++) {
                     TrainerPokemon thisPoke = new TrainerPokemon();
                     thisPoke.IVs = ((readWord(pointerToPokes + poke * 16) & 0xFF) * 31) / 255;
-                    thisPoke.level = readWord(pointerToPokes + poke * 16 + 2);
+                    thisPoke.level = readWord(pointerToPokes + poke * 16 + 2) & 0xff;
+                    thisPoke.abilitySlot = (readWord(pointerToPokes + poke * 16 + 3) & 0x03);
                     thisPoke.pokemon = pokesInternal[readWord(pointerToPokes + poke * 16 + 4)];
                     thisPoke.heldItem = readWord(pointerToPokes + poke * 16 + 6);
                     for (int move = 0; move < 4; move++) {
@@ -2074,7 +2095,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                     TrainerPokemon tp = pokes.next();
                     // Add 1 to offset integer division truncation
                     writeWord(pointerToPokes + poke * 16, Math.min(255, 1 + (tp.IVs * 255) / 31));
-                    writeWord(pointerToPokes + poke * 16 + 2, tp.level);
+                    rom[pointerToPokes + poke * 16 + 2] = (byte) tp.level;
+                    rom[pointerToPokes + poke * 16 + 3] = (byte) tp.abilitySlot;
                     writeWord(pointerToPokes + poke * 16 + 4, pokedexToInternal[tp.pokemon.number]);
                     int movesStart;
                     if (tr.pokemonHaveItems()) {
@@ -2101,7 +2123,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 for (int poke = 0; poke < newPokeCount; poke++) {
                     TrainerPokemon tp = pokes.next();
                     writeWord(pointerToPokes + poke * 8, Math.min(255, 1 + (tp.IVs * 255) / 31));
-                    writeWord(pointerToPokes + poke * 8 + 2, tp.level);
+                    rom[pointerToPokes + poke * 8 + 2] = (byte) tp.level;
+                    rom[pointerToPokes + poke * 8 + 3] = (byte) tp.abilitySlot;
                     writeWord(pointerToPokes + poke * 8 + 4, pokedexToInternal[tp.pokemon.number]);
                     if (tr.pokemonHaveItems()) {
                         writeWord(pointerToPokes + poke * 8 + 6, tp.heldItem);
@@ -2196,11 +2219,14 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                     moveDataLoc += 3;
                 }
             } else {
-                while ((rom[moveDataLoc] & 0xFF) != 0xFF || (rom[moveDataLoc + 1] & 0xFF) != 0xFF) {
-                    int move = (rom[moveDataLoc] & 0xFF);
-                    int level = (rom[moveDataLoc + 1] & 0xFE) >> 1;
-                    if ((rom[moveDataLoc + 1] & 0x01) == 0x01) {
-                        move += 0x100;
+                int levelupMove;
+                while ((levelupMove = readWord(moveDataLoc)) != 0xFFFF) {
+                    int move = (levelupMove & 0x1FF);
+                    int level = (levelupMove & 0xFE00) >> 9;
+                    if (useNatDex && romEntry.name.contains("1.2")) { // each value is 2 bytes
+                        move = levelupMove;
+                        level = readWord(moveDataLoc+2);
+                        moveDataLoc += 2;
                     }
                     MoveLearnt ml = new MoveLearnt();
                     ml.level = level;
@@ -2225,17 +2251,19 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             List<MoveLearnt> moves = movesets.get(pkmn.number);
             int newMoveCount = moves.size();
             int mloc = moveDataLoc;
-            int entrySize;
+            int entrySize = 2;
+            if (useNatDex && romEntry.name.contains("1.2")) { // each value is 2 bytes
+                entrySize += 2;
+            }
             if (jamboMovesetHack) {
-                while ((rom[mloc] & 0xFF) != 0x00 || (rom[mloc + 1] & 0xFF) != 0x00 || (rom[mloc + 2] & 0xFF) != 0xFF) {
-                    mloc += 3;
-                }
                 entrySize = 3;
-            } else {
-                while ((rom[mloc] & 0xFF) != 0xFF || (rom[mloc + 1] & 0xFF) != 0xFF) {
-                    mloc += 2;
+                while ((rom[mloc] & 0xFF) != 0x00 || (rom[mloc + 1] & 0xFF) != 0x00 || (rom[mloc + 2] & 0xFF) != 0xFF) {
+                    mloc += entrySize;
                 }
-                entrySize = 2;
+            } else {
+                while (readWord(mloc) != 0xFFFF) {
+                    mloc += entrySize;
+                }
             }
             int currentMoveCount = (mloc - moveDataLoc) / entrySize;
 
@@ -2284,6 +2312,10 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             writeWord(offset, ml.move);
             rom[offset + 2] = (byte) ml.level;
             return 3;
+        } else if (useNatDex && romEntry.name.contains("1.2")) {
+            writeWord(offset, ml.move);
+            writeWord(offset+2, ml.level);
+            return 4;
         } else {
             rom[offset] = (byte) (ml.move & 0xFF);
             int levelPart = (ml.level << 1) & 0xFE;
@@ -3704,8 +3736,13 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     @Override
     public int getAbilityForTrainerPokemon(TrainerPokemon tp) {
-        // In Gen 3, Trainer Pokemon *always* use the first Ability, no matter what
-        return tp.pokemon.ability1;
+        // modified so that trainers can decide their ability
+        Pokemon pkmn = tp.pokemon;
+        if (tp.abilitySlot == 2 || tp.abilitySlot == 6) {
+            return pkmn.ability2;
+        } else {
+            return pkmn.ability1;
+        }
     }
 
     @Override
@@ -4110,10 +4147,13 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             IngameTrade trade = new IngameTrade();
             int entryOffset = tableOffset + entry * entryLength;
             trade.nickname = readVariableLengthString(entryOffset);
-            trade.givenPokemon = pokesInternal[readWord(entryOffset + 12)];
+            int off = entryOffset + 12;
+            if (useNatDex && romEntry.name.contains("1.2")) off += 2;
+            trade.givenPokemon = pokesInternal[readWord(off)];
+            off += 2;
             trade.ivs = new int[6];
             for (int i = 0; i < 6; i++) {
-                trade.ivs[i] = rom[entryOffset + 14 + i] & 0xFF;
+                trade.ivs[i] = rom[off + i] & 0xFF;
             }
             trade.otId = readWord(entryOffset + 24);
             trade.item = readWord(entryOffset + 40);
@@ -4143,10 +4183,13 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             }
             IngameTrade trade = trades.get(tradeOffset++);
             int entryOffset = tableOffset + entry * entryLength;
-            writeFixedLengthString(trade.nickname, entryOffset, 12);
-            writeWord(entryOffset + 12, pokedexToInternal[trade.givenPokemon.number]);
+            int len = 12;
+            if (useNatDex && romEntry.name.contains("1.2")) len += 2;
+            writeFixedLengthString(trade.nickname, entryOffset, len);
+            writeWord(entryOffset + len, pokedexToInternal[trade.givenPokemon.number]);
+            len += 2;
             for (int i = 0; i < 6; i++) {
-                rom[entryOffset + 14 + i] = (byte) trade.ivs[i];
+                rom[entryOffset + len + i] = (byte) trade.ivs[i];
             }
             writeWord(entryOffset + 24, trade.otId);
             writeWord(entryOffset + 40, trade.item);
@@ -4258,7 +4301,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             nonBadItems.banSingles(Gen3Items.luckyEgg);
         } else if (tweak == MiscTweak.RANDOMIZE_PC_POTION) {
             randomizePCPotion();
-        } else if (tweak == MiscTweak.RUN_WITHOUT_RUNNING_SHOES) {
+        } else if (tweak == MiscTweak.RUN_WITHOUT_RUNNING_SHOES && !useNatDex) {
             applyRunWithoutRunningShoesPatch();
         } else if (tweak == MiscTweak.BALANCE_STATIC_LEVELS) {
             int[] fossilLevelOffsets = romEntry.arrayEntries.get("FossilLevelOffsets");

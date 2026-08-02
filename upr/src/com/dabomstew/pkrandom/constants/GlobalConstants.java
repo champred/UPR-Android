@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 
 public class GlobalConstants {
 
-    public static final boolean[] bannedRandomMoves = new boolean[827], bannedForDamagingMove = new boolean[827];
+    public static final boolean[] bannedRandomMoves = new boolean[848], bannedForDamagingMove = new boolean[848];
     static {
         bannedRandomMoves[Moves.struggle] = true; //  self explanatory
 
