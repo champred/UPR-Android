@@ -515,19 +515,19 @@ public class Gen3Constants {
     }
 
     private static void setupAllowedItems() {
-        allowedItems = new ItemList(Gen3Items.oldSeaMap);
+        allowedItems = new ItemList(Gen3Items.prisonBottle);
         // Key items (+1 unknown item)
         allowedItems.banRange(Gen3Items.machBike, 30);
-        allowedItems.banRange(Gen3Items.oaksParcel, 28);
+        allowedItems.banRange(Gen3Items.oaksParcel, 30);
         // Unknown blank items
-        allowedItems.banRange(Gen3Items.unknown52, 11);
+        allowedItems.banRange(Gen3Items.regionalMineral, 11);
         allowedItems.banRange(Gen3Items.unknown87, 6);
         allowedItems.banRange(Gen3Items.unknown99, 4);
         allowedItems.banRange(Gen3Items.unknown112, 9);
         allowedItems.banRange(Gen3Items.unknown176, 3);
         allowedItems.banRange(Gen3Items.unknown226, 28);
         allowedItems.banRange(Gen3Items.unknown347, 2);
-        allowedItems.banSingles(Gen3Items.unknown72, Gen3Items.unknown82, Gen3Items.unknown105, Gen3Items.unknown267);
+        allowedItems.banSingles(Gen3Items.unknown72, Gen3Items.xSpDef, Gen3Items.unknown105, Gen3Items.unknown267);
         // HMs
         allowedItems.banRange(Gen3Items.hm01, 8);
         // TMs
@@ -1002,7 +1002,7 @@ public class Gen3Constants {
             {Gen3Items.blueShard, 40},
             {Gen3Items.yellowShard, 40},
             {Gen3Items.greenShard, 40},
-            {Gen3Items.unknown52, 0},
+            {Gen3Items.regionalMineral, 300},
             {Gen3Items.unknown53, 0},
             {Gen3Items.unknown54, 0},
             {Gen3Items.unknown55, 0},
@@ -1032,7 +1032,7 @@ public class Gen3Constants {
             {Gen3Items.xSpecial, 35},
             {Gen3Items.pokeDoll, 100},
             {Gen3Items.fluffyTail, 100},
-            {Gen3Items.unknown82, 0},
+            {Gen3Items.xSpDef, 35},
             {Gen3Items.superRepel, 50},
             {Gen3Items.maxRepel, 70},
             {Gen3Items.escapeRope, 55},
@@ -1327,5 +1327,7 @@ public class Gen3Constants {
             {Gen3Items.sapphire, 0},
             {Gen3Items.magmaEmblem, 0},
             {Gen3Items.oldSeaMap, 0},
+            {Gen3Items.gracidea, 0},
+            {Gen3Items.prisonBottle, 0}
     }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
 }

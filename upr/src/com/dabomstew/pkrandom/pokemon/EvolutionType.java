@@ -25,6 +25,8 @@ package com.dabomstew.pkrandom.pokemon;
 /*--  along with this program. If not, see <http://www.gnu.org/licenses/>.  --*/
 /*----------------------------------------------------------------------------*/
 
+import com.dabomstew.pkrandom.constants.Gen3Constants;
+import com.dabomstew.pkrandom.constants.Gen3Items;
 import com.dabomstew.pkrandom.romhandlers.Gen3RomHandler;
 
 public enum EvolutionType {
@@ -93,7 +95,7 @@ public enum EvolutionType {
         @Override
         public int toIndex(int generation) {
             if (Gen3RomHandler.useNatDex) {
-                indexNumbers = new int[]{-1, -1, 18, 16, 17, 17, 17};
+                indexNumbers[2] = 18;
             }
             return super.toIndex(generation);
         }
@@ -102,7 +104,7 @@ public enum EvolutionType {
         @Override
         public int toIndex(int generation) {
             if (Gen3RomHandler.useNatDex) {
-                indexNumbers = new int[]{-1, -1, 19, 17, 18, 18, 18};
+                indexNumbers[2] = 19;
             }
             return super.toIndex(generation);
         }
@@ -117,7 +119,7 @@ public enum EvolutionType {
         @Override
         public int toIndex(int generation) {
             if (Gen3RomHandler.useNatDex) {
-                indexNumbers = new int[]{-1, -1, 17, 22, 23, 23, 23};
+                indexNumbers[2] = 17;
             }
             return super.toIndex(generation);
         }
@@ -130,7 +132,7 @@ public enum EvolutionType {
         @Override
         public int toIndex(int generation) {
             if (Gen3RomHandler.useNatDex) {
-                indexNumbers = new int[]{-1, -1, 16, 23, 24, 24, 24};
+                indexNumbers[2] = 16;
             }
             return super.toIndex(generation);
         }
@@ -224,6 +226,28 @@ public enum EvolutionType {
         @Override
         public boolean skipSplitEvo() {
             return true;
+        }
+    },
+    LEVEL_REGIONAL_ROCK(-1, -1, -1, -1, -1, -1, -1) {
+        @Override
+        public int toIndex(int generation) {
+            if (Gen3RomHandler.useNatDex && Gen3Constants.allowedItems.isAllowed(Gen3Items.regionalMineral)) {
+                indexNumbers[2] = 22;
+            }
+            return super.toIndex(generation);
+        }
+        @Override
+        public boolean usesLevel() {
+            return true;
+        }
+    },
+    STONE_REGIONAL_ROCK(-1, -1, -1, -1, -1, -1, -1) {
+        @Override
+        public int toIndex(int generation) {
+            if (Gen3RomHandler.useNatDex && Gen3Constants.allowedItems.isAllowed(Gen3Items.regionalMineral)) {
+                indexNumbers[2] = 23;
+            }
+            return super.toIndex(generation);
         }
     },
     NONE(-1, -1, -1, -1, -1, -1, -1);

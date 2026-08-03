@@ -78,7 +78,7 @@ public class Gen3Items {
     public static final int blueShard = 49;
     public static final int yellowShard = 50;
     public static final int greenShard = 51;
-    public static final int unknown52 = 52;
+    public static final int regionalMineral = 52;
     public static final int unknown53 = 53;
     public static final int unknown54 = 54;
     public static final int unknown55 = 55;
@@ -108,7 +108,7 @@ public class Gen3Items {
     public static final int xSpecial = 79;
     public static final int pokeDoll = 80;
     public static final int fluffyTail = 81;
-    public static final int unknown82 = 82;
+    public static final int xSpDef = 82;
     public static final int superRepel = 83;
     public static final int maxRepel = 84;
     public static final int escapeRope = 85;
@@ -412,4 +412,6 @@ public class Gen3Items {
     /* Exclusive to Emerald */
     public static final int magmaEmblem = 375;
     public static final int oldSeaMap = 376;
+    public static final int gracidea = 377;
+    public static final int prisonBottle = 378;
 }

@@ -509,12 +509,16 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             allowedItems.unbanRange(Gen3Items.unknown99, 4);
             allowedItems.unbanRange(Gen3Items.unknown226, 1);
             nonBadItems.unbanRange(Gen3Items.figyBerry, 5);
-            if (romEntry.name.contains("1.1.0")) {
+            if (romEntry.name.contains("1.1")) {
                 Gen3Constants.allHeldItems.add(Gen3Items.razorClaw);
                 Gen3Constants.allHeldItems.add(Gen3Items.razorFang);
                 Gen3Constants.generalPurposeItems.add(Gen3Items.razorClaw);
                 Gen3Constants.generalPurposeItems.add(Gen3Items.razorFang);
                 allowedItems.unbanRange(Gen3Items.dubiousDisc, 4);
+            } else if (romEntry.name.contains("1.2")) {
+                allowedItems.unbanRange(Gen3Items.xSpDef, 1);
+                allowedItems.unbanRange(Gen3Items.regionalMineral, 1);
+                Gen3Constants.allowedItems = allowedItems.copy();
             }
             if (romEntry.romType == Gen3Constants.RomType_Em) {
                 nonBadItems.banRange(Gen3Items.tinyMushroom, 8);
@@ -3916,6 +3920,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         int bankCount = romEntry.getValue("MapBankCount");
         int[] bankMapCounts = romEntry.arrayEntries.get("MapBankSizes");
         int itemBall = romEntry.getValue("ItemBallPic");
+        int tmBall = romEntry.getValue("TMBallPic");
         mapNames = new String[bankCount][];
         int mbpsOffset = romEntry.getValue("MapHeaders");
         int mapLabels = romEntry.getValue("MapLabels");
@@ -3951,7 +3956,11 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                         int peopleOffset = readPointer(eventOffset + 4);
                         for (int p = 0; p < pCount; p++) {
                             int pSprite = rom[peopleOffset + p * 24 + 1];
-                            if (pSprite == itemBall && readPointer(peopleOffset + p * 24 + 16) >= 0) {
+                            if (useNatDex && romEntry.name.contains("1.2")) { // ids are 2 bytes
+                                pSprite = (rom[peopleOffset + p * 24 + 2] & 0xFF)
+                                        | (rom[peopleOffset + p * 24 + 3] << 8);
+                            }
+                            if ((pSprite == itemBall || (pSprite == tmBall && tmBall != 0)) && readPointer(peopleOffset + p * 24 + 16) >= 0) {
                                 // Get script and look inside
                                 int scriptOffset = readPointer(peopleOffset + p * 24 + 16);
                                 if (rom[scriptOffset] == 0x1A && rom[scriptOffset + 1] == 0x00
