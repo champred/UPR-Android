@@ -27,6 +27,7 @@ package com.dabomstew.pkrandom.romhandlers;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -1575,7 +1576,11 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         } else {
             // do something else
             Pokemon starter1 = pokesInternal[readWord(baseOffset)];
-            if (useNatDex) baseOffset -= 12;
+            if (useNatDex) {
+                baseOffset -= 12;
+                if (romEntry.name.contains("1.2"))
+                    baseOffset += 8;
+            }
             Pokemon starter2 = pokesInternal[readWord(baseOffset + Gen3Constants.frlgStarter2Offset)];
             Pokemon starter3 = pokesInternal[readWord(baseOffset + Gen3Constants.frlgStarter3Offset)];
             starters.add(starter1);
@@ -1612,14 +1617,16 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             // order: 0, 1, 2
             writeWord(baseOffset, starter0);
             writeWord(baseOffset + Gen3Constants.frlgStarterRepeatOffset, starter1);
-
+            if (useNatDex) {
+                baseOffset -= 12;
+                if (romEntry.name.contains("1.2"))
+                    baseOffset += 8;
+            }
             int offset2 = baseOffset + Gen3Constants.frlgStarter2Offset;
-            if (useNatDex) offset2 -= 12;
             writeWord(offset2, starter1);
             writeWord(offset2 + Gen3Constants.frlgStarterRepeatOffset, starter2);
 
             int offset3 = baseOffset + Gen3Constants.frlgStarter3Offset;
-            if (useNatDex) offset3 -= 12;
             writeWord(offset3, starter2);
             writeWord(offset3 + Gen3Constants.frlgStarterRepeatOffset, starter0);
 
@@ -1627,13 +1634,22 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 // Update PROF. Oak's descriptions for each starter
                 // First result for each STARTERNAME is the text we need
                 int begin = 0, end = rom.length;
+                UnaryOperator<String> transform = String::toUpperCase;
                 if (useNatDex) {
                     begin = 0xA000D0;
                     end = 0xA7FFFF;
+                    if (romEntry.name.contains("1.2")) {
+                        begin = romEntry.getValue("EventScriptsStart");
+                        end = romEntry.getValue("EventScriptsEnd");
+                        transform = UnaryOperator.identity();
+                    }
                 }
-                List<Integer> bulbasaurFoundTexts = RomFunctions.search(rom, begin, end, translateString(pokes[Gen3Constants.frlgBaseStarter1].name.toUpperCase()));
-                List<Integer> charmanderFoundTexts = RomFunctions.search(rom, begin, end, translateString(pokes[Gen3Constants.frlgBaseStarter2].name.toUpperCase()));
-                List<Integer> squirtleFoundTexts = RomFunctions.search(rom, begin, end, translateString(pokes[Gen3Constants.frlgBaseStarter3].name.toUpperCase()));
+                String name = pokes[Gen3Constants.frlgBaseStarter1].name;
+                List<Integer> bulbasaurFoundTexts = RomFunctions.search(rom, begin, end, translateString(transform.apply(name)));
+                name = pokes[Gen3Constants.frlgBaseStarter2].name;
+                List<Integer> charmanderFoundTexts = RomFunctions.search(rom, begin, end, translateString(transform.apply(name)));
+                name = pokes[Gen3Constants.frlgBaseStarter3].name;
+                List<Integer> squirtleFoundTexts = RomFunctions.search(rom, begin, end, translateString(transform.apply(name)));
                 writeFRLGStarterText(bulbasaurFoundTexts, newStarters.get(0), "you want to go with\\nthe ");
                 writeFRLGStarterText(charmanderFoundTexts, newStarters.get(1), "you’re claiming the\\n");
                 writeFRLGStarterText(squirtleFoundTexts, newStarters.get(2), "you’ve decided on the\\n");
@@ -3456,7 +3472,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     public List<PickupItem> getPickupItems() {
         List<PickupItem> pickupItems = new ArrayList<>();
         int pickupItemCount = romEntry.getValue("PickupItemCount");
-        int sizeOfPickupEntry = romEntry.romType == Gen3Constants.RomType_Em ? 2 : 4;
+        int sizeOfPickupEntry = (romEntry.romType == Gen3Constants.RomType_Em || (useNatDex && romEntry.name.contains("1.2"))) ? 2 : 4;
 
         // If we haven't found the pickup table for this ROM already, find it.
         if (pickupItemsTableOffset == 0) {
@@ -3522,7 +3538,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     @Override
     public void setPickupItems(List<PickupItem> pickupItems) {
-        int sizeOfPickupEntry = romEntry.romType == Gen3Constants.RomType_Em ? 2 : 4;
+        int sizeOfPickupEntry = (romEntry.romType == Gen3Constants.RomType_Em || (useNatDex && romEntry.name.contains("1.2"))) ? 2 : 4;
         if (pickupItemsTableOffset > 0) {
             for (int i = 0; i < pickupItems.size(); i++) {
                 int itemOffset = pickupItemsTableOffset + (sizeOfPickupEntry * i);
