@@ -3775,13 +3775,18 @@ public abstract class AbstractRomHandler implements RomHandler {
         List<Move> allMoves = this.getMoves();
         List<Integer> hms = this.getHMMoves();
         Set<Integer> allBanned = new HashSet<Integer>(noBroken ? this.getGameBreakingMoves() : Collections.EMPTY_SET);
-        allBanned.addAll(hms);
+        if (this instanceof Gen3RomHandler) {
+            Gen3RomHandler rh = (Gen3RomHandler) this;
+            if (!Gen3RomHandler.useNatDex || rh.getROMName().contains("1.1.0"))
+                allBanned.addAll(hms);
+        } else
+            allBanned.addAll(hms);
         allBanned.addAll(this.getMovesBannedFromLevelup());
         allBanned.addAll(GlobalConstants.zMoves);
         allBanned.addAll(this.getIllegalMoves());
 
         for (Move mv : allMoves) {
-            if (mv != null && !GlobalConstants.bannedRandomMoves[mv.number] && !allBanned.contains(mv.number) && mv.valid && mv.pp > 0) {
+            if (mv != null && !GlobalConstants.bannedRandomMoves[mv.number] && !allBanned.contains(mv.number) && mv.valid) {
                 validMoves.add(mv);
                 if (mv.type != null) {
                     if (!validTypeMoves.containsKey(mv.type)) {
@@ -4539,7 +4544,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
         for (Move mv : usableMoves) {
             if (GlobalConstants.bannedRandomMoves[mv.number] || GlobalConstants.zMoves.contains(mv.number) ||
-                    hms.contains(mv.number) || banned.contains(mv.number)) {
+                    hms.contains(mv.number) || banned.contains(mv.number) || !mv.valid) {
                 unusableMoves.add(mv);
             } else if (GlobalConstants.bannedForDamagingMove[mv.number] || !mv.isGoodDamaging(perfectAccuracy)) {
                 unusableDamagingMoves.add(mv);

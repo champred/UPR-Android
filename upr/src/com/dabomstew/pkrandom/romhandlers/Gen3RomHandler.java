@@ -909,9 +909,9 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             moves[i].number = i;
             moves[i].internalId = i;
             moves[i].effectIndex = rom[offs + i * 0xC] & 0xFF;
-//            if (useNatDex && romEntry.name.contains("1.2")) { // index is 2 bytes
-//                moves[i].effectIndex = readWord(offs + i * 0xC + 10);
-//            }
+            if (useNatDex && romEntry.name.contains("1.2")) { // index is 2 bytes
+                moves[i].effectIndex = readWord(offs + i * 0xC + 10);
+            }
             moves[i].hitratio = ((rom[offs + i * 0xC + 3] & 0xFF));
             moves[i].power = rom[offs + i * 0xC + 1] & 0xFF;
             moves[i].pp = rom[offs + i * 0xC + 4] & 0xFF;
@@ -930,6 +930,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 int mask = (flags & 0b1100_0000) >> 6;
                 moves[i].category = MoveCategory.values()[mask - 1];
                 isRomHack = true;
+            } else if (useNatDex && romEntry.name.contains("1.2")) {
+                moves[i].valid = moves[i].effectIndex != 214; // EFFECT_PLACEHOLDER
             }
 
             if (i == Moves.swift) {
@@ -1305,9 +1307,9 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         int moveCount = romEntry.getValue("MoveCount");
         int offs = romEntry.getValue("MoveData");
         for (int i = 1; i <= moveCount; i++) {
-//            if (useNatDex && romEntry.name.contains("1.2")) { // index is 2 bytes
-//                writeWord(offs + i * 0xC + 10, moves[i].effectIndex);
-//            }
+            if (useNatDex && romEntry.name.contains("1.2")) { // index is 2 bytes
+                writeWord(offs + i * 0xC + 10, moves[i].effectIndex);
+            }
             rom[offs + i * 0xC] = (byte) moves[i].effectIndex;
             rom[offs + i * 0xC + 1] = (byte) moves[i].power;
             rom[offs + i * 0xC + 2] = Gen3Constants.typeToByte(moves[i].type);
